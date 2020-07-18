@@ -6,9 +6,10 @@ Baze language, very simple artificial language.
 
 Choose your language.
 
-- [English](/docs/en-us/summary.md)
+- [Baze](/docs/bz/summary.md)
+- [English](/docs/en/summary.md)
 - [Esperanto](/docs/eo/summary.md)
-- [日本語](/docs/ja-jp/summary.md)
+- [日本語](/docs/ja/summary.md)
 
 ## Contact
 
