@@ -2,6 +2,10 @@
 
 Baze language, very simple artificial language.
 
+## GitHub Repository
+
+- [Garnet3106/bazelinga](https://github.com/Garnet3106/bazelinga)
+
 ## Documents
 
 Choose your language.
