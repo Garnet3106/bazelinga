@@ -6,7 +6,7 @@ Baze language, very simple artificial language.
 
 Choose your language.
 
-- [Baze](/docs/bz/index.md)
-- [English](/docs/en/index.md)
-- [Esperanto](/docs/eo/index.md)
-- [日本語](/docs/ja/index.md)
+- [Baze](//bazelinga.gant.work/docs/bz/)
+- [English](//bazelinga.gant.work/docs/en/)
+- [Esperanto](//bazelinga.gant.work/docs/eo/)
+- [日本語](//bazelinga.gant.work/docs/ja/)
