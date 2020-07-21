@@ -2,7 +2,7 @@
 
 ## JSONデータ
 
-[dict.json](//bazelinga.gant.work/docs/ja/dict/dict.json) にてダウンロードが可能です。
+[dict.json](//bazelinga.gant.work/lib/dict/data/ja.json) にてダウンロードが可能です。
 
 ## 辞書検索
 
