@@ -2,7 +2,7 @@
 
 ## リンク
 
-- [Baze語辞書](//bazelinga.gant.work/docs/ja/dict/)
+- [把日辞書](//bazelinga.gant.work/docs/ja/dict/)
 
 ## 言語
 

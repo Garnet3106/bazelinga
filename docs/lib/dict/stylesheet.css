@@ -1,0 +1,71 @@
+body {
+    align-items: center;
+    background-color: #eeeeee;
+    display: flex;
+    color: #000000;
+    height: 100vh;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+}
+
+div.main {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+div.title {
+    font-size: 25px;
+    font-weight: bold;
+    text-align: center;
+}
+
+div.description {
+    font-size: 15px;
+    margin: 25px 0;
+}
+
+input.input {
+    display: inline-block;
+    border: solid 1px #333333;
+    border-radius: 8px;
+    font-size: 15px;
+    height: 25px;
+    outline: 0;
+    text-align: center;
+    width: 200px;
+}
+
+div.wordlist {
+    background-color: #ffffff;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+    margin-top: 25px;
+    width: 50vw;
+}
+
+div.wordlist-item {
+    align-items: center;
+    border-bottom: solid 1px #333333;
+    display: flex;
+    padding: 8px 20px;
+}
+
+div.wordlist-item-spell {
+    margin-right: 20px;
+}
+
+div.wordlist-item-translation {
+    color: #555555;
+    font-size: 13px;
+}
+
+div.wordlist-item-type {
+    font-size: 15px;
+    margin-right: 20px;
+}

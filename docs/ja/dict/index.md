@@ -2,11 +2,11 @@
 
 ## JSONデータ
 
-[dict.json](//bazelinga.gant.work/docs/ja/dict/bz/dict.json) にてダウンロードが可能です。
+[dict.json](//bazelinga.gant.work/docs/ja/dict/dict.json) にてダウンロードが可能です。
 
-## 単語検索
+## 辞書検索
 
-[辞書検索](//bazelinga.gant.work/docs/ja/dict/search/)
+[辞書検索](//bazelinga.gant.work/docs/ja/dict/search/) を利用できます。
 
 ## 言語
 
