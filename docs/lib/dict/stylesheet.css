@@ -52,8 +52,17 @@ div.wordlist {
 div.wordlist-item {
     align-items: center;
     border-bottom: solid 1px #333333;
+    cursor: pointer;
     display: flex;
     padding: 8px 20px;
+}
+
+div.wordlist-item:hover {
+    background-color: #eeeeee;
+}
+
+div.wordlist-item:active {
+    background-color: #dddddd;
 }
 
 div.wordlist-item-spell {
