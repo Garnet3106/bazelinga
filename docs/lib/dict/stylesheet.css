@@ -46,6 +46,7 @@ div.wordlist {
     flex-direction: column;
     height: 300px;
     margin-top: 25px;
+    overflow-x: scroll;
     width: 50vw;
 }
 

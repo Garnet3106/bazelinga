@@ -1,9 +1,16 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <link rel="stylesheet" href="//bazelinga.gant.work/lib/dict/stylesheet.css">
+    <link rel="stylesheet" href="//bazelinga.gant.work/docs/lib/dict/stylesheet.css">
     <link rel="stylesheet" href="../../../lib/dict/stylesheet.css">
     <meta charset="utf-8">
+    <script src="//bazelinga.gant.work/docs/lib/jquery-3.5.1.min.js"></script>
+    <script src="../../../lib/jquery-3.5.1.min.js"></script>
+    <script src="//bazelinga.gant.work/docs/lib/dict/dictionary.js"></script>
+    <script src="../../../lib/dict/dictionary.js"></script>
+    <script>
+        let dict = new Dictionary('ja');
+    </script>
     <title>把日辞書検索</title>
 </head>
 <body>
@@ -14,7 +21,7 @@
         <div class="description">
             把日辞書から単語を検索します。
         </div>
-        <input class="input" placeholder="(例) baze" type="text">
+        <input class="input" oninput="dict.updateWordList()" placeholder="(例) baze" type="text">
         <div class="wordlist">
             <div class="wordlist-item">
                 <div class="wordlist-item-spell">
