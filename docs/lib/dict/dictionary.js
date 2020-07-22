@@ -71,6 +71,14 @@ class Dictionary {
         $('.wordlist-item').remove();
         let keyword = $('.input')[0].value;
 
+        // 先頭の全角/半角スペースを削除
+        keyword = keyword.replace(/　/g, ' ');
+        keyword = keyword.replace(/^ +/g, '');
+        keyword = keyword.replace(/ {2,}/g, ' ');
+        keyword = keyword.replace(/ +$/g, '');
+        console.log(keyword);
+        console.log(keyword.length);
+
         if(keyword == '') {
             $('.wordlist-guide').show();
             return;
