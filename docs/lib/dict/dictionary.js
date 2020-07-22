@@ -68,16 +68,18 @@ class Dictionary {
     }
 
     updateWordList() {
-        $('.wordlist').empty();
+        $('.wordlist-item').remove();
         let keyword = $('.input')[0].value;
 
-        if(keyword == '')
+        if(keyword == '') {
+            $('.wordlist-guide').show();
             return;
+        }
 
+        $('.wordlist-guide').hide();
         let wordList = this.search(keyword);
 
         wordList.forEach(word => {
-            console.log(word);
             word.translation.forEach(translation => {
                 let wordClass = this.getClassStr(translation.class);
                 wordClass = wordClass == '一般' ? '' : '<div class="wordlist-item-class">[' + wordClass + ']</div>';
