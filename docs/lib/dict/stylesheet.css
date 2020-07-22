@@ -66,6 +66,10 @@ div.wordlist-item:active {
     background-color: #dddddd;
 }
 
+div.wordlist-item-class {
+    margin-right: 20px;
+}
+
 div.wordlist-item-spell {
     margin-right: 20px;
 }

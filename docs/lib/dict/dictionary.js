@@ -28,13 +28,13 @@ class Dictionary {
         let matchedWords = [];
         let loweredKeyword = keyword.toLowerCase();
 
-        this.data.dict.forEach((word, wordIndex) => {
+        this.data.dict.forEach(word => {
             let matched = false;
 
             if(word.spell.includes(loweredKeyword))
                 matched = true;
 
-            // 発音記号は大文字と小文字を区別することがあるので keyword を使う
+            // 発音記号は大文字と小文字を区別することがあるので toLowerCase() をしない
             if(word.ipa.includes(keyword))
                 matched = true;
 
@@ -57,8 +57,10 @@ class Dictionary {
                         tmpTranslation.push(translation);
                 });
 
-                tmpWord.translation = tmpTranslation;
-                matchedWords.push(tmpWord);
+                if(tmpTranslation.length >= 1) {
+                    tmpWord.translation = tmpTranslation;
+                    matchedWords.push(tmpWord);
+                }
             }
         });
 
@@ -75,9 +77,10 @@ class Dictionary {
         let wordList = this.search(keyword);
 
         wordList.forEach(word => {
+            console.log(word);
             word.translation.forEach(translation => {
                 let wordClass = this.getClassStr(translation.class);
-                wordClass = wordClass == '一般' ? '' : '[' + wordClass + ']';
+                wordClass = wordClass == '一般' ? '' : '<div class="wordlist-item-class">[' + wordClass + ']</div>';
 
                 $('.wordlist').append('\
                 <div class="wordlist-item">\
@@ -87,8 +90,8 @@ class Dictionary {
                 <div class="wordlist-item-type">\
                 [' + this.getTranslationTypeStr(translation.type) + ']\
                 </div>\
+                ' + wordClass + '\
                 <div class="wordlist-item-translation">\
-                ' + wordClass +'\
                 ' + translation.words.join(' ') + '\
                 </div>\
                 </div>\
