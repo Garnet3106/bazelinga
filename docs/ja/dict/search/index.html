@@ -1,38 +1,38 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <link rel="stylesheet" href="//bazelinga.gant.work/docs/lib/dict/stylesheet.css">
-    <link rel="stylesheet" href="../../../lib/dict/stylesheet.css">
-    <meta charset="utf-8">
-    <script src="//bazelinga.gant.work/docs/lib/jquery-3.5.1.min.js"></script>
-    <script src="../../../lib/jquery-3.5.1.min.js"></script>
-    <script src="//bazelinga.gant.work/docs/lib/dict/dictionary.js"></script>
-    <script src="../../../lib/dict/dictionary.js"></script>
-    <script>
-        let dict = new Dictionary('ja');
+    <head>
+        <link rel="stylesheet" href="//bazelinga.gant.work/docs/lib/dict/stylesheet.css">
+        <link rel="stylesheet" href="../../../lib/dict/stylesheet.css">
+        <meta charset="utf-8">
+        <script src="//bazelinga.gant.work/docs/lib/jquery-3.5.1.min.js"></script>
+        <script src="../../../lib/jquery-3.5.1.min.js"></script>
+        <script src="//bazelinga.gant.work/docs/lib/dict/dictionary.js"></script>
+        <script src="../../../lib/dict/dictionary.js"></script>
+        <script>
+            let dict = new Dictionary('ja');
 
-        $(() => {
-            $('#searchInput').on('input', () => {
-                dict.updateWordList();
+            $(() => {
+                $('#searchInput').on('input', () => {
+                    dict.updateWordList();
+                });
             });
-        });
-    </script>
-    <title>把日辞書検索</title>
-</head>
-<body>
-    <div class="main">
-        <div class="top">
-            <img class="top-title" src="//bazelinga.gant.work/docs/lib/dict/img/ja/title.svg">
-            <div class="top-description">
-                把日辞書から単語を検索します。
+        </script>
+        <title>把日辞書検索</title>
+    </head>
+    <body>
+        <div class="main">
+            <div class="top">
+                <img class="top-title" src="http://bazelinga.gant.work/docs/lib/dict/img/ja/title.svg">
+                <div class="top-description">
+                    把日辞書から単語を検索します。
+                </div>
+                <input class="top-input" id="searchInput" placeholder="(例) baze" type="text">
             </div>
-            <input class="top-input" id="searchInput" placeholder="(例) baze" type="text">
-        </div>
-        <div class="wordlist" id="wordList">
-            <div class="wordlist-guide" id="wordListGuide">
-                ここに検索結果が表示されます。
+            <div class="wordlist" id="wordList">
+                <div class="wordlist-guide" id="wordListGuide">
+                    ここに検索結果が表示されます。
+                </div>
             </div>
         </div>
-    </div>
-</body>
+    </body>
 </html>
