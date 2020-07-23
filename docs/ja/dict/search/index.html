@@ -12,7 +12,7 @@
         let dict = new Dictionary('ja');
 
         $(() => {
-            $('.input').on('input', () => {
+            $('#searchInput').on('input', () => {
                 dict.updateWordList();
             });
         });
@@ -21,13 +21,13 @@
 </head>
 <body>
     <div class="main">
-        <div class="title">
-            把日辞書検索
+        <div class="top">
+            <img class="top-title" src="//bazelinga.gant.work/docs/lib/dict/img/ja/title.svg">
+            <div class="top-description">
+                把日辞書から単語を検索します。
+            </div>
+            <input class="top-input" id="searchInput" placeholder="(例) baze" type="text">
         </div>
-        <div class="description">
-            把日辞書から単語を検索します。
-        </div>
-        <input class="input" id="searchInput" placeholder="(例) baze" type="text">
         <div class="wordlist" id="wordList">
             <div class="wordlist-guide" id="wordListGuide">
                 ここに検索結果が表示されます。
