@@ -87,7 +87,7 @@ class Dictionary {
         let $input = $('#searchInput');
         let $list = $('#wordList');
         let $listItem = $('.wordlist-item');
-        let $listGuideMsg = $('#wordListGuide');
+        let $listGuide = $('#wordListGuide');
 
         if(!this.dictDataReady || !this.langDataReady) {
             alert('しばらくお待ち下さい...');
@@ -105,21 +105,19 @@ class Dictionary {
         keyword = keyword.replace(/ +$/g, '');
 
         if(keyword == '') {
-            $listGuideMsg.text('ここに検索結果が表示されます。');
-            $listGuideMsg.show();
+            this.setGuideMessage('ここに検索結果が表示されます。', true);
             return true;
         }
 
         let wordList = this.search(keyword);
 
         if(wordList.length == 0) {
-            $listGuideMsg.text('単語が見つかりませんでした。');
-            $listGuideMsg.show();
+            this.setGuideMessage('単語が見つかりませんでした。', true);
             return;
         }
 
-        $listGuideMsg.hide();
-        $listGuideMsg.text('ここに検索結果が表示されます。');
+        this.setGuideMessage('ここに検索結果が表示されます。', false);
+
         wordList.forEach(word => {
             word.translation.forEach(translation => {
                 let wordClass = this.getTranslationClass(translation.class);
@@ -163,5 +161,35 @@ class Dictionary {
             return '?';
 
         return result;
+    }
+
+    /*
+     * ガイドメッセージを変更する
+     * - - - - - - - - - -
+     * showElem: setGuideVisible() に渡す値
+     * - - - - - - - - - -
+     */
+    setGuideMessage(message, showElem = -1) {
+        $('#wordListGuide').text(message);
+        this.setGuideVisible(showElem);
+    }
+
+    /*
+     * ガイドメッセージの表示/非表示を変更する
+     * - - - - - - - - - -
+     * showElem: ガイドメッセージを表示するかどうか
+     *     true: 表示する
+     *     false: 隠す
+     *     その他: 変更しない (-1を推奨)
+     * - - - - - - - - - -
+     */
+    setGuideVisible(showElem) {
+        let $listGuide = $('#wordListGuide');
+
+        if(showElem === true) {
+            $listGuide.show();
+        } else if(showElem === false) {
+            $listGuide.hide();
+        }
     }
 }
