@@ -84,14 +84,19 @@ class Dictionary {
     }
 
     updateWordList() {
+        let $input = $('#searchInput');
+        let $list = $('#wordList');
+        let $listItem = $('.wordlist-item');
+        let $listGuideMsg = $('#wordListGuide');
+
         if(!this.dictDataReady || !this.langDataReady) {
             alert('しばらくお待ち下さい...');
-            $('.input').val('');
+            $input.val('');
             return false;
         }
 
-        $('.wordlist-item').remove();
-        let keyword = $('.input')[0].value;
+        $listItem.remove();
+        let keyword = $input.val();
 
         // 余分な全角/半角スペースを削除
         keyword = keyword.replace(/　/g, ' ');
@@ -100,11 +105,11 @@ class Dictionary {
         keyword = keyword.replace(/ +$/g, '');
 
         if(keyword == '') {
-            $('.wordlist-guide').show();
+            $listGuideMsg.show();
             return true;
         }
 
-        $('.wordlist-guide').hide();
+        $listGuideMsg.hide();
         let wordList = this.search(keyword);
 
         wordList.forEach(word => {
@@ -123,13 +128,13 @@ class Dictionary {
 
                 // クリック時のスペル検索機能
                 elem.on('click', () => {
-                    let input = $('.input');
+                    let input = $input;
                     input.val(word.spell);
                     // val() ではイベントが発火しないので手動で処理
                     input.trigger('input');
                 });
 
-                $('.wordlist').append(elem);
+                $list.append(elem);
             });
         });
     }
