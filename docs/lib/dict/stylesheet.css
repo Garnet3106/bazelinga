@@ -46,8 +46,14 @@ div.wordlist {
     flex-direction: column;
     height: 300px;
     margin-top: 25px;
+    -ms-overflow-style: none;
     overflow-x: scroll;
+    scrollbar-width: none;
     width: 50vw;
+}
+
+div.wordlist::-webkit-scrollbar {
+    display: none;
 }
 
 div.wordlist-guide {
