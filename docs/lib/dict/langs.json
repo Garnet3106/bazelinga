@@ -1,0 +1,34 @@
+{
+    "en": {
+        "classes": {
+            "architecture": "archit.",
+            "general": "general"
+        },
+        "types": {
+            "adjective": "adj.",
+            "adverb": "adv.",
+            "noun": "noun",
+            "noun-common": "noun",
+            "preposition": "prep.",
+            "verb": "verb",
+            "verb-intransitive": "v.i.",
+            "verb-transitive": "v.t."
+        }
+    },
+    "ja": {
+        "classes": {
+            "architecture": "建築",
+            "general": "一般"
+        },
+        "types": {
+            "adjective": "形",
+            "adverb": "副",
+            "noun": "名",
+            "noun-common": "名",
+            "preposition": "前",
+            "verb": "動詞",
+            "verb-intransitive": "自動",
+            "verb-transitive": "他動"
+        }
+    }
+}

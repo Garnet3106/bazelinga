@@ -2,7 +2,8 @@ class Dictionary {
     constructor(lang) {
         this.lang = lang;
         this.data = {};
-        this.completedLoading = false;
+        this.dictDataReady = false;
+        this.langDataReady = false;
 
         this.load();
     }
@@ -11,16 +12,30 @@ class Dictionary {
         let options = {
             dataType: 'json',
             timespan: 5000,
-            url: 'http://bazelinga.gant.work/docs/lib/dict/data/' + this.lang + '.json',
         };
 
+        options.url = 'http://bazelinga.gant.work/docs/lib/dict/data/' + this.lang + '.json';
+
+        // 辞書データを読み込み
         $.ajax(options)
             .done(data => {
                 this.data = data;
-                this.completedLoading = true;
+                this.dictDataReady = true;
             })
             .fail((jqXHR, status, err) => {
                 console.log('Failed to load dictionary data file.');
+            });
+
+        options.url = 'http://bazelinga.gant.work/docs/lib/dict/langs.json';
+
+        // 言語データを読み込み
+        $.ajax(options)
+            .done(data => {
+                this.langData = data;
+                this.langDataReady = true;
+            })
+            .fail((jqXHR, status, err) => {
+                console.log('Failed to load lang data file.');
             });
     }
 
@@ -69,6 +84,12 @@ class Dictionary {
     }
 
     updateWordList() {
+        if(!this.dictDataReady || !this.langDataReady) {
+            alert('しばらくお待ち下さい...');
+            $('.input').val('');
+            return false;
+        }
+
         $('.wordlist-item').remove();
         let keyword = $('.input')[0].value;
 
@@ -80,7 +101,7 @@ class Dictionary {
 
         if(keyword == '') {
             $('.wordlist-guide').show();
-            return;
+            return true;
         }
 
         $('.wordlist-guide').hide();
@@ -88,12 +109,12 @@ class Dictionary {
 
         wordList.forEach(word => {
             word.translation.forEach(translation => {
-                let wordClass = this.getClassStr(translation.class);
+                let wordClass = this.getTranslationClass(translation.class);
 
                 // 単語リストに要素を追加
                 let elem = $('<div class="wordlist-item"></div>');
                 elem.append('<div class="wordlist-item-spell">' + word.spell + '</div>');
-                elem.append('<div class="wordlist-item-type">[' + this.getTranslationTypeStr(translation.type) + ']</div>');
+                elem.append('<div class="wordlist-item-type">[' + this.getWordType(translation.type) + ']</div>');
 
                 if(translation.class != 'general')
                     elem.append('<div class="wordlist-item-class">[' + wordClass + ']</div>');
@@ -113,41 +134,21 @@ class Dictionary {
         });
     }
 
-    getClassStr(type) {
-        switch(type) {
-            case 'architecture':
-            return '建築';
+    getTranslationClass(className) {
+        let result = this.langData[this.lang]['classes'][className];
 
-            case 'general':
-            return '一般';
-        }
+        if(result == undefined)
+            return '?';
+
+        return result;
     }
 
-    getTranslationTypeStr(type) {
-        switch(type) {
-            case 'noun':
-            return '名';
+    getWordType(type) {
+        let result = this.langData[this.lang]['types'][type];
 
-            case 'noun-common':
-            return '名';
+        if(result == undefined)
+            return '?';
 
-            case 'verb':
-            return '動';
-
-            case 'verb-intransitive':
-            return '他動';
-
-            case 'verb-transitive':
-            return '他動';
-
-            case 'adjective':
-            return '形';
-
-            case 'adverb':
-            return '副';
-
-            case 'proposition':
-            return '前';
-        }
+        return result;
     }
 }
