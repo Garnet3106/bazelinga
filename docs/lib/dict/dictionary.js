@@ -72,7 +72,7 @@ class Dictionary {
         $('.wordlist-item').remove();
         let keyword = $('.input')[0].value;
 
-        // 先頭の全角/半角スペースを削除
+        // 余分な全角/半角スペースを削除
         keyword = keyword.replace(/　/g, ' ');
         keyword = keyword.replace(/^ +/g, '');
         keyword = keyword.replace(/ {2,}/g, ' ');
@@ -89,22 +89,18 @@ class Dictionary {
         wordList.forEach(word => {
             word.translation.forEach(translation => {
                 let wordClass = this.getClassStr(translation.class);
-                wordClass = wordClass == '一般' ? '' : '<div class="wordlist-item-class">[' + wordClass + ']</div>';
 
-                let elem = $('\
-                <div class="wordlist-item">\
-                <div class="wordlist-item-spell">\
-                ' + word.spell + '\
-                </div>\
-                <div class="wordlist-item-type">\
-                [' + this.getTranslationTypeStr(translation.type) + ']\
-                </div>\
-                ' + wordClass + '\
-                <div class="wordlist-item-translation">\
-                ' + translation.words.join(' ') + '\
-                </div>\
-                </div>');
+                // 単語リストに要素を追加
+                let elem = $('<div class="wordlist-item"></div>');
+                elem.append('<div class="wordlist-item-spell">' + word.spell + '</div>');
+                elem.append('<div class="wordlist-item-type">[' + this.getTranslationTypeStr(translation.type) + ']</div>');
 
+                if(translation.class != 'general')
+                    elem.append('<div class="wordlist-item-class">[' + wordClass + ']</div>');
+
+                elem.append('<div class="wordlist-item-translation">' + translation.words.join(' ') + '</div>');
+
+                // クリック時のスペル検索機能
                 elem.on('click', () => {
                     let input = $('.input');
                     input.val(word.spell);
