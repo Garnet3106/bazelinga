@@ -13,6 +13,11 @@
             "verb": "verb",
             "verb-intransitive": "v.i.",
             "verb-transitive": "v.t."
+        },
+        "guides": {
+            "displayResults": "The search results will be displayed here.",
+            "loadFailed": "It has failed to load dictionary data.",
+            "wordNotFound": "The word was not found."
         }
     },
     "ja": {
@@ -29,6 +34,11 @@
             "verb": "動詞",
             "verb-intransitive": "自動",
             "verb-transitive": "他動"
+        },
+        "guides": {
+            "displayResults": "ここに検索結果が表示されます。",
+            "loadFailed": "辞書データのロードに失敗しました。",
+            "wordNotFound": "単語が見つかりませんでした。"
         }
     }
 }

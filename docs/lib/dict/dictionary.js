@@ -87,30 +87,30 @@ class Dictionary {
         let $input = $('#searchInput');
         let $list = $('#wordList');
         let $listItem = $('.wordlist-item');
-        let $listGuide = $('#wordListGuide');
 
         if(!this.dictDataReady || !this.langDataReady) {
-            alert('しばらくお待ち下さい...');
+            alert('Please wait...');
             $input.val('');
             return false;
         }
 
         $listItem.remove();
+        let guideMsgs = this.langData[this.lang].guides;
         let keyword = this.formatSearchKeyword($input.val());
 
         if(keyword == '') {
-            this.setGuideMessage('ここに検索結果が表示されます。', true);
+            this.setGuideMessage(guideMsgs.displayResults, true);
             return true;
         }
 
         let wordList = this.search(keyword);
 
         if(wordList.length == 0) {
-            this.setGuideMessage('単語が見つかりませんでした。', true);
+            this.setGuideMessage(guideMsgs.wordNotFound, true);
             return;
         }
 
-        this.setGuideMessage('ここに検索結果が表示されます。', false);
+        this.setGuideMessage(guideMsgs.displayResults, false);
 
         wordList.forEach(word => {
             word.translation.forEach(translation => {
