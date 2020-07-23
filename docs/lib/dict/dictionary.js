@@ -105,13 +105,21 @@ class Dictionary {
         keyword = keyword.replace(/ +$/g, '');
 
         if(keyword == '') {
+            $listGuideMsg.text('ここに検索結果が表示されます。');
             $listGuideMsg.show();
             return true;
         }
 
-        $listGuideMsg.hide();
         let wordList = this.search(keyword);
 
+        if(wordList.length == 0) {
+            $listGuideMsg.text('単語が見つかりませんでした。');
+            $listGuideMsg.show();
+            return;
+        }
+
+        $listGuideMsg.hide();
+        $listGuideMsg.text('ここに検索結果が表示されます。');
         wordList.forEach(word => {
             word.translation.forEach(translation => {
                 let wordClass = this.getTranslationClass(translation.class);
