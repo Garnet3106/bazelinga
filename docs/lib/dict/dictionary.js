@@ -96,13 +96,7 @@ class Dictionary {
         }
 
         $listItem.remove();
-        let keyword = $input.val();
-
-        // 余分な全角/半角スペースを削除
-        keyword = keyword.replace(/　/g, ' ');
-        keyword = keyword.replace(/^ +/g, '');
-        keyword = keyword.replace(/ {2,}/g, ' ');
-        keyword = keyword.replace(/ +$/g, '');
+        let keyword = this.formatSearchKeyword($input.val());
 
         if(keyword == '') {
             this.setGuideMessage('ここに検索結果が表示されます。', true);
@@ -161,6 +155,21 @@ class Dictionary {
             return '?';
 
         return result;
+    }
+
+    /*
+     * 検索キーワードをフォーマットする
+     * - - - - - - - - - -
+     * keyword: フォーマットされる前のキーワード文字列
+     * - - - - - - - - - -
+     */
+    formatSearchKeyword(keyword) {
+        keyword = keyword.replace(/　/g, ' ');
+        keyword = keyword.replace(/^ +/g, '');
+        keyword = keyword.replace(/ {2,}/g, ' ');
+        keyword = keyword.replace(/ +$/g, '');
+
+        return keyword;
     }
 
     /*
