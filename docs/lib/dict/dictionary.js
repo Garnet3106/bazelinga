@@ -41,7 +41,8 @@ class Dictionary {
             if(matched) {
                 matchedWords.push(word);
             } else {
-                let tmpWord = word;
+                // word のコピーを作成する (参照渡し防止)
+                let tmpWord = $.extend(true, {}, word);
                 let tmpTranslation = [];
 
                 word.translation.forEach(translation => {
@@ -76,8 +77,6 @@ class Dictionary {
         keyword = keyword.replace(/^ +/g, '');
         keyword = keyword.replace(/ {2,}/g, ' ');
         keyword = keyword.replace(/ +$/g, '');
-        console.log(keyword);
-        console.log(keyword.length);
 
         if(keyword == '') {
             $('.wordlist-guide').show();
@@ -92,7 +91,7 @@ class Dictionary {
                 let wordClass = this.getClassStr(translation.class);
                 wordClass = wordClass == '一般' ? '' : '<div class="wordlist-item-class">[' + wordClass + ']</div>';
 
-                $('.wordlist').append('\
+                let elem = $('\
                 <div class="wordlist-item">\
                 <div class="wordlist-item-spell">\
                 ' + word.spell + '\
@@ -104,8 +103,16 @@ class Dictionary {
                 <div class="wordlist-item-translation">\
                 ' + translation.words.join(' ') + '\
                 </div>\
-                </div>\
-                ');
+                </div>');
+
+                elem.on('click', () => {
+                    let input = $('.input');
+                    input.val(word.spell);
+                    // val() ではイベントが発火しないので手動で処理
+                    input.trigger('input');
+                });
+
+                $('.wordlist').append(elem);
             });
         });
     }

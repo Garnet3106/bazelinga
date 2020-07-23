@@ -10,6 +10,12 @@
     <script src="../../../lib/dict/dictionary.js"></script>
     <script>
         let dict = new Dictionary('ja');
+
+        $(() => {
+            $('.input').on('input', () => {
+                dict.updateWordList();
+            });
+        });
     </script>
     <title>把日辞書検索</title>
 </head>
@@ -21,7 +27,7 @@
         <div class="description">
             把日辞書から単語を検索します。
         </div>
-        <input class="input" oninput="dict.updateWordList()" placeholder="(例) baze" type="text">
+        <input class="input" placeholder="(例) baze" type="text">
         <div class="wordlist">
             <div class="wordlist-guide">
                 ここに検索結果が表示されます。
