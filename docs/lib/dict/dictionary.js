@@ -85,56 +85,61 @@ class Dictionary {
 
     updateWordList() {
         let $input = $('#searchInput');
-        let $list = $('#wordList');
-        let $listItem = $('.wordlist-item');
+        let $wordList = $('#wordList');
+        let $wordListItem = $('.workarea-wordlist-item');
 
         if(!this.dictDataReady || !this.langDataReady) {
             alert('Please wait...');
             $input.val('');
-            return false;
+            return;
         }
 
-        $listItem.remove();
+        $wordListItem.remove();
         let guideMsgs = this.langData[this.lang].guides;
         let keyword = this.formatSearchKeyword($input.val());
 
         if(keyword == '') {
             this.setGuideMessage(guideMsgs.displayResults, true);
-            return true;
+            return;
         }
 
-        let wordList = this.search(keyword);
+        let words = this.search(keyword);
 
-        if(wordList.length == 0) {
+        if(words.length == 0) {
             this.setGuideMessage(guideMsgs.wordNotFound, true);
             return;
         }
 
         this.setGuideMessage(guideMsgs.displayResults, false);
+        this.addWordsToList(words);
+    }
+
+    addWordsToList(wordList) {
+        let $input = $('#searchInput');
+        let $list = $('#wordList');
 
         wordList.forEach(word => {
             word.translation.forEach(translation => {
                 let wordClass = this.getTranslationClass(translation.class);
 
                 // 単語リストに要素を追加
-                let elem = $('<div class="wordlist-item"></div>');
-                elem.append('<div class="wordlist-item-spell">' + word.spell + '</div>');
-                elem.append('<div class="wordlist-item-type">[' + this.getWordType(translation.type) + ']</div>');
+                let $elem = $('<div class="workarea-wordlist-item"></div>');
+                $elem.append('<div class="workarea-wordlist-item-spell">' + word.spell + '</div>');
+                $elem.append('<div class="workarea-wordlist-item-type">[' + this.getWordType(translation.type) + ']</div>');
 
                 if(translation.class != 'general')
-                    elem.append('<div class="wordlist-item-class">[' + wordClass + ']</div>');
+                    $elem.append('<div class="workarea-wordlist-item-class">[' + wordClass + ']</div>');
 
-                elem.append('<div class="wordlist-item-translation">' + translation.words.join(' ') + '</div>');
+                $elem.append('<div class="workarea-wordlist-item-translation">' + translation.words.join(' ') + '</div>');
 
                 // クリック時のスペル検索機能
-                elem.on('click', () => {
-                    let input = $input;
-                    input.val(word.spell);
+                $elem.on('click', () => {
+                    $input.val(word.spell);
                     // val() ではイベントが発火しないので手動で処理
-                    input.trigger('input');
+                    $input.trigger('input');
                 });
 
-                $list.append(elem);
+                $list.append($elem);
             });
         });
     }

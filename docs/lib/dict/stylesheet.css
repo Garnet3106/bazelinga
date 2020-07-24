@@ -10,6 +10,36 @@ body {
     width: 100vw;
 }
 
+div.bottomlinks {
+    background-color: #ffffff;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding: 0 5px;
+}
+
+div.bottomlinks-item {
+    border-right: solid 1px #333333;
+    cursor: pointer;
+    font-size: 15px;
+    margin: 5px 0;
+    padding: 0 15px;
+    transition: background-color 200ms 0s ease;
+}
+
+div.bottomlinks-item:last-child {
+    border: none;
+}
+
+div.bottomlinks-item:hover {
+    background-color: #dddddd;
+}
+
+div.bottomlinks-item:active {
+    background-color: #bbbbbb;
+}
+
 div.main {
     align-items: center;
     display: flex;
@@ -18,17 +48,37 @@ div.main {
 }
 
 div.top {
-    background: #cccccc;
+    background: #ffffff;
     border-radius: 5px;
-    padding: 30px 50px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    padding: 20px;
 }
 
-div.top-description {
-    font-size: 15px;
-    margin: 25px 0;
+div.top-icons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
 }
 
-input.top-input {
+div.top-icons-item {
+}
+
+img.top-icons-item#topIconLogo {
+    height: 20px;
+    width: 20px;
+}
+
+img.top-icons-item#topIconTitle {
+    height: 20px;
+    width: 150px;
+}
+
+div.top-inputarea {
+}
+
+input.top-inputarea-input {
     display: inline-block;
     border: solid 1px #333333;
     border-radius: 8px;
@@ -43,24 +93,38 @@ img.top-title {
     width: 200px;
 }
 
-div.wordlist {
-    background-color: #ffffff;
+div.workarea {
     border-radius: 15px;
     display: flex;
+    height: 50vh;
+    justify-content: space-between;
+    width: 60vw;
+}
+
+div.workarea-sidemenu {
+    background-color: #ffffff;
+    border-radius: 10px;
+    height: 100%;
+    width: 40px;
+}
+
+div.workarea-wordlist {
+    background-color: #ffffff;
+    border-radius: 10px;
+    display: flex;
     flex-direction: column;
-    height: 40vh;
-    margin-top: 30px;
+    height: 100%;
     -ms-overflow-style: none;
     overflow-x: scroll;
     scrollbar-width: none;
-    width: 50vw;
+    width: calc(100% - 120px);
 }
 
-div.wordlist::-webkit-scrollbar {
+div.workarea-wordlist::-webkit-scrollbar {
     display: none;
 }
 
-div.wordlist-guide {
+div.workarea-wordlist-guide {
     align-items: center;
     color: #888888;
     display: flex;
@@ -69,7 +133,7 @@ div.wordlist-guide {
     width: 100%;
 }
 
-div.wordlist-item {
+div.workarea-wordlist-item {
     align-items: center;
     border-bottom: solid 1px #333333;
     cursor: pointer;
@@ -77,32 +141,32 @@ div.wordlist-item {
     padding: 8px 20px;
 }
 
-div.wordlist-item:last-child {
+div.workarea-wordlist-item:last-child {
     border: none;
 }
 
-div.wordlist-item:hover {
+div.workarea-wordlist-item:hover {
     background-color: #eeeeee;
 }
 
-div.wordlist-item:active {
+div.workarea-wordlist-item:active {
     background-color: #dddddd;
 }
 
-div.wordlist-item-class {
+div.workarea-wordlist-item-class {
     margin-right: 20px;
 }
 
-div.wordlist-item-spell {
+div.workarea-wordlist-item-spell {
     margin-right: 20px;
 }
 
-div.wordlist-item-translation {
+div.workarea-wordlist-item-translation {
     color: #555555;
     font-size: 13px;
 }
 
-div.wordlist-item-type {
+div.workarea-wordlist-item-type {
     font-size: 15px;
     margin-right: 20px;
 }
