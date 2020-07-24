@@ -103,9 +103,37 @@ div.workarea {
 
 div.workarea-sidemenu {
     background-color: #ffffff;
-    border-radius: 10px;
-    height: 100%;
+    display: flex;
+    flex-direction: column;
     width: 40px;
+}
+
+div.workarea-sidemenu#sideMenuEdit {
+    height: 120px;
+}
+
+div.workarea-sidemenu#sideMenuView {
+    height: 160px;
+}
+
+div.workarea-sidemenu-item {
+    border-bottom: solid 1px #333333;
+    cursor: pointer;
+    height: 40px;
+    transition: all 200ms 0s ease;
+    width: 40px;
+}
+
+div.workarea-sidemenu-item:last-child {
+    border: none;
+}
+
+div.workarea-sidemenu-item:hover {
+    background-color: #dddddd;
+}
+
+div.workarea-sidemenu-item:active {
+    background-color: #cccccc;
 }
 
 div.workarea-wordlist {
