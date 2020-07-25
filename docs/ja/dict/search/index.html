@@ -17,6 +17,22 @@
                     dict.updateWordList();
                 });
 
+                let observer = new MutationObserver(event => {
+                    let $target = $(event[0].target);
+
+                    $target.animate({
+                        width: $target.children().length * 40
+                    }, 500);
+                });
+
+                let options = {
+                    childList: true
+                };
+
+                $('.workarea-sidemenu-item').each((i, elem) => {
+                    observer.observe(elem, options);
+                });
+
                 $('#sideMenuViewDocs').on('click', () => {
                     if(dict.selectedItemIndex == -1) {
                         alert('単語を選択してください。');
@@ -24,6 +40,15 @@
                     }
 
                     location.href = dict.getDocsURI();
+                });
+
+                $('#sideMenuViewShare').on('click', () => {
+                    if(dict.selectedItemIndex == -1) {
+                        alert('単語を選択してください。');
+                        return;
+                    }
+
+                    
                 });
             });
         </script>
@@ -55,9 +80,17 @@
                     </div>
                 </div>
                 <div class="workarea-sidemenu" id="sideMenuView">
-                    <div class="workarea-sidemenu-item" id="sideMenuViewDocs">
+                    <div class="workarea-sidemenu-item">
+                        <div class="workarea-sidemenu-item-icon" id="sideMenuViewDocs">
+                        </div>
                     </div>
-                    <div class="workarea-sidemenu-item" id="sideMenuViewShare">
+                    <div class="workarea-sidemenu-item">
+                        <div class="workarea-sidemenu-item-icon" id="sideMenuViewShare">
+                        </div>
+                        <div class="workarea-sidemenu-item-icon" id="sideMenuViewShare">
+                        </div>
+                        <div class="workarea-sidemenu-item-icon" id="sideMenuViewShare">
+                        </div>
                     </div>
                     <div class="workarea-sidemenu-item">
                     </div>

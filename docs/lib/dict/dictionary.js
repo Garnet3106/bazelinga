@@ -188,7 +188,7 @@ class Dictionary {
      */
     getDocsURI() {
         let $item = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
-        let spell = $item.find('.workarea-wordlist-item-spell').text();
+        let spell = $item.children('.workarea-wordlist-item-spell').text();
         //let dictURI = location.protocol + '://' + location.host + '/' + location.pathname;
         let dictURI = 'http://bazelinga.gant.work/docs/' + this.lang + '/dict/words/' + spell + '/';
 

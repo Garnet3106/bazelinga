@@ -117,30 +117,35 @@ div.workarea-sidemenu#sideMenuView {
 }
 
 div.workarea-sidemenu-item {
-    border-bottom: solid 1px #aaaaaa;
+    background-color: #ffffff;
+    display: flex;
+}
+
+div.workarea-sidemenu-item-icon {
+    background-size: 100% 100%;
     cursor: pointer;
     height: 40px;
     transition: all 200ms 0s ease;
     width: 40px;
 }
 
-div.workarea-sidemenu-item#sideMenuViewDocs {
+div.workarea-sidemenu-item-icon#sideMenuViewDocs {
     background-image: url('../../lib/dict/img/ja/docs.svg');
 }
 
-div.workarea-sidemenu-item#sideMenuViewShare {
+div.workarea-sidemenu-item-icon#sideMenuViewShare {
     background-image: url('../../lib/dict/img/ja/share.svg');
 }
 
-div.workarea-sidemenu-item:last-child {
+div.workarea-sidemenu-item-icon:last-child {
     border: none;
 }
 
-div.workarea-sidemenu-item:hover {
+div.workarea-sidemenu-item-icon:hover {
     background-color: #dddddd;
 }
 
-div.workarea-sidemenu-item:active {
+div.workarea-sidemenu-item-icon:active {
     background-color: #cccccc;
 }
 
