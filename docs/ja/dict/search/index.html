@@ -8,84 +8,7 @@
         <script src="../../../lib/dict/scripts/dictionary.js"></script>
         <script src="../../../lib/dict/scripts/interface.js"></script>
         <script>
-            let dict = new Dictionary('ja');
-
-            $(() => {
-                $('#searchInput').on('input', () => {
-                    dict.updateWordList();
-                });
-
-                let observer = new MutationObserver(event => {
-                    let $target = $(event[0].target);
-
-                    $target.animate({
-                        width: $target.children().length * 40
-                    }, 500);
-                });
-
-                let options = {
-                    childList: true
-                };
-
-                $('.workarea-sidemenu-item').each((i, elem) => {
-                    observer.observe(elem, options);
-                });
-
-                $('#rightMenuDocsIcon').on('click', () => {
-                    if(dict.selectedItemIndex == -1) {
-                        alert('単語を選択してください。');
-                        return;
-                    }
-
-                    location.href = dict.getDocsURI();
-                });
-
-                $('#rightMenuShareIcon').on('click', () => {
-                    $menuItem = $('#rightMenuShare');
-
-                    // アイコンがすでに表示されている場合は閉じる
-                    if($menuItem.children().length > 1) {
-                        $menuItem.children('#rightMenuShareLink').remove();
-                        $menuItem.children('#rightMenuShareTwitter').remove();
-                        return;
-                    }
-
-                    if(dict.selectedItemIndex == -1) {
-                        alert('単語を選択してください。');
-                        return;
-                    }
-
-                    $linkShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareLink"></div>');
-                    $twitterShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareTwitter"></div>');
-
-                    $linkShareIcon.on('click', () => {
-                        // ドキュメントURLをクリップボードにコピー
-                        $clipboardText = $('<div id="clipboardText">' + dict.getDocsURI() + '</div>');
-                        $('#body').append($clipboardText);
-                        let $text = $('#clipboardText');
-                        getSelection().selectAllChildren(document.getElementById('clipboardText'));
-                        document.execCommand('copy');
-                        $clipboardText.remove();
-
-                        alert('クリップボードにコピーしました。');
-
-                        // アイコンを削除する
-                        $linkShareIcon.remove();
-                        $twitterShareIcon.remove();
-                    });
-
-                    $twitterShareIcon.on('click', () => {
-                        open(dict.getTwitterShareLink());
-
-                        // アイコンを削除する
-                        $linkShareIcon.remove();
-                        $twitterShareIcon.remove();
-                    });
-
-                    $menuItem.append($linkShareIcon);
-                    $menuItem.append($twitterShareIcon);
-                });
-            });
+            new Interface('ja');
         </script>
         <title>把日辞書検索</title>
     </head>
@@ -116,11 +39,11 @@
                 </div>
                 <div class="workarea-sidemenu" id="rightMenu">
                     <div class="workarea-sidemenu-item" id="rightMenuDocs">
-                        <div class="workarea-sidemenu-item-icon" id="rightMenuDocsIcon">
+                        <div class="workarea-sidemenu-item-icon" id="rightMenuDocsTop">
                         </div>
                     </div>
                     <div class="workarea-sidemenu-item" id="rightMenuShare">
-                        <div class="workarea-sidemenu-item-icon" id="rightMenuShareIcon">
+                        <div class="workarea-sidemenu-item-icon" id="rightMenuShareTop">
                         </div>
                     </div>
                     <div class="workarea-sidemenu-item">

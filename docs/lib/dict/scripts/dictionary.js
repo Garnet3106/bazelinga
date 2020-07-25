@@ -1,13 +1,13 @@
+/*
+ * 辞書データを操作する
+ */
 class Dictionary {
     constructor(lang) {
         this.lang = lang;
         this.data = {};
-        this.dictDataReady = false;
-        this.langDataReady = false;
+        this.dataReady = false;
         // 選択された単語リストの項目の番号 (未選択: -1)
         this.selectedItemIndex = -1;
-
-        this.load();
     }
 
     addWordsToList(wordList) {
@@ -115,35 +115,39 @@ class Dictionary {
         return result;
     }
 
-    load() {
+    load(succeeded = () => {}, failed = (jqXHR, status, error) => {}) {
+        let dictDataURI = 'http://bazelinga.gant.work/docs/lib/dict/data/' + this.lang + '.json';
+
+        this.loadJsonData(dictDataURI, data => {
+            // ロード成功時
+            this.data = data;
+            let langDataURI = 'http://bazelinga.gant.work/docs/lib/dict/data/langs.json';
+
+            this.loadJsonData(langDataURI, data => {
+                // ロード成功時
+                this.langData = data;
+                this.dataReady = true;
+                succeeded();
+            }, (jqXHR, status, error) => {
+                // ロード失敗時
+                failed(jqXHR, status, error);
+            });
+        }, (jqXHR, status, error) => {
+            // ロード失敗時
+            failed(jqXHR, status, error);
+        });
+    }
+
+    loadJsonData(uri, succeeded = data => {}, failed = (jqXHR, status, error) => {}) {
         let options = {
             dataType: 'json',
             timespan: 5000,
+            url: uri
         };
 
-        options.url = 'http://bazelinga.gant.work/docs/lib/dict/data/' + this.lang + '.json';
-
-        // 辞書データを読み込む
         $.ajax(options)
-            .done(data => {
-                this.data = data;
-                this.dictDataReady = true;
-            })
-            .fail((jqXHR, status, err) => {
-                console.log('Failed to load dictionary data file.');
-            });
-
-        options.url = 'http://bazelinga.gant.work/docs/lib/dict/data/langs.json';
-
-        // 言語データを読み込む
-        $.ajax(options)
-            .done(data => {
-                this.langData = data;
-                this.langDataReady = true;
-            })
-            .fail((jqXHR, status, err) => {
-                console.log('Failed to load lang data file.');
-            });
+            .done(succeeded)
+            .fail(failed);
     }
 
     search(keyword) {
@@ -246,7 +250,7 @@ class Dictionary {
         let $wordListItem = $('.workarea-wordlist-item');
 
         // データの読み込みが未完了の場合はアラートを表示
-        if(!this.dictDataReady || !this.langDataReady) {
+        if(!this.dataReady) {
             alert('Please wait...');
             // 入力された文字列を残さない
             $input.val('');
