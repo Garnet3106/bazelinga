@@ -4,6 +4,8 @@ class Dictionary {
         this.data = {};
         this.dictDataReady = false;
         this.langDataReady = false;
+        // 選択された単語リストの項目の番号 (未選択: -1)
+        this.selectedItemIndex = -1;
 
         this.load();
     }
@@ -16,7 +18,7 @@ class Dictionary {
 
         options.url = 'http://bazelinga.gant.work/docs/lib/dict/data/' + this.lang + '.json';
 
-        // 辞書データを読み込み
+        // 辞書データを読み込む
         $.ajax(options)
             .done(data => {
                 this.data = data;
@@ -28,7 +30,7 @@ class Dictionary {
 
         options.url = 'http://bazelinga.gant.work/docs/lib/dict/langs.json';
 
-        // 言語データを読み込み
+        // 言語データを読み込む
         $.ajax(options)
             .done(data => {
                 this.langData = data;
@@ -83,18 +85,42 @@ class Dictionary {
         return matchedWords;
     }
 
+    selectListItem(index) {
+        let $items = $('.workarea-wordlist-item');
+
+        if(index >= $items.length)
+            return;
+
+        // 選択する前に他の選択を解除
+        this.unslectListItem();
+
+        $items.eq(index).css('background-color', '#dddddd');
+        this.selectedItemIndex = index;
+    }
+
+    unslectListItem() {
+        let $items = $('.workarea-wordlist-item');
+        // return回避のため事前にindexを設定
+        this.selectedItemIndex = -1;
+
+        $items.css('background-color', '#ffffff');
+    }
+
     updateWordList() {
         let $input = $('#searchInput');
-        let $wordList = $('#wordList');
         let $wordListItem = $('.workarea-wordlist-item');
 
+        // データの読み込みが未完了の場合はアラートを表示
         if(!this.dictDataReady || !this.langDataReady) {
             alert('Please wait...');
+            // 入力された文字列を残さない
             $input.val('');
             return;
         }
 
         $wordListItem.remove();
+        this.unslectListItem();
+
         let guideMsgs = this.langData[this.lang].guides;
         let keyword = this.formatSearchKeyword($input.val());
 
@@ -122,7 +148,7 @@ class Dictionary {
             word.translation.forEach(translation => {
                 let wordClass = this.getTranslationClass(translation.class);
 
-                // 単語リストに要素を追加
+                // 要素を生成・追加
                 let $elem = $('<div class="workarea-wordlist-item"></div>');
                 $elem.append('<div class="workarea-wordlist-item-spell">' + word.spell + '</div>');
                 $elem.append('<div class="workarea-wordlist-item-type">[' + this.getWordType(translation.type) + ']</div>');
@@ -132,16 +158,46 @@ class Dictionary {
 
                 $elem.append('<div class="workarea-wordlist-item-translation">' + translation.words.join(' ') + '</div>');
 
-                // クリック時のスペル検索機能
-                $elem.on('click', () => {
-                    $input.val(word.spell);
-                    // val() ではイベントが発火しないので手動で処理
-                    $input.trigger('input');
+                // イベントを設定
+                $elem.on('click', elem => {
+                    let formattedKeyword = this.formatSearchKeyword($input.val());
+
+                    // キーワードが異なる場合のみvalueを変更
+                    if(formattedKeyword != word.spell) {
+                        $input.val(word.spell);
+                        // val() ではイベントが発火しないので手動で処理
+                        $input.trigger('input');
+                    } else {
+                        let $item = $($(elem.target)).eq(0);
+
+                        if($item.attr('class') != 'workarea-wordlist-item')
+                            $item = $item.parent();
+
+                        let index = $item.index();
+                        this.selectListItem(index - 1);
+                    }
                 });
 
                 $list.append($elem);
             });
         });
+    }
+
+    /*
+     * 検索キーワードをもとにドキュメントのURIを取得する
+     * 条件によって戻り値が異なる
+     *     通常: 各単語のページのURIを返す
+     *     空の場合: 各言語の辞書ページのURIを返す
+     */
+    getDocsURI() {
+        let keyword = $('#searchInput').val();
+        //let dictURI = location.protocol + '://' + location.host + '/' + location.pathname;
+        let dictTopURI = 'http://bazelinga.gant.work/docs/' + this.lang + '/dict/';
+
+        if(keyword == '')
+            return dictTopURI;
+
+        return dictTopURI + 'words/' + keyword + '/';
     }
 
     getTranslationClass(className) {

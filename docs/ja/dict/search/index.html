@@ -16,6 +16,10 @@
                 $('#searchInput').on('input', () => {
                     dict.updateWordList();
                 });
+
+                $('#sideMenuViewDocs').on('click', () => {
+                    location.href = dict.getDocsURI();
+                });
             });
         </script>
         <title>把日辞書検索</title>
@@ -46,9 +50,9 @@
                     </div>
                 </div>
                 <div class="workarea-sidemenu" id="sideMenuView">
-                    <div class="workarea-sidemenu-item">
+                    <div class="workarea-sidemenu-item" id="sideMenuViewDocs">
                     </div>
-                    <div class="workarea-sidemenu-item">
+                    <div class="workarea-sidemenu-item" id="sideMenuViewShare">
                     </div>
                     <div class="workarea-sidemenu-item">
                     </div>
