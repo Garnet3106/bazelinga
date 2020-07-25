@@ -129,12 +129,16 @@ div.workarea-sidemenu-item-icon {
     width: 40px;
 }
 
-div.workarea-sidemenu-item-icon#sideMenuViewDocs {
+div.workarea-sidemenu-item-icon#sideMenuViewDocsIcon {
     background-image: url('../../lib/dict/img/ja/docs.svg');
 }
 
-div.workarea-sidemenu-item-icon#sideMenuViewShare {
+div.workarea-sidemenu-item-icon#sideMenuViewShareIcon {
     background-image: url('../../lib/dict/img/ja/share.svg');
+}
+
+div.workarea-sidemenu-item-icon#sideMenuViewShareLink {
+    background-image: url('../../lib/dict/img/ja/link.svg');
 }
 
 div.workarea-sidemenu-item-icon#sideMenuViewShareTwitter {

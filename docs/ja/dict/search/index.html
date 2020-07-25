@@ -33,7 +33,7 @@
                     observer.observe(elem, options);
                 });
 
-                $('#sideMenuViewDocs').on('click', () => {
+                $('#sideMenuViewDocsIcon').on('click', () => {
                     if(dict.selectedItemIndex == -1) {
                         alert('単語を選択してください。');
                         return;
@@ -42,13 +42,20 @@
                     location.href = dict.getDocsURI();
                 });
 
-                $('#sideMenuViewShare').on('click', event => {
+                $('#sideMenuViewShareIcon').on('click', () => {
+                    $menuItem = $('#sideMenuViewShare');
+
+                    // アイコンがすでに表示されている場合は閉じる
+                    if($menuItem.children().length > 1) {
+                        $menuItem.children('#sideMenuViewShareLink').remove();
+                        $menuItem.children('#sideMenuViewShareTwitter').remove();
+                        return;
+                    }
+
                     if(dict.selectedItemIndex == -1) {
                         alert('単語を選択してください。');
                         return;
                     }
-
-                    let $target = $(event.target);
 
                     $linkShareIcon = $('<div class="workarea-sidemenu-item-icon" id="sideMenuViewShareLink"></div>');
                     $twitterShareIcon = $('<div class="workarea-sidemenu-item-icon" id="sideMenuViewShareTwitter"></div>');
@@ -63,14 +70,22 @@
                         $clipboardText.remove();
 
                         alert('クリップボードにコピーしました。');
+
+                        // アイコンを削除する
+                        $linkShareIcon.remove();
+                        $twitterShareIcon.remove();
                     });
 
                     $twitterShareIcon.on('click', () => {
                         location.href = dict.getTwitterShareLink();
+
+                        // アイコンを削除する
+                        $linkShareIcon.remove();
+                        $twitterShareIcon.remove();
                     });
 
-                    $target.parent().append($linkShareIcon);
-                    $target.parent().append($twitterShareIcon);
+                    $menuItem.append($linkShareIcon);
+                    $menuItem.append($twitterShareIcon);
                 });
             });
         </script>
@@ -102,12 +117,12 @@
                     </div>
                 </div>
                 <div class="workarea-sidemenu" id="sideMenuView">
-                    <div class="workarea-sidemenu-item">
-                        <div class="workarea-sidemenu-item-icon" id="sideMenuViewDocs">
+                    <div class="workarea-sidemenu-item" id="sideMenuViewDocs">
+                        <div class="workarea-sidemenu-item-icon" id="sideMenuViewDocsIcon">
                         </div>
                     </div>
-                    <div class="workarea-sidemenu-item">
-                        <div class="workarea-sidemenu-item-icon" id="sideMenuViewShare">
+                    <div class="workarea-sidemenu-item" id="sideMenuViewShare">
+                        <div class="workarea-sidemenu-item-icon" id="sideMenuViewShareIcon">
                         </div>
                     </div>
                     <div class="workarea-sidemenu-item">
