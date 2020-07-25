@@ -108,11 +108,11 @@ div.workarea-sidemenu {
     width: 40px;
 }
 
-div.workarea-sidemenu#sideMenuEdit {
+div.workarea-sidemenu#leftMenu {
     height: 120px;
 }
 
-div.workarea-sidemenu#sideMenuView {
+div.workarea-sidemenu#rightMenu {
     height: 160px;
 }
 
@@ -129,19 +129,19 @@ div.workarea-sidemenu-item-icon {
     width: 40px;
 }
 
-div.workarea-sidemenu-item-icon#sideMenuViewDocsIcon {
+div.workarea-sidemenu-item-icon#rightMenuDocsIcon {
     background-image: url('../../lib/dict/img/ja/docs.svg');
 }
 
-div.workarea-sidemenu-item-icon#sideMenuViewShareIcon {
+div.workarea-sidemenu-item-icon#rightMenuShareIcon {
     background-image: url('../../lib/dict/img/ja/share.svg');
 }
 
-div.workarea-sidemenu-item-icon#sideMenuViewShareLink {
+div.workarea-sidemenu-item-icon#rightMenuShareLink {
     background-image: url('../../lib/dict/img/ja/link.svg');
 }
 
-div.workarea-sidemenu-item-icon#sideMenuViewShareTwitter {
+div.workarea-sidemenu-item-icon#rightMenuShareTwitter {
     background-image: url('../../lib/dict/img/ja/twitter.svg');
 }
 

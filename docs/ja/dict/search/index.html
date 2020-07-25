@@ -33,7 +33,7 @@
                     observer.observe(elem, options);
                 });
 
-                $('#sideMenuViewDocsIcon').on('click', () => {
+                $('#rightMenuDocsIcon').on('click', () => {
                     if(dict.selectedItemIndex == -1) {
                         alert('単語を選択してください。');
                         return;
@@ -42,13 +42,13 @@
                     location.href = dict.getDocsURI();
                 });
 
-                $('#sideMenuViewShareIcon').on('click', () => {
-                    $menuItem = $('#sideMenuViewShare');
+                $('#rightMenuShareIcon').on('click', () => {
+                    $menuItem = $('#rightMenuShare');
 
                     // アイコンがすでに表示されている場合は閉じる
                     if($menuItem.children().length > 1) {
-                        $menuItem.children('#sideMenuViewShareLink').remove();
-                        $menuItem.children('#sideMenuViewShareTwitter').remove();
+                        $menuItem.children('#rightMenuShareLink').remove();
+                        $menuItem.children('#rightMenuShareTwitter').remove();
                         return;
                     }
 
@@ -57,8 +57,8 @@
                         return;
                     }
 
-                    $linkShareIcon = $('<div class="workarea-sidemenu-item-icon" id="sideMenuViewShareLink"></div>');
-                    $twitterShareIcon = $('<div class="workarea-sidemenu-item-icon" id="sideMenuViewShareTwitter"></div>');
+                    $linkShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareLink"></div>');
+                    $twitterShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareTwitter"></div>');
 
                     $linkShareIcon.on('click', () => {
                         // ドキュメントURLをクリップボードにコピー
@@ -77,7 +77,7 @@
                     });
 
                     $twitterShareIcon.on('click', () => {
-                        location.href = dict.getTwitterShareLink();
+                        open(dict.getTwitterShareLink());
 
                         // アイコンを削除する
                         $linkShareIcon.remove();
@@ -103,7 +103,7 @@
                 </div>
             </div>
             <div class="workarea">
-                <div class="workarea-sidemenu" id="sideMenuEdit">
+                <div class="workarea-sidemenu" id="rightMenu">
                     <div class="workarea-sidemenu-item">
                     </div>
                     <div class="workarea-sidemenu-item">
@@ -116,13 +116,13 @@
                         ここに検索結果が表示されます。
                     </div>
                 </div>
-                <div class="workarea-sidemenu" id="sideMenuView">
-                    <div class="workarea-sidemenu-item" id="sideMenuViewDocs">
-                        <div class="workarea-sidemenu-item-icon" id="sideMenuViewDocsIcon">
+                <div class="workarea-sidemenu" id="rightMenu">
+                    <div class="workarea-sidemenu-item" id="rightMenuDocs">
+                        <div class="workarea-sidemenu-item-icon" id="rightMenuDocsIcon">
                         </div>
                     </div>
-                    <div class="workarea-sidemenu-item" id="sideMenuViewShare">
-                        <div class="workarea-sidemenu-item-icon" id="sideMenuViewShareIcon">
+                    <div class="workarea-sidemenu-item" id="rightMenuShare">
+                        <div class="workarea-sidemenu-item-icon" id="rightMenuShareIcon">
                         </div>
                     </div>
                     <div class="workarea-sidemenu-item">
