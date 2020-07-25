@@ -18,6 +18,11 @@
                 });
 
                 $('#sideMenuViewDocs').on('click', () => {
+                    if(dict.selectedItemIndex == -1) {
+                        alert('単語を選択してください。');
+                        return;
+                    }
+
                     location.href = dict.getDocsURI();
                 });
             });
