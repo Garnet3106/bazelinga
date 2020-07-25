@@ -137,6 +137,10 @@ div.workarea-sidemenu-item-icon#sideMenuViewShare {
     background-image: url('../../lib/dict/img/ja/share.svg');
 }
 
+div.workarea-sidemenu-item-icon#sideMenuViewShareTwitter {
+    background-image: url('../../lib/dict/img/ja/twitter.svg');
+}
+
 div.workarea-sidemenu-item-icon:last-child {
     border: none;
 }

@@ -42,19 +42,41 @@
                     location.href = dict.getDocsURI();
                 });
 
-                $('#sideMenuViewShare').on('click', () => {
+                $('#sideMenuViewShare').on('click', event => {
                     if(dict.selectedItemIndex == -1) {
                         alert('単語を選択してください。');
                         return;
                     }
 
-                    
+                    let $target = $(event.target);
+
+                    $linkShareIcon = $('<div class="workarea-sidemenu-item-icon" id="sideMenuViewShareLink"></div>');
+                    $twitterShareIcon = $('<div class="workarea-sidemenu-item-icon" id="sideMenuViewShareTwitter"></div>');
+
+                    $linkShareIcon.on('click', () => {
+                        // ドキュメントURLをクリップボードにコピー
+                        $clipboardText = $('<div id="clipboardText">' + dict.getDocsURI() + '</div>');
+                        $('#body').append($clipboardText);
+                        let $text = $('#clipboardText');
+                        getSelection().selectAllChildren(document.getElementById('clipboardText'));
+                        document.execCommand('copy');
+                        $clipboardText.remove();
+
+                        alert('クリップボードにコピーしました。');
+                    });
+
+                    $twitterShareIcon.on('click', () => {
+                        location.href = dict.getTwitterShareLink();
+                    });
+
+                    $target.parent().append($linkShareIcon);
+                    $target.parent().append($twitterShareIcon);
                 });
             });
         </script>
         <title>把日辞書検索</title>
     </head>
-    <body>
+    <body id="body">
         <div class="main" id="main">
             <div class="top" id="top">
                 <div class="top-icons">
@@ -85,10 +107,6 @@
                         </div>
                     </div>
                     <div class="workarea-sidemenu-item">
-                        <div class="workarea-sidemenu-item-icon" id="sideMenuViewShare">
-                        </div>
-                        <div class="workarea-sidemenu-item-icon" id="sideMenuViewShare">
-                        </div>
                         <div class="workarea-sidemenu-item-icon" id="sideMenuViewShare">
                         </div>
                     </div>

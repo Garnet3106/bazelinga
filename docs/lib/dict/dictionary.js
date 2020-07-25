@@ -204,6 +204,23 @@ class Dictionary {
         return result;
     }
 
+    getTwitterShareLink() {
+        let $item = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
+        let spell = $item.children('.workarea-wordlist-item-spell').text();
+
+        let relatedAccount = 'Garnet3106';
+
+        let string = 'BazeLinga \'' + spell + '\'';
+        let link = 'http://bazelinga.gant.work/docs/' + this.lang + '/dict/search/#' + spell;
+        let mention = '@bazelinga';
+        let hashtag = '#bazelinga';
+
+        // encodeURI() でシャープ記号がエンコードされないので手動で置換する
+        let text = encodeURI(string + '\n\n' + link + '\n' + mention + ' ' + hashtag).replace(/#/g, '%23');
+
+        return 'https://twitter.com/share?related=' + relatedAccount + '&text=' + text;
+    }
+
     getWordType(type) {
         let result = this.langData[this.lang]['types'][type];
 
