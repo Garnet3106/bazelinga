@@ -130,19 +130,19 @@ div.workarea-sidemenu-item-icon {
 }
 
 div.workarea-sidemenu-item-icon#rightMenuDocsIcon {
-    background-image: url('../../lib/dict/img/ja/docs.svg');
+    background-image: url('../../dict/img/docs.svg');
 }
 
 div.workarea-sidemenu-item-icon#rightMenuShareIcon {
-    background-image: url('../../lib/dict/img/ja/share.svg');
+    background-image: url('../../dict/img/share.svg');
 }
 
 div.workarea-sidemenu-item-icon#rightMenuShareLink {
-    background-image: url('../../lib/dict/img/ja/link.svg');
+    background-image: url('../../dict/img/link.svg');
 }
 
 div.workarea-sidemenu-item-icon#rightMenuShareTwitter {
-    background-image: url('../../lib/dict/img/ja/twitter.svg');
+    background-image: url('../../dict/img/twitter.svg');
 }
 
 div.workarea-sidemenu-item-icon:last-child {

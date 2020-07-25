@@ -133,7 +133,7 @@ class Dictionary {
                 console.log('Failed to load dictionary data file.');
             });
 
-        options.url = 'http://bazelinga.gant.work/docs/lib/dict/langs.json';
+        options.url = 'http://bazelinga.gant.work/docs/lib/dict/data/langs.json';
 
         // 言語データを読み込む
         $.ajax(options)
