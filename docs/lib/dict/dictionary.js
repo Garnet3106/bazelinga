@@ -185,19 +185,14 @@ class Dictionary {
 
     /*
      * 検索キーワードをもとにドキュメントのURIを取得する
-     * 条件によって戻り値が異なる
-     *     通常: 各単語のページのURIを返す
-     *     空の場合: 各言語の辞書ページのURIを返す
      */
     getDocsURI() {
-        let keyword = $('#searchInput').val();
+        let $item = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
+        let spell = $item.find('.workarea-wordlist-item-spell').text();
         //let dictURI = location.protocol + '://' + location.host + '/' + location.pathname;
-        let dictTopURI = 'http://bazelinga.gant.work/docs/' + this.lang + '/dict/';
+        let dictURI = 'http://bazelinga.gant.work/docs/' + this.lang + '/dict/words/' + spell + '/';
 
-        if(keyword == '')
-            return dictTopURI;
-
-        return dictTopURI + 'words/' + keyword + '/';
+        return dictURI;
     }
 
     getTranslationClass(className) {
