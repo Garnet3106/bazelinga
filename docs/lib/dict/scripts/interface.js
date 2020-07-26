@@ -67,14 +67,41 @@ class Interface {
         $clipboardText.remove();
     }
 
-    hideGuideMessage() {
-        $('#wordListGuide').hide();
+    /*
+     * id
+     *   すべて → 指定なし(undefined)
+     *   指定する → メニューのエレメントID
+     */
+    hideMenu(id) {
+        let $sideMenuItems;
+
+        // 引数をもとに対象のメニューアイテムを取り出す
+        if(id === undefined) {
+            $sideMenuItems = $('.workarea-sidemenu-item');
+        } else {
+            $sideMenuItems = $('#' + id);
+        }
+
+        $sideMenuItems.each((itemIndex, item) => {
+            let parentID = $(item).parent().attr('id');
+            // 除外するインデックス = TopIconのインデックス (left: 0, right: 最後のインデックス)
+            let exceptIndex = 0;
+
+            if(parentID == 'leftMenu')
+                exceptIndex = $(item).children().length - 1;
+
+            $(item).children().each((iconIndex, icon) => {
+                // インデックスが除外対象であればreturn
+                if(iconIndex == exceptIndex)
+                    return;
+
+                $(icon).remove();
+            });
+        });
     }
 
-    hideShareMenu() {
-        let $rightMenuShare = $('#rightMenuShare');
-        $rightMenuShare.children('#rightMenuShareLink').remove();
-        $rightMenuShare.children('#rightMenuShareTwitter').remove();
+    hideGuideMessage() {
+        $('#wordListGuide').hide();
     }
 
     init() {
@@ -110,7 +137,7 @@ class Interface {
 
         // アイコンがすでに表示されている場合は閉じる
         if($rightMenuShare.children().length > 1) {
-            this.hideShareMenu();
+            this.hideMenu('rightMenuShare');
             return;
         }
 
@@ -125,14 +152,14 @@ class Interface {
         $linkShareIcon.on('click', () => {
             // ドキュメントURLをクリップボードにコピー
             this.copyToClipboard(this.dict.getDocsURI(this.selectedItemIndex));
-            this.hideShareMenu();
+            this.hideMenu('rightMenuShare');
             alert('クリップボードにコピーしました。');
         });
 
         $twitterShareIcon.on('click', () => {
             // Twitterのシェアリンクを新規タブで開く
             open(this.dict.getTwitterShareLink(this.selectedItemIndex));
-            this.hideShareMenu();
+            this.hideMenu('rightMenuShare');
         });
 
         $rightMenuShare.append($linkShareIcon);
@@ -149,6 +176,12 @@ class Interface {
         this.unslectListItem();
 
         $items.eq(index).css('background-color', '#dddddd');
+
+        let $sideMenuItems = $('.workarea-sidemenu-item');
+        let $sideMenuIcons = $('.workarea-sidemenu-item-icon');
+        $sideMenuItems.css('background-color', '#ffffff');
+        $sideMenuIcons.css('cursor', 'default');
+
         this.selectedItemIndex = index;
     }
 
@@ -198,6 +231,11 @@ class Interface {
     unslectListItem() {
         let $items = $('.workarea-wordlist-item');
         $items.css('background-color', '#ffffff');
+
+        let $sideMenuItems = $('.workarea-sidemenu-item');
+        let $sideMenuIcons = $('.workarea-sidemenu-item-icon');
+        $sideMenuItems.css('background-color', '#dddddd');
+        $sideMenuIcons.css('cursor', 'not-allowed');
 
         this.selectedItemIndex = -1;
     }

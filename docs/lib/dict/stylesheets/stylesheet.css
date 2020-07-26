@@ -109,13 +109,14 @@ div.workarea-sidemenu {
 }
 
 div.workarea-sidemenu-item {
-    background-color: #ffffff;
+    background-color: #dddddd;
     display: flex;
+    transition: all 200ms 0s ease;
 }
 
 div.workarea-sidemenu-item-icon {
     background-size: 100% 100%;
-    cursor: pointer;
+    cursor: not-allowed;
     height: 40px;
     transition: all 200ms 0s ease;
     width: 40px;
