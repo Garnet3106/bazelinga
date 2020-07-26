@@ -1,6 +1,3 @@
-/*
- * 辞書検索のインタフェース周りを扱う
- */
 class Interface {
     constructor(lang) {
         this.dict = new Dictionary(lang);
@@ -60,11 +57,13 @@ class Interface {
     }
 
     copyToClipboard(text) {
-        $clipboardText = $('<div id="clipboardText">' + text + '</div>');
+        let $clipboardText = $('<div id="clipboardText">' + text + '</div>');
         $('#body').append($clipboardText);
+
         // DOM要素が必要なので getElementById() を使う
         getSelection().selectAllChildren(document.getElementById('clipboardText'));
         document.execCommand('copy');
+
         $clipboardText.remove();
     }
 
@@ -93,12 +92,12 @@ class Interface {
     }
 
     onDocsTopClicked() {
-        if(this.dict.selectedItemIndex == -1) {
+        if(this.selectedItemIndex == -1) {
             alert('単語を選択してください。');
             return;
         }
 
-        location.href = this.dict.getDocsURI();
+        location.href = this.dict.getDocsURI(this.selectedItemIndex);
     }
 
     onSearchInputClicked() {
@@ -124,14 +123,14 @@ class Interface {
 
         $linkShareIcon.on('click', () => {
             // ドキュメントURLをクリップボードにコピー
-            this.copyToClipboard(this.getDocsURI());
+            this.copyToClipboard(this.dict.getDocsURI(this.selectedItemIndex));
             this.hideShareMenu();
             alert('クリップボードにコピーしました。');
         });
 
         $twitterShareIcon.on('click', () => {
             // Twitterのシェアリンクを新規タブで開く
-            open(this.getTwitterShareLink());
+            open(this.dict.getTwitterShareLink(this.selectedItemIndex));
             this.hideShareMenu();
         });
 

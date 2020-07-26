@@ -1,6 +1,3 @@
-/*
- * 辞書データを操作する
- */
 class Dictionary {
     constructor(lang) {
         this.lang = lang;
@@ -8,12 +5,6 @@ class Dictionary {
         this.dataReady = false;
     }
 
-    /*
-     * 検索キーワードをフォーマットする
-     * - - - - - - - - - -
-     * keyword: フォーマットされる前のキーワード文字列
-     * - - - - - - - - - -
-     */
     formatSearchKeyword(keyword) {
         keyword = keyword.replace(/　/g, ' ');
         keyword = keyword.replace(/^ +/g, '');
@@ -23,13 +14,9 @@ class Dictionary {
         return keyword;
     }
 
-    /*
-     * 検索キーワードをもとにドキュメントのURIを取得する
-     */
-    getDocsURI() {
-        let $item = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
-        let spell = $item.children('.workarea-wordlist-item-spell').text();
-        //let dictURI = location.protocol + '://' + location.host + '/' + location.pathname;
+    getDocsURI(index) {
+        let $item = $('.workarea-wordlist-item').eq(index);
+        let spell = $item.children('.workarea-wordlist-item-spell').eq(0).text();
         let dictURI = 'http://bazelinga.gant.work/docs/' + this.lang + '/dict/words/' + spell + '/';
 
         return dictURI;
@@ -44,8 +31,8 @@ class Dictionary {
         return result;
     }
 
-    getTwitterShareLink() {
-        let $item = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
+    getTwitterShareLink(index) {
+        let $item = $('.workarea-wordlist-item').eq(index);
         let spell = $item.children('.workarea-wordlist-item-spell').text();
 
         let relatedAccount = 'Garnet3106';
