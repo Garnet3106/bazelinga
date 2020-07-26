@@ -36,10 +36,13 @@
             "verb-transitive": "他動"
         },
         "messages": {
+            "add": "追加",
+            "back": "戻る",
             "copiedToClipboard": "クリップボードにコピーしました。",
             "displayResults": "ここに検索結果が表示されます。",
             "loadFailed": "辞書データのロードに失敗しました。",
             "selectWords": "単語を選択してください。",
+            "wordAddition": "単語追加",
             "wordNotFound": "単語が見つかりませんでした。"
         }
     }

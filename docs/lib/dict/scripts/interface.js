@@ -117,6 +117,16 @@ class Interface {
         $('#wordListGuide').hide();
     }
 
+    hidePopup() {
+        let $popup = $('.popup');
+        $popup.hide();
+
+        $('#popupTitle').text('');
+        $('#popupIcon').attr('src', '');
+        $('#popupContent').empty();
+        $('#popupBottom').empty();
+    }
+
     init() {
         $(() => {
             let $searchInput = $('#searchInput');
@@ -139,6 +149,27 @@ class Interface {
     }
 
     onAddTopClicked() {
+        $('#popupTitle').text(this.messages.wordAddition);
+        $('#popupIcon').attr('src', '../../../lib/dict/img/add.svg');
+
+        //$('#popupContent');
+
+        let $popupBottom = $('#popupBottom');
+
+        let $backButton = $('<div class="popup-bottom-button" id="popupBackButton">' + this.messages.back + '</div>');
+        let $addButton = $('<div class="popup-bottom-button" id="popupAddButton">' + this.messages.add + '</div>');
+
+        $backButton.on('click', () => {
+            this.hidePopup();
+        });
+
+        $backButton.on('click', () => {
+            // 単語の追加処理
+        });
+
+        $popupBottom.append($backButton);
+        $popupBottom.append($addButton);
+
         this.showPopup();
     }
 
