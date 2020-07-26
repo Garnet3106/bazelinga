@@ -102,18 +102,10 @@ div.workarea {
 }
 
 div.workarea-sidemenu {
-    background-color: #ffffff;
     display: flex;
     flex-direction: column;
+    height: 100%;
     width: 40px;
-}
-
-div.workarea-sidemenu#leftMenu {
-    height: 120px;
-}
-
-div.workarea-sidemenu#rightMenu {
-    height: 160px;
 }
 
 div.workarea-sidemenu-item {
@@ -127,6 +119,18 @@ div.workarea-sidemenu-item-icon {
     height: 40px;
     transition: all 200ms 0s ease;
     width: 40px;
+}
+
+div.workarea-sidemenu-item-icon#leftMenuAddTop {
+    background-image: url('../../dict/img/add.svg');
+}
+
+div.workarea-sidemenu-item-icon#leftMenuEditTop {
+    background-image: url('../../dict/img/edit.svg');
+}
+
+div.workarea-sidemenu-item-icon#leftMenuRemoveTop {
+    background-image: url('../../dict/img/remove.svg');
 }
 
 div.workarea-sidemenu-item-icon#rightMenuDocsTop {
