@@ -1,8 +1,9 @@
 class Dictionary {
-    constructor(lang) {
-        this.lang = lang;
+    constructor(langPack) {
         this.data = {};
-        this.dataReady = false;
+        this.lang = langPack.lang;
+        this.langPack = langPack;
+        this.ready = false;
     }
 
     formatSearchKeyword(keyword) {
@@ -58,29 +59,8 @@ class Dictionary {
     }
 
     load(succeeded = () => {}, failed = (jqXHR, status, error) => {}) {
-        let dictDataURI = 'http://bazelinga.gant.work/docs/lib/dict/data/' + this.lang + '.json';
+        let uri = 'http://bazelinga.gant.work/docs/lib/dict/data/' + this.lang + '.json';
 
-        this.loadJsonData(dictDataURI, data => {
-            // ロード成功時
-            this.data = data;
-            let langDataURI = 'http://bazelinga.gant.work/docs/lib/dict/data/langs.json';
-
-            this.loadJsonData(langDataURI, data => {
-                // ロード成功時
-                this.langData = data;
-                this.dataReady = true;
-                succeeded();
-            }, (jqXHR, status, error) => {
-                // ロード失敗時
-                failed(jqXHR, status, error);
-            });
-        }, (jqXHR, status, error) => {
-            // ロード失敗時
-            failed(jqXHR, status, error);
-        });
-    }
-
-    loadJsonData(uri, succeeded = data => {}, failed = (jqXHR, status, error) => {}) {
         let options = {
             dataType: 'json',
             timespan: 5000,
@@ -88,8 +68,17 @@ class Dictionary {
         };
 
         $.ajax(options)
-            .done(succeeded)
-            .fail(failed);
+            .done(data => {
+                // ロード成功時
+                this.data = data;
+                this.ready = true;
+
+                succeeded();
+            })
+            .fail((jqXHR, status, error) => {
+                // ロード失敗時
+                failed(jqXHR, status, error);
+            });
     }
 
     search(keyword) {

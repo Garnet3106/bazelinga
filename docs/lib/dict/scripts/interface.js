@@ -1,14 +1,25 @@
 class Interface {
     constructor(lang) {
-        this.dict = new Dictionary(lang);
         this.lang = lang;
+        this.langPack = new LangPack(lang);
+        this.dict = new Dictionary(this.langPack);
         // 選択された単語リストの項目の番号 (未選択: -1)
         this.selectedItemIndex = -1;
 
-        this.dict.load(() => {
+        this.langPack.load(() => {
             // ロード成功時
-            this.init();
+            let langData = this.langPack.getData();
+            this.messages = langData.messages;
+
+            this.dict.load(() => {
+                // ロード成功時
+                this.init();
+            }, (jqXHR, status, error) => {
+                // ロード失敗時
+                console.log('Failed to load data file.');
+            });
         }, (jqXHR, status, error) => {
+            // ロード失敗時
             console.log('Failed to load data file.');
         });
     }
@@ -121,7 +132,7 @@ class Interface {
 
     onDocsTopClicked() {
         if(this.selectedItemIndex == -1) {
-            alert('単語を選択してください。');
+            alert(this.messages.selectWords);
             return;
         }
 
@@ -142,7 +153,7 @@ class Interface {
         }
 
         if(this.selectedItemIndex == -1) {
-            alert('単語を選択してください。');
+            alert(this.messages.selectWords);
             return;
         }
 
@@ -153,7 +164,7 @@ class Interface {
             // ドキュメントURLをクリップボードにコピー
             this.copyToClipboard(this.dict.getDocsURI(this.selectedItemIndex));
             this.hideMenu('rightMenuShare');
-            alert('クリップボードにコピーしました。');
+            alert(this.messages.copiedToClipboard);
         });
 
         $twitterShareIcon.on('click', () => {
@@ -245,7 +256,7 @@ class Interface {
         let $wordListItem = $('.workarea-wordlist-item');
 
         // データの読み込みが未完了の場合はアラートを表示
-        if(!this.dict.dataReady) {
+        if(!this.dict.ready || !this.langPack.ready) {
             alert('Please wait...');
             // 入力された文字列を残さない
             $searchInput.val('');
@@ -255,11 +266,10 @@ class Interface {
         $wordListItem.remove();
         this.unslectListItem();
 
-        let guideMsgs = this.dict.langData[this.lang].guides;
         let keyword = this.dict.formatSearchKeyword($searchInput.val());
 
         if(keyword == '') {
-            this.setGuideMessage(guideMsgs.displayResults);
+            this.setGuideMessage(this.messages.displayResults);
             this.showGuideMessage();
             return;
         }
@@ -267,12 +277,12 @@ class Interface {
         let words = this.dict.search(keyword);
 
         if(words.length == 0) {
-            this.setGuideMessage(guideMsgs.wordNotFound);
+            this.setGuideMessage(this.messages.wordNotFound);
             this.showGuideMessage();
             return;
         }
 
-        this.setGuideMessage(guideMsgs.displayResults);
+        this.setGuideMessage(this.messages.displayResults);
         this.hideGuideMessage();
         this.addWordsToList(words);
     }
