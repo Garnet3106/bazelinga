@@ -88,6 +88,7 @@ class Interface {
             $rightMenuShareTop.on('click', () => { this.onShareTopClicked() });
 
             this.setSideMenuObserver();
+            this.setInitialKeyword();
         });
     }
 
@@ -149,6 +150,21 @@ class Interface {
 
         $items.eq(index).css('background-color', '#dddddd');
         this.selectedItemIndex = index;
+    }
+
+    setInitialKeyword() {
+        let uriHash = location.hash;
+
+        if(uriHash == '')
+            return;
+
+        let $searchInput = $('#searchInput');
+        // URIの'#'を取り除いてデコード
+        let keyword = decodeURI(uriHash.substring(1));
+
+        $searchInput.val(keyword);
+        // val() ではイベントが発火しないので手動で処理
+        $searchInput.trigger('input');
     }
 
     setGuideMessage(message) {
