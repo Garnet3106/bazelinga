@@ -129,11 +129,11 @@ div.workarea-sidemenu-item-icon {
     width: 40px;
 }
 
-div.workarea-sidemenu-item-icon#rightMenuDocsIcon {
+div.workarea-sidemenu-item-icon#rightMenuDocsTop {
     background-image: url('../../dict/img/docs.svg');
 }
 
-div.workarea-sidemenu-item-icon#rightMenuShareIcon {
+div.workarea-sidemenu-item-icon#rightMenuShareTop {
     background-image: url('../../dict/img/share.svg');
 }
 
