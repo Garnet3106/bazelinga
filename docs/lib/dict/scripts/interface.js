@@ -120,16 +120,26 @@ class Interface {
     init() {
         $(() => {
             let $searchInput = $('#searchInput');
+            let $leftMenuAddTop = $('#leftMenuAddTop');
+            let $leftMenuEditTop = $('#leftMenuEditTop');
+            let $leftMenuRemoveTop = $('#leftMenuRemoveTop');
             let $rightMenuDocsTop = $('#rightMenuDocsTop');
             let $rightMenuShareTop = $('#rightMenuShareTop');
 
             $searchInput.on('input', () => { this.onSearchInputClicked() });
+            $leftMenuAddTop.on('click', () => { this.onAddTopClicked() });
+            $leftMenuEditTop.on('click', () => { this.onEditTopClicked() });
+            $leftMenuRemoveTop.on('click', () => { this.onRemoveTopClicked() });
             $rightMenuDocsTop.on('click', () => { this.onDocsTopClicked() });
             $rightMenuShareTop.on('click', () => { this.onShareTopClicked() });
 
             this.setSideMenuObserver();
             this.setInitialKeyword();
         });
+    }
+
+    onAddTopClicked() {
+        this.showPopup();
     }
 
     onDocsTopClicked() {
@@ -140,6 +150,10 @@ class Interface {
 
         location.href = this.dict.getDocsURI(this.selectedItemIndex);
     }
+
+    onEditTopClicked() {}
+
+    onRemoveTopClicked() {}
 
     onSearchInputClicked() {
         this.updateWordList();
@@ -239,6 +253,12 @@ class Interface {
 
     showGuideMessage() {
         $('#wordListGuide').show();
+    }
+
+    showPopup() {
+        let $popup = $('.popup');
+        $popup.css('display', 'flex');
+        $popup.show();
     }
 
     unslectListItem() {

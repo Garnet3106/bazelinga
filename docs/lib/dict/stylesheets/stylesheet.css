@@ -47,6 +47,66 @@ div.main {
     justify-content: center;
 }
 
+div.popup {
+    align-items: center;
+    background-color: rgba(0, 0, 0, .3);
+    display: none;
+    height: 100vh;
+    justify-content: center;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100vw;
+}
+
+div.popup-main {
+    background-color: #ffffff;
+    padding: 30px;
+}
+
+div.popup-bottom {
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+div.popup-bottom-button {
+    align-items: center;
+    background-color: #eeeeee;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    font-size: 15px;
+    height: 30px;
+    justify-content: center;
+    width: 80px;
+}
+
+div.popup-content {
+    background-color: #eeeeee;
+    height: 30vh;
+    margin: 25px 0;
+    width: 30vw;
+}
+
+div.popup-top {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+img.popup-top-icon {
+    height: 30px;
+    width: 30px;
+}
+
+div.popup-top-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
 div.top {
     background: #ffffff;
     border-radius: 5px;
@@ -123,7 +183,9 @@ div.workarea-sidemenu-item-icon {
 }
 
 div.workarea-sidemenu-item-icon#leftMenuAddTop {
+    background-color: #ffffff !important;
     background-image: url('../../dict/img/add.svg');
+    cursor: pointer !important;
 }
 
 div.workarea-sidemenu-item-icon#leftMenuEditTop {
