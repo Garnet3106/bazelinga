@@ -201,7 +201,7 @@ div.workarea-wordlist-item:last-child {
 }
 
 div.workarea-wordlist-item:hover {
-    background-color: #eeeeee;
+    background-color: #eeeeee !important;
 }
 
 div.workarea-wordlist-item:active {
