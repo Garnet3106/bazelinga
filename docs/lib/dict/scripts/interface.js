@@ -10,6 +10,8 @@ class Interface {
             // ロード成功時
             let langData = this.langPack.getData();
             this.messages = langData.messages;
+            this.wordClasses = langData.classes;
+            this.wordTypes = langData.types;
 
             this.dict.load(() => {
                 // ロード成功時
@@ -30,12 +32,12 @@ class Interface {
 
         wordList.forEach(word => {
             word.translation.forEach(translation => {
-                let wordClass = this.dict.getTranslationClass(translation.class);
+                let wordClass = this.wordClasses[translation.class];
 
                 // 要素を生成・追加
                 let $elem = $('<div class="workarea-wordlist-item"></div>');
                 $elem.append('<div class="workarea-wordlist-item-spell">' + word.spell + '</div>');
-                $elem.append('<div class="workarea-wordlist-item-type">[' + this.dict.getWordType(translation.type) + ']</div>');
+                $elem.append('<div class="workarea-wordlist-item-type">[' + this.wordTypes[translation.type] + ']</div>');
 
                 if(translation.class != 'general')
                     $elem.append('<div class="workarea-wordlist-item-class">[' + wordClass + ']</div>');

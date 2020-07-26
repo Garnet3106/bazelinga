@@ -23,15 +23,6 @@ class Dictionary {
         return dictURI;
     }
 
-    getTranslationClass(className) {
-        let result = this.langData[this.lang]['classes'][className];
-
-        if(result == undefined)
-            return '?';
-
-        return result;
-    }
-
     getTwitterShareLink(index) {
         let $item = $('.workarea-wordlist-item').eq(index);
         let spell = $item.children('.workarea-wordlist-item-spell').text();
@@ -47,15 +38,6 @@ class Dictionary {
         let text = encodeURI(string + '\n\n' + link + '\n' + mention + ' ' + hashtag).replace(/#/g, '%23');
 
         return 'https://twitter.com/share?related=' + relatedAccount + '&text=' + text;
-    }
-
-    getWordType(type) {
-        let result = this.langData[this.lang]['types'][type];
-
-        if(result == undefined)
-            return '?';
-
-        return result;
     }
 
     load(succeeded = () => {}, failed = (jqXHR, status, error) => {}) {
