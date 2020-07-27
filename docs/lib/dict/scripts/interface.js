@@ -118,13 +118,17 @@ class Interface {
     }
 
     hidePopup() {
-        let $popup = $('.popup');
-        $popup.hide();
+        let $popup = $('#popup');
+        $popup.css('opacity', '0');
 
-        $('#popupTitle').text('');
-        $('#popupIcon').attr('src', '');
-        $('#popupContent').empty();
-        $('#popupBottom').empty();
+        setTimeout(() => {
+            $popup.hide();
+
+            $('#popupTitle').text('');
+            $('#popupIcon').attr('src', '');
+            $('#popupContent').empty();
+            $('#popupBottom').empty();
+        }, 200);
     }
 
     init() {
@@ -152,10 +156,22 @@ class Interface {
         $('#popupTitle').text(this.messages.wordAddition);
         $('#popupIcon').attr('src', '../../../lib/dict/img/add.svg');
 
-        //$('#popupContent');
+        let $popupContent = $('#popupContent');
+        let $inputArea = $('<div class="popup-content-add-inputarea" id="popupAddInputArea"></div>');
+
+        // { メッセージ名: IDの末尾, ... }
+        let inputItems = { 'spell': 'Spell', 'ipa': 'IPA', 'type': 'Type' };
+
+        for(let [ key, value ] in inputItems) {
+            let $pair = $('<div class="popup-content-add-inputarea-pair" id="popupAddInputArea' + value + '">');
+            $pair.append('<div id="popupAddInputAreaPairName">' + this.messages[key] + '</div>');
+            $pair.append('<input id="popupAddInputAreaPairInput">');
+            $inputArea.append($pair);
+        }
+
+        $popupContent.append($inputArea);
 
         let $popupBottom = $('#popupBottom');
-
         let $backButton = $('<div class="popup-bottom-button" id="popupBackButton">' + this.messages.back + '</div>');
         let $addButton = $('<div class="popup-bottom-button" id="popupAddButton">' + this.messages.add + '</div>');
 
@@ -287,9 +303,14 @@ class Interface {
     }
 
     showPopup() {
-        let $popup = $('.popup');
+        let $popup = $('#popup');
         $popup.css('display', 'flex');
         $popup.show();
+
+        // なぜか直後だとアニメーションされないのでtimeoutをもうける
+        setTimeout(() => {
+            $popup.css('opacity', '1');
+        }, 50);
     }
 
     unslectListItem() {
