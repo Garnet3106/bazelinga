@@ -100,12 +100,13 @@ div.popup-content-add-inputarea-pair {
     align-items: center;
     display: inline-block;
     font-size: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 div.popup-content-add-inputarea-pair > div {
     display: inline-block;
-    margin-right: 15px;
+    margin-right: 10px;
+    vertical-align: middle;
 }
 
 div.popup-content-add-inputarea-pair > input {
@@ -115,7 +116,7 @@ div.popup-content-add-inputarea-pair > input {
     height: 25px;
     outline: none;
     text-align: center;
-    width: 100px;
+    width: 120px;
 }
 
 div.popup-top {
