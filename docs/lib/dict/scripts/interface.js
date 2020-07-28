@@ -162,13 +162,16 @@ class Interface {
         // { メッセージ名: IDの末尾, ... }
         let inputItems = { 'spell': 'Spell', 'ipa': 'IPA', 'type': 'Type' };
 
-        for(let [ key, value ] in inputItems) {
-            let $pair = $('<div class="popup-content-add-inputarea-pair" id="popupAddInputArea' + value + '">');
-            $pair.append('<div id="popupAddInputAreaPairName">' + this.messages[key] + '</div>');
-            $pair.append('<input id="popupAddInputAreaPairInput">');
+        for(let key in inputItems) {
+            let pairID = 'popupAddInputArea' + inputItems[key];
+            let $pair = $('<div class="popup-content-add-inputarea-pair" id="' + pairID + '">');
+            $pair.append('<div id="' + pairID + 'Name">' + this.messages[key] + '</div>');
+            $pair.append('<input id="' + pairID + 'Input">');
             $inputArea.append($pair);
+            $inputArea.append('<br>');
         }
 
+        $inputArea.find('br:last').remove();
         $popupContent.append($inputArea);
 
         let $popupBottom = $('#popupBottom');

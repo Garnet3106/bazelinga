@@ -87,38 +87,35 @@ div.popup-bottom-button {
 
 div.popup-content {
     background-color: #eeeeee;
-    height: 30vh;
     margin: 25px 0;
-    width: 30vw;
 }
 
 div.popup-content-add-inputarea {
-    background-color: #888888;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    padding-top: 10px;
-    width: 100%;
+    display: inline-block;
+    padding: 20px 20px 0 20px;
+    text-align: right;
 }
 
 div.popup-content-add-inputarea-pair {
     align-items: center;
-    background-color: #555555;
-    display: flex;
+    display: inline-block;
     font-size: 15px;
-    justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+div.popup-content-add-inputarea-pair > div {
+    display: inline-block;
+    margin-right: 15px;
 }
 
 div.popup-content-add-inputarea-pair > input {
     background-color: #ffffff;
     border: none;
+    border-radius: 5px;
     height: 25px;
     outline: none;
+    text-align: center;
     width: 100px;
-}
-
-div.popup-content-add-inputarea-pair > div {
 }
 
 div.popup-top {
