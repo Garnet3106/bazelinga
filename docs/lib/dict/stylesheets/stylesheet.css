@@ -92,7 +92,7 @@ div.popup-content {
 
 div.popup-content-add-inputarea {
     display: inline-block;
-    padding: 20px 20px 0 20px;
+    padding: 20px;
     text-align: right;
 }
 
@@ -100,7 +100,11 @@ div.popup-content-add-inputarea-pair {
     align-items: center;
     display: inline-block;
     font-size: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+div.popup-content-add-inputarea-pair:last-child {
+    margin: 0;
 }
 
 div.popup-content-add-inputarea-pair > div {

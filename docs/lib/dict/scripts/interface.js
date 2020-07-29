@@ -131,12 +131,7 @@ class Interface {
         $popup.css('opacity', '0');
 
         setTimeout(() => {
-            $popup.hide();
-
-            $('#popupTitle').text('');
-            $('#popupIcon').attr('src', '');
-            $('#popupContent').empty();
-            $('#popupBottom').empty();
+            $popup.remove();
         }, 200);
     }
 
@@ -150,7 +145,7 @@ class Interface {
             let $rightMenuShareTop = $('#rightMenuShareTop');
 
             $searchInput.on('input', () => { this.onSearchInputClicked() });
-            $leftMenuAddTop.on('click', () => { this.onAddTopClicked() });
+            $leftMenuAddTop.on('click', () => { this.showPopup(() => { this.initAddPopup() }) });
             $leftMenuEditTop.on('click', () => { this.onEditTopClicked() });
             $leftMenuRemoveTop.on('click', () => { this.onRemoveTopClicked() });
             $rightMenuDocsTop.on('click', () => { this.onDocsTopClicked() });
@@ -161,11 +156,15 @@ class Interface {
         });
     }
 
-    onAddTopClicked() {
-        $('#popupTitle').text(this.messages.wordAddition);
-        $('#popupIcon').attr('src', '../../../lib/dict/img/add.svg');
-
+    initAddPopup() {
+        let $popupTitle = $('#popupTopTitle');
+        let $popupIcon = $('#popupTopIcon');
         let $popupContent = $('#popupContent');
+
+        let iconURI = '../../../lib/dict/img/add.svg';
+        $popupTitle.text(this.messages.wordAddition);
+        $popupIcon.attr('src', iconURI);
+
         let $inputArea = $('<div class="popup-content-add-inputarea" id="popupAddInputArea"></div>');
 
         // { メッセージ名: IDの末尾, ... }
@@ -201,8 +200,6 @@ class Interface {
 
         $popupBottom.append($backButton);
         $popupBottom.append($addButton);
-
-        this.showPopup();
     }
 
     onDocsTopClicked() {
@@ -347,10 +344,33 @@ class Interface {
         $('#wordListGuide').show();
     }
 
-    showPopup() {
-        let $popup = $('#popup');
+    showPopup(onReady = () => {}) {
+        // 初期化中に表示させないためにポップアップのスタイルは display: none に設定してある
+
+        let $popup = $('<div class="popup" id="popup"></div>');
+
+        let $popupMain = $('<div class="popup-main"></div>');
+
+        let $popupTop = $('<div class="popup-top"></div>');
+        let $popupTopTitle = $('<div class="popup-top-title" id="popupTopTitle"></div>');
+        let $popupTopIcon = $('<img class="popup-top-icon" id="popupTopIcon">');
+
+        let $popupContent = $('<div class="popup-content" id="popupContent"></div>');
+
+        let $popupBottom = $('<div class="popup-bottom" id="popupBottom"></div>');
+
+        $popupTop.append($popupTopIcon);
+        $popupTop.append($popupTopTitle);
+
+        $popupMain.append($popupTop);
+        $popupMain.append($popupContent);
+        $popupMain.append($popupBottom);
+
+        $popup.append($popupMain);
+        $('#body').append($popup);
+
+        onReady();
         $popup.css('display', 'flex');
-        $popup.show();
 
         // なぜか直後だとアニメーションされないのでtimeoutをもうける
         setTimeout(() => {
