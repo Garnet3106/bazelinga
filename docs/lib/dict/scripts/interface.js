@@ -164,22 +164,37 @@ class Interface {
 
     init() {
         $(() => {
-            let $searchInput = $('#searchInput');
-            let $leftMenuAddTop = $('#leftMenuAddTop');
-            let $leftMenuEditTop = $('#leftMenuEditTop');
-            let $leftMenuRemoveTop = $('#leftMenuRemoveTop');
-            let $rightMenuDocsTop = $('#rightMenuDocsTop');
-            let $rightMenuShareTop = $('#rightMenuShareTop');
-
-            $searchInput.on('input', () => { this.onSearchInputClicked() });
-            $leftMenuAddTop.on('click', () => { this.showPopup($popup => { this.initAddPopup($popup) }) });
-            $leftMenuEditTop.on('click', () => { this.onEditTopClicked() });
-            $leftMenuRemoveTop.on('click', () => { this.onRemoveTopClicked() });
-            $rightMenuDocsTop.on('click', () => { this.onDocsTopClicked() });
-            $rightMenuShareTop.on('click', () => { this.onShareTopClicked() });
-
+            this.initEvents();
             this.setSideMenuObserver();
             this.setInitialKeyword();
+        });
+    }
+
+    initEvents() {
+        $('#searchInput').on('input', () => {
+            this.onSearchInputClicked();
+        });
+
+        $('#leftMenuAddTop').on('click', () => {
+            this.showPopup($popup => {
+                this.initAddPopup($popup);
+            });
+        });
+
+        $('#leftMenuEditTop').on('click', () => {
+            this.onEditTopClicked();
+        });
+
+        $('#leftMenuRemoveTop').on('click', () => {
+            this.onRemoveTopClicked();
+        });
+
+        $('#rightMenuDocsTop').on('click', () => {
+            this.onDocsTopClicked();
+        });
+
+        $('#rightMenuShareTop').on('click', () => {
+            this.onShareTopClicked();
         });
     }
 
