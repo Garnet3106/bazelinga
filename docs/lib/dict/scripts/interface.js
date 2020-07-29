@@ -223,15 +223,8 @@ class Interface {
     }
 
     onDocsTopClicked() {
-        if(this.selectedItemIndex == -1) {
-            // alert
-            /*this.showConfirmationPopup(() => {
-                let okButton = $('<div class="confirm-button" id="confirmOKButton">');
-                (this.messages.selectWord);
-            });*/
-
+        if(this.selectedItemIndex == -1)
             return;
-        }
 
         location.href = this.dict.getDocsURI(this.selectedItemIndex);
     }
@@ -253,10 +246,8 @@ class Interface {
             return;
         }
 
-        if(this.selectedItemIndex == -1) {
-            alert(this.messages.selectWord);
+        if(this.selectedItemIndex == -1)
             return;
-        }
 
         let $linkShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareLink"></div>');
         let $twitterShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareTwitter"></div>');
@@ -265,7 +256,7 @@ class Interface {
             // ドキュメントURLをクリップボードにコピー
             this.copyToClipboard(this.dict.getDocsURI(this.selectedItemIndex));
             this.hideMenu('rightMenuShare');
-            alert(this.messages.copiedToClipboard);
+            this.showNoticePopup(this.messages.copiedToClipboard);
         });
 
         $twitterShareIcon.on('click', () => {
@@ -336,6 +327,19 @@ class Interface {
         });
     }
 
+    showNoticePopup(message, onOKClicked = () => {}) {
+        this.showPopup($popup => {
+            let iconURI = '../../../lib/dict/img/notice.svg';
+            this.addPopupTopIcon($popup, iconURI);
+            this.addPopupMainMessage($popup, message);
+
+            this.addPopupBottomButton($popup, this.messages.ok, () => {
+                this.hidePopup($popup);
+                onOKClicked();
+            });
+        });
+    }
+
     showConfirmationPopup(message, onYesClicked = () => {}, onNoClicked = () => {}) {
         this.showPopup($popup => {
             let iconURI = '../../../lib/dict/img/question.svg';
@@ -400,7 +404,7 @@ class Interface {
 
         // データの読み込みが未完了の場合はアラートを表示
         if(!this.dict.ready || !this.langPack.ready) {
-            alert('Please wait...');
+            this.showNoticePopup(this.messages.pleaseWait);
             // 入力された文字列を残さない
             $searchInput.val('');
             return;
