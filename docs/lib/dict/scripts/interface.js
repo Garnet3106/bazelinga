@@ -26,6 +26,43 @@ class Interface {
         });
     }
 
+    addPopupBottomButton($popup, message, onClicked = () => {}) {
+        let $popupBottom = $popup.find('.popup-content-bottom');
+        let $button = $('<div class="popup-content-bottom-button"></div>');
+
+        $button.text(message);
+
+        $button.on('click', () => {
+            onClicked();
+        })
+
+        $popupBottom.append($button);
+    }
+
+    addPopupMainMessage($popup, message) {
+        let $main = $popup.find('.popup-content-main');
+        let $msg = $('<div class="popup-content-main-message"></div>');
+
+        $msg.text(message);
+        $main.append($msg);
+    }
+
+    addPopupTopIcon($popup, iconURI) {
+        let $top = $popup.find('.popup-content-top');
+        let $topIcon = $('<img class="popup-content-top-icon">');
+
+        $topIcon.attr('src', iconURI);
+        $top.append($topIcon);
+    }
+
+    addPopupTopTitle($popup, title) {
+        let $top = $popup.find('.popup-content-top');
+        let $topTitle = $('<div class="popup-content-top-title"></div>');
+
+        $topTitle.text(title);
+        $top.append($topTitle);
+    }
+
     addWordsToList(wordList) {
         let $input = $('#searchInput');
         let $list = $('#wordList');
@@ -80,15 +117,6 @@ class Interface {
         $clipboardText.remove();
     }
 
-    hideConfirmPopup() {
-        let $confirm = $('#confirm');
-        $confirm.css('opacity', '0');
-
-        setTimeout(() => {
-            $confirm.remove();
-        }, 200);
-    }
-
     hideGuideMessage() {
         $('#wordListGuide').hide();
     }
@@ -126,8 +154,7 @@ class Interface {
         });
     }
 
-    hidePopup() {
-        let $popup = $('#popup');
+    hidePopup($popup) {
         $popup.css('opacity', '0');
 
         setTimeout(() => {
@@ -145,7 +172,7 @@ class Interface {
             let $rightMenuShareTop = $('#rightMenuShareTop');
 
             $searchInput.on('input', () => { this.onSearchInputClicked() });
-            $leftMenuAddTop.on('click', () => { this.showPopup(() => { this.initAddPopup() }) });
+            $leftMenuAddTop.on('click', () => { this.showPopup($popup => { this.initAddPopup($popup) }) });
             $leftMenuEditTop.on('click', () => { this.onEditTopClicked() });
             $leftMenuRemoveTop.on('click', () => { this.onRemoveTopClicked() });
             $rightMenuDocsTop.on('click', () => { this.onDocsTopClicked() });
@@ -156,23 +183,23 @@ class Interface {
         });
     }
 
-    initAddPopup() {
-        let $popupTitle = $('#popupTopTitle');
-        let $popupIcon = $('#popupTopIcon');
-        let $popupContent = $('#popupContent');
+    initAddPopup($popup) {
+        let $main = $popup.find('.popup-content-main');
 
+        let title = this.messages.wordAddition;
         let iconURI = '../../../lib/dict/img/add.svg';
-        $popupTitle.text(this.messages.wordAddition);
-        $popupIcon.attr('src', iconURI);
 
-        let $inputArea = $('<div class="popup-content-add-inputarea" id="popupAddInputArea"></div>');
+        this.addPopupTopIcon($popup, iconURI);
+        this.addPopupTopTitle($popup, title);
+
+        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
 
         // { メッセージ名: IDの末尾, ... }
         let inputItems = { 'spell': 'Spell', 'ipa': 'IPA', 'type': 'Type' };
 
         for(let key in inputItems) {
             let pairID = 'popupAddInputArea' + inputItems[key];
-            let $pair = $('<div class="popup-content-add-inputarea-pair" id="' + pairID + '">');
+            let $pair = $('<div class="popup-content-main-inputarea-pair" id="' + pairID + '">');
             $pair.append('<div id="' + pairID + 'Name">' + this.messages[key] + '</div>');
             $pair.append('<input id="' + pairID + 'Input">');
             $inputArea.append($pair);
@@ -181,30 +208,28 @@ class Interface {
 
         // 最後の改行はいらないので削除
         $inputArea.find('br:last').remove();
-        $popupContent.append($inputArea);
+        $main.append($inputArea);
 
-        let $popupBottom = $('#popupBottom');
-        let $backButton = $('<div class="popup-button" id="popupBackButton">' + this.messages.back + '</div>');
-        let $addButton = $('<div class="popup-button" id="popupAddButton">' + this.messages.add + '</div>');
-
-        $backButton.on('click', () => {
-            this.showConfirmPopup(() => {
+        this.addPopupBottomButton($popup, this.messages.back, () => {
+            this.showConfirmationPopup(this.messages.closeConfirm, () => {
                 // Yesの場合
-                this.hidePopup();
+                this.hidePopup($popup);
             });
         });
 
-        $backButton.on('click', () => {
+        this.addPopupBottomButton($popup, this.messages.add, () => {
             // 単語の追加処理
         });
-
-        $popupBottom.append($backButton);
-        $popupBottom.append($addButton);
     }
 
     onDocsTopClicked() {
         if(this.selectedItemIndex == -1) {
-            alert(this.messages.selectWords);
+            // alert
+            /*this.showConfirmationPopup(() => {
+                let okButton = $('<div class="confirm-button" id="confirmOKButton">');
+                (this.messages.selectWord);
+            });*/
+
             return;
         }
 
@@ -229,7 +254,7 @@ class Interface {
         }
 
         if(this.selectedItemIndex == -1) {
-            alert(this.messages.selectWords);
+            alert(this.messages.selectWord);
             return;
         }
 
@@ -311,84 +336,44 @@ class Interface {
         });
     }
 
-    showConfirmPopup(onYesClicked = () => {}, onNoClicked = () => {}) {
-        let $confirm = $('<div class="popup" id="confirm"></div>');
-        let $confirmMain = $('<div class="popup-main"></div>');
+    showConfirmationPopup(message, onYesClicked = () => {}, onNoClicked = () => {}) {
+        this.showPopup($popup => {
+            let iconURI = '../../../lib/dict/img/question.svg';
+            this.addPopupTopIcon($popup, iconURI);
+            this.addPopupMainMessage($popup, message);
 
-        let $confirmTop = $('<div class="popup-top"></div>');
-        let $confirmTopTitle = $('<div class="popup-top-title"></div>');
-        let $confirmTopIcon = $('<img class="popup-top-icon">');
+            this.addPopupBottomButton($popup, this.messages.no, () => {
+                this.hidePopup($popup);
+                onNoClicked();
+            });
 
-        let $confirmContent = $('<div class="popup-content"></div>');
-        let $confirmMessage = $('<div class="popup-content-message"></div>');
-
-        let $confirmBottom = $('<div class="popup-bottom" id="confirmBottom"></div>');
-        let $yesButton = $('<div class="popup-button" id="confirmButtonYes">Yes</div>');
-        let $noButton = $('<div class="popup-button" id="confirmButtonNo">No</div>');
-
-        $yesButton.on('click', () => {
-            this.hideConfirmPopup();
-            onYesClicked();
+            this.addPopupBottomButton($popup, this.messages.yes, () => {
+                this.hidePopup($popup);
+                onYesClicked();
+            });
         });
-
-        $noButton.on('click', () => {
-            this.hideConfirmPopup();
-            onNoClicked();
-        });
-
-        let iconURI = '../../../lib/dict/img/question.svg';
-        $confirmTopIcon.attr('src', iconURI);
-        $confirmTop.append($confirmTopIcon);
-        $confirmMain.append($confirmTop);
-
-        $confirmMessage.text(this.messages.closeConfirm);
-        $confirmContent.append($confirmMessage);
-        $confirmMain.append($confirmContent);
-
-        // 追加する順番は No → Yes
-        $confirmBottom.append($noButton);
-        $confirmBottom.append($yesButton);
-        $confirmMain.append($confirmBottom);
-
-        $confirm.append($confirmMain);
-        $('#body').append($confirm);
-        $confirm.css('display', 'flex');
-
-        // なぜか直後だとアニメーションされないのでtimeoutをもうける
-        setTimeout(() => {
-            $confirm.css('opacity', 1);
-        }, 50);
     }
 
     showGuideMessage() {
         $('#wordListGuide').show();
     }
 
-    showPopup(onReady = () => {}) {
+    showPopup(onReady = $popup => {}) {
         // 初期化中に表示させないためにポップアップのスタイルは display: none に設定してある
-        let $popup = $('<div class="popup" id="popup"></div>');
+        let $popup = $('<div class="popup"></div>');
+        let $content = $('<div class="popup-content"></div>');
+        let $top = $('<div class="popup-content-top"></div>');
+        let $main = $('<div class="popup-content-main"></div>');
+        let $bottom = $('<div class="popup-content-bottom" id="popupBottom"></div>');
 
-        let $popupMain = $('<div class="popup-main"></div>');
+        $content.append($top);
+        $content.append($main);
+        $content.append($bottom);
+        $popup.append($content);
 
-        let $popupTop = $('<div class="popup-top"></div>');
-        let $popupTopTitle = $('<div class="popup-top-title" id="popupTopTitle"></div>');
-        let $popupTopIcon = $('<img class="popup-top-icon" id="popupTopIcon">');
+        onReady($popup);
 
-        let $popupContent = $('<div class="popup-content" id="popupContent"></div>');
-
-        let $popupBottom = $('<div class="popup-bottom" id="popupBottom"></div>');
-
-        $popupTop.append($popupTopIcon);
-        $popupTop.append($popupTopTitle);
-
-        $popupMain.append($popupTop);
-        $popupMain.append($popupContent);
-        $popupMain.append($popupBottom);
-
-        $popup.append($popupMain);
         $('#body').append($popup);
-
-        onReady();
         $popup.css('display', 'flex');
 
         // なぜか直後だとアニメーションされないのでtimeoutをもうける

@@ -61,27 +61,28 @@ div.popup {
     width: 100vw;
 }
 
-div.popup-main {
+div.popup-content {
     background-color: #ffffff;
+    border-radius: 5px;
     padding: 30px;
 }
 
-div.popup-main > * {
+div.popup-content > * {
     margin-bottom: 25px;
 }
 
-div.popup-main > *:last-child {
+div.popup-content > *:last-child {
     margin: 0;
 }
 
-div.popup-bottom {
+div.popup-content-bottom {
     align-items: center;
     display: flex;
     justify-content: space-around;
     width: 100%;
 }
 
-div.popup-button {
+div.popup-content-bottom-button {
     align-items: center;
     background-color: #eeeeee;
     border-radius: 5px;
@@ -93,34 +94,34 @@ div.popup-button {
     width: 80px;
 }
 
-div.popup-content {
+div.popup-content-main {
     background-color: #eeeeee;
 }
 
-div.popup-content-add-inputarea {
+div.popup-content-main-inputarea {
     display: inline-block;
     padding: 20px;
     text-align: right;
 }
 
-div.popup-content-add-inputarea-pair {
+div.popup-content-main-inputarea-pair {
     align-items: center;
     display: inline-block;
     font-size: 15px;
     margin-bottom: 20px;
 }
 
-div.popup-content-add-inputarea-pair:last-child {
+div.popup-content-main-inputarea-pair:last-child {
     margin: 0;
 }
 
-div.popup-content-add-inputarea-pair > div {
+div.popup-content-main-inputarea-pair > div {
     display: inline-block;
     margin-right: 10px;
     vertical-align: middle;
 }
 
-div.popup-content-add-inputarea-pair > input {
+div.popup-content-main-inputarea-pair > input {
     background-color: #ffffff;
     border: none;
     border-radius: 5px;
@@ -130,31 +131,31 @@ div.popup-content-add-inputarea-pair > input {
     width: 120px;
 }
 
-div.popup-content-message {
+div.popup-content-main-message {
     display: inline-block;
     margin: 20px;
 }
 
-div.popup-top {
+div.popup-content-top {
     align-items: center;
     display: flex;
     justify-content: center;
 }
 
-div.popup-top > * {
+div.popup-content-top > * {
     margin-left: 5px;
 }
 
-div.popup-top > *:last-child {
+div.popup-content-top > *:last-child {
     margin: 0;
 }
 
-img.popup-top-icon {
+img.popup-content-top-icon {
     height: 30px;
     width: 30px;
 }
 
-div.popup-top-title {
+div.popup-content-top-title {
     font-size: 20px;
     font-weight: bold;
 }
