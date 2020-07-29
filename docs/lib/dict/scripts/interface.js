@@ -313,7 +313,16 @@ class Interface {
 
     showConfirmPopup(onYesClicked = () => {}, onNoClicked = () => {}) {
         let $confirm = $('<div class="popup" id="confirm"></div>');
-        let $confirmContent = $('<div class="popup-main"></div>');
+        let $confirmMain = $('<div class="popup-main"></div>');
+
+        let $confirmTop = $('<div class="popup-top"></div>');
+        let $confirmTopTitle = $('<div class="popup-top-title"></div>');
+        let $confirmTopIcon = $('<img class="popup-top-icon">');
+
+        let $confirmContent = $('<div class="popup-content"></div>');
+        let $confirmMessage = $('<div class="popup-content-message"></div>');
+
+        let $confirmBottom = $('<div class="popup-bottom" id="confirmBottom"></div>');
         let $yesButton = $('<div class="popup-button" id="confirmButtonYes">Yes</div>');
         let $noButton = $('<div class="popup-button" id="confirmButtonNo">No</div>');
 
@@ -327,10 +336,23 @@ class Interface {
             onNoClicked();
         });
 
+        let iconURI = '../../../lib/dict/img/question.svg';
+        $confirmTopTitle.text(this.messages.popup);
+        $confirmTopIcon.attr('src', iconURI);
+        $confirmTop.append($confirmTopIcon);
+        $confirmTop.append($confirmTopTitle);
+        $confirmMain.append($confirmTop);
+
+        $confirmMessage.text(this.messages.closeConfirm);
+        $confirmContent.append($confirmMessage);
+        $confirmMain.append($confirmContent);
+
         // 追加する順番は No → Yes
-        $confirmContent.append($noButton);
-        $confirmContent.append($yesButton);
-        $confirm.append($confirmContent);
+        $confirmBottom.append($noButton);
+        $confirmBottom.append($yesButton);
+        $confirmMain.append($confirmBottom);
+
+        $confirm.append($confirmMain);
         $('#body').append($confirm);
         $confirm.css('display', 'flex');
 
@@ -346,7 +368,6 @@ class Interface {
 
     showPopup(onReady = () => {}) {
         // 初期化中に表示させないためにポップアップのスタイルは display: none に設定してある
-
         let $popup = $('<div class="popup" id="popup"></div>');
 
         let $popupMain = $('<div class="popup-main"></div>');

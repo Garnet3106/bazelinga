@@ -66,6 +66,14 @@ div.popup-main {
     padding: 30px;
 }
 
+div.popup-main > * {
+    margin-bottom: 25px;
+}
+
+div.popup-main > *:last-child {
+    margin: 0;
+}
+
 div.popup-bottom {
     align-items: center;
     display: flex;
@@ -87,7 +95,6 @@ div.popup-button {
 
 div.popup-content {
     background-color: #eeeeee;
-    margin: 25px 0;
 }
 
 div.popup-content-add-inputarea {
@@ -121,6 +128,11 @@ div.popup-content-add-inputarea-pair > input {
     outline: none;
     text-align: center;
     width: 120px;
+}
+
+div.popup-content-message {
+    display: inline-block;
+    margin: 20px;
 }
 
 div.popup-top {
