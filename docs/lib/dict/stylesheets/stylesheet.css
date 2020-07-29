@@ -141,6 +141,14 @@ div.popup-top {
     justify-content: center;
 }
 
+div.popup-top > * {
+    margin-left: 5px;
+}
+
+div.popup-top > *:last-child {
+    margin: 0;
+}
+
 img.popup-top-icon {
     height: 30px;
     width: 30px;
@@ -149,7 +157,6 @@ img.popup-top-icon {
 div.popup-top-title {
     font-size: 20px;
     font-weight: bold;
-    margin-left: 5px;
 }
 
 div.top {

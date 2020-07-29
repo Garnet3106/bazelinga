@@ -337,10 +337,8 @@ class Interface {
         });
 
         let iconURI = '../../../lib/dict/img/question.svg';
-        $confirmTopTitle.text(this.messages.confirm);
         $confirmTopIcon.attr('src', iconURI);
         $confirmTop.append($confirmTopIcon);
-        $confirmTop.append($confirmTopTitle);
         $confirmMain.append($confirmTop);
 
         $confirmMessage.text(this.messages.closeConfirm);
