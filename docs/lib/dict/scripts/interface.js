@@ -80,6 +80,19 @@ class Interface {
         $clipboardText.remove();
     }
 
+    hideConfirmPopup() {
+        let $confirm = $('#confirm');
+        $confirm.css('opacity', '0');
+
+        setTimeout(() => {
+            $confirm.remove();
+        }, 200);
+    }
+
+    hideGuideMessage() {
+        $('#wordListGuide').hide();
+    }
+
     /*
      * id
      *   すべて → 指定なし(undefined)
@@ -111,10 +124,6 @@ class Interface {
                 $(icon).remove();
             });
         });
-    }
-
-    hideGuideMessage() {
-        $('#wordListGuide').hide();
     }
 
     hidePopup() {
@@ -171,15 +180,19 @@ class Interface {
             $inputArea.append('<br>');
         }
 
+        // 最後の改行はいらないので削除
         $inputArea.find('br:last').remove();
         $popupContent.append($inputArea);
 
         let $popupBottom = $('#popupBottom');
-        let $backButton = $('<div class="popup-bottom-button" id="popupBackButton">' + this.messages.back + '</div>');
-        let $addButton = $('<div class="popup-bottom-button" id="popupAddButton">' + this.messages.add + '</div>');
+        let $backButton = $('<div class="popup-button" id="popupBackButton">' + this.messages.back + '</div>');
+        let $addButton = $('<div class="popup-button" id="popupAddButton">' + this.messages.add + '</div>');
 
         $backButton.on('click', () => {
-            this.hidePopup();
+            this.showConfirmPopup(() => {
+                // Yesの場合
+                this.hidePopup();
+            });
         });
 
         $backButton.on('click', () => {
@@ -299,6 +312,35 @@ class Interface {
         $('.workarea-sidemenu-item').each((i, elem) => {
             this.sideMenuObserver.observe(elem, options);
         });
+    }
+
+    showConfirmPopup(onYesClicked = () => {}, onNoClicked = () => {}) {
+        let $confirm = $('<div class="popup" id="confirm"></div>');
+        let $confirmContent = $('<div class="popup-main"></div>');
+        let $yesButton = $('<div class="popup-button" id="confirmButtonYes">Yes</div>');
+        let $noButton = $('<div class="popup-button" id="confirmButtonNo">No</div>');
+
+        $yesButton.on('click', () => {
+            this.hideConfirmPopup();
+            onYesClicked();
+        });
+
+        $noButton.on('click', () => {
+            this.hideConfirmPopup();
+            onNoClicked();
+        });
+
+        // 追加する順番は No → Yes
+        $confirmContent.append($noButton);
+        $confirmContent.append($yesButton);
+        $confirm.append($confirmContent);
+        $('#body').append($confirm);
+        $confirm.css('display', 'flex');
+
+        // なぜか直後だとアニメーションされないのでtimeoutをもうける
+        setTimeout(() => {
+            $confirm.css('opacity', 1);
+        }, 50);
     }
 
     showGuideMessage() {
