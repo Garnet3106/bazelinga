@@ -194,8 +194,8 @@ class Interface {
             this.setSideMenuObserver();
             this.setInitialKeyword();
 
-            let leftMenuAddTop = $('#leftMenuAdd').children('.workarea-sidemenu-item-icon');
-            leftMenuAddTop.css('cursor', 'pointer');
+            let $leftMenuAddTop = $('#leftMenuAdd').children('.workarea-sidemenu-item-icon');
+            $leftMenuAddTop.css('cursor', 'pointer');
         });
     }
 
@@ -445,14 +445,16 @@ class Interface {
 
         this.hideMenu('rightMenuShare');
 
-        let $rightMenu = $('#rightMenu');
-        // 左メニューは後で対応させる
-        $rightMenu.find('.workarea-sidemenu-item-icon').css('cursor', 'not-allowed');
-
         let $sideMenuItems = $('.workarea-sidemenu-item');
         let $sideMenuIcons = $('.workarea-sidemenu-item-icon');
+
         $sideMenuItems.css('background-color', '#dddddd');
         $sideMenuIcons.css('cursor', 'not-allowed');
+
+        let $leftMenu = $('#leftMenuAdd');
+        let $leftMenuAddTop = $leftMenu.children('.workarea-sidemenu-item-icon');
+
+        $leftMenuAddTop.css('cursor', 'pointer');
 
         this.selectedItemIndex = -1;
         this.latestSelectedItemID = '';
