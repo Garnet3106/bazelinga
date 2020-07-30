@@ -96,6 +96,7 @@ div.popup-content-bottom-button {
 
 div.popup-content-main {
     background-color: #eeeeee;
+    border-radius: 5px;
 }
 
 div.popup-content-main-inputarea {
@@ -238,7 +239,6 @@ div.workarea-sidemenu-item-icon {
 div.workarea-sidemenu-item-icon#leftMenuAddTop {
     background-color: #ffffff !important;
     background-image: url('../../dict/img/add.svg');
-    cursor: pointer !important;
 }
 
 div.workarea-sidemenu-item-icon#leftMenuEditTop {

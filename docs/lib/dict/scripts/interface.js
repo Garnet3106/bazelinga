@@ -282,6 +282,8 @@ class Interface {
 
         $rightMenuShare.append($linkShareIcon);
         $rightMenuShare.append($twitterShareIcon);
+
+        $rightMenuShare.find('.workarea-sidemenu-item-icon').css('cursor', 'pointer');
     }
 
     selectListItem(index) {
@@ -298,7 +300,7 @@ class Interface {
         let $sideMenuItems = $('.workarea-sidemenu-item');
         let $sideMenuIcons = $('.workarea-sidemenu-item-icon');
         $sideMenuItems.css('background-color', '#ffffff');
-        $sideMenuIcons.css('cursor', 'default');
+        $sideMenuIcons.css('cursor', 'pointer');
 
         this.selectedItemIndex = index;
     }
@@ -404,6 +406,12 @@ class Interface {
     unslectListItem() {
         let $items = $('.workarea-wordlist-item');
         $items.css('background-color', '#ffffff');
+
+        this.hideMenu('rightMenuShare');
+
+        let $rightMenu = $('#rightMenu');
+        // 左メニューは後で対応させる
+        $rightMenu.find('.workarea-sidemenu-item-icon').css('cursor', 'not-allowed');
 
         let $sideMenuItems = $('.workarea-sidemenu-item');
         let $sideMenuIcons = $('.workarea-sidemenu-item-icon');
