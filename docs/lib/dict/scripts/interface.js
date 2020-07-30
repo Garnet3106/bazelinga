@@ -107,7 +107,13 @@ class Interface {
                         $item = $item.parent();
 
                     let index = $item.index() - 1;
-                    this.selectListItem(index);
+
+                    if($target.attr('id') != this.latestSelectedItemID) {
+                        this.selectListItem(index);
+                    } else {
+                        // 選択済みの項目がクリックされた場合
+                        this.unslectListItem();
+                    }
 
                     // キーワードが異なる場合のみvalueを変更
                     if(formattedKeyword != word.spell) {
