@@ -193,6 +193,9 @@ class Interface {
             this.initEvents();
             this.setSideMenuObserver();
             this.setInitialKeyword();
+
+            let leftMenuAddTop = $('#leftMenuAdd').children('.workarea-sidemenu-item-icon');
+            leftMenuAddTop.css('cursor', 'pointer');
         });
     }
 
@@ -319,12 +322,12 @@ class Interface {
             return;
 
         let $item = $itemList.eq(index);
-
         let tmpLatestID = $item.attr('id');
 
         // 選択する前に他の選択を解除
         this.unslectListItem();
 
+        // 選択解除前だと背景色がリセットされる
         $item.css('background-color', '#dddddd');
 
         let $sideMenuItems = $('.workarea-sidemenu-item');
@@ -333,6 +336,8 @@ class Interface {
         $sideMenuIcons.css('cursor', 'pointer');
 
         this.selectedItemIndex = index;
+
+        // 選択解除でlatestSelectedItemIDが初期化されるため保持
         this.latestSelectedItemID = tmpLatestID;
     }
 
