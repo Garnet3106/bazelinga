@@ -108,14 +108,15 @@ class Interface {
 
                     let index = $item.index() - 1;
 
-                    if($target.attr('id') != this.latestSelectedItemID) {
-                        this.selectListItem(index);
-                    } else {
-                        // 選択済みの項目がクリックされた場合
+                    // 選択済みの項目がクリックされた場合
+                    if($item.attr('id') == this.latestSelectedItemID) {
                         this.unslectListItem();
+                        return;
                     }
 
-                    // キーワードが異なる場合のみvalueを変更
+                    this.selectListItem(index);
+
+                    // キーワードが変更された場合のみ入力欄のvalueを変更
                     if(formattedKeyword != word.spell) {
                         $input.val(word.spell);
                         // val() ではイベントが発火しないので手動で処理
@@ -207,7 +208,7 @@ class Interface {
 
     initEvents() {
         $('#searchInput').on('input', () => {
-            this.onSearchInputClicked();
+            this.onSearchKeywordInput();
         });
 
         $('#leftMenuAddTop').on('click', () => {
@@ -294,7 +295,7 @@ class Interface {
 
     onRemoveTopClicked() {}
 
-    onSearchInputClicked() {
+    onSearchKeywordInput() {
         this.updateWordList();
     }
 
