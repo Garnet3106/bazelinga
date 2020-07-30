@@ -243,9 +243,20 @@ class Interface {
 
         for(let key in inputItems) {
             let pairID = 'popupAddInputArea' + inputItems[key];
-            let $pair = $('<div class="popup-content-main-inputarea-pair" id="' + pairID + '">');
-            $pair.append('<div id="' + pairID + 'Name">' + this.messages[key] + '</div>');
-            $pair.append('<input id="' + pairID + 'Input">');
+            let $pair = $('<div class="popup-content-main-inputarea-pair">');
+
+            $pair.attr('id', pairID);
+
+            let $pairName = $('<div id="' + pairID + 'Name">' + this.messages[key] + '</div>')
+            let $pairInput = $('<input id="' + pairID + 'Input">')
+
+            $pairName.attr('id', pairID + 'Name');
+            $pairName.text(this.messages[key]);
+            $pairInput.attr('id', pairID + 'Input');
+
+            $pair.append($pairName);
+            $pair.append($pairInput);
+
             $inputArea.append($pair);
             $inputArea.append('<br>');
         }
