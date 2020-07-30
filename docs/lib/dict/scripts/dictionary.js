@@ -67,7 +67,7 @@ class Dictionary {
         let matchedWords = [];
         let loweredKeyword = keyword.toLowerCase();
 
-        this.data.dict.forEach(word => {
+        this.data.dict.forEach((word, wordIndex) => {
             let matched = false;
 
             if(word.spell.includes(loweredKeyword))
@@ -77,30 +77,34 @@ class Dictionary {
             if(word.ipa.includes(keyword))
                 matched = true;
 
-            if(matched) {
-                matchedWords.push(word);
-            } else {
-                // word のコピーを作成する (参照渡し防止)
-                let tmpWord = $.extend(true, {}, word);
-                let tmpTranslation = [];
+            // word のコピーを作成する (参照渡し防止)
+            let tmpWord = $.extend(true, {}, word);
+            let tmpTranslationList = [];
 
-                word.translation.forEach(translation => {
-                    let matchedTranslationWord = false;
+            tmpWord.index = wordIndex;
 
+            word.translation.forEach((translation, translationIndex) => {
+                // スペルなどがマッチしていた場合はデフォルトでtrue
+                let matchedTranslationWord = matched;
+
+                if(!matchedTranslationWord) {
                     translation.words.forEach(translationWords => {
                         if(translationWords.includes(loweredKeyword)) {
                             matchedTranslationWord = true;
                         }
                     });
-
-                    if(matchedTranslationWord)
-                        tmpTranslation.push(translation);
-                });
-
-                if(tmpTranslation.length >= 1) {
-                    tmpWord.translation = tmpTranslation;
-                    matchedWords.push(tmpWord);
                 }
+
+                if(matchedTranslationWord) {
+                    let tmpTranslation = $.extend(true, {}, translation);
+                    tmpTranslation.index = translationIndex;
+                    tmpTranslationList.push(tmpTranslation);
+                }
+            });
+
+            if(tmpTranslationList.length != 0) {
+                tmpWord.translation = tmpTranslationList;
+                matchedWords.push(tmpWord);
             }
         });
 

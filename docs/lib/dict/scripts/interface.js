@@ -3,8 +3,10 @@ class Interface {
         this.lang = lang;
         this.langPack = new LangPack(lang);
         this.dict = new Dictionary(this.langPack);
-        // 選択された単語リストの項目の番号 (未選択: -1)
+        // 選択された単語リストの項目の番号 (未選択時: -1)
         this.selectedItemIndex = -1;
+        // 最後に選択された単語リストの項目のID (未選択時: 空文字)
+        this.latestSelectedItemID = '';
 
         this.langPack.load(() => {
             // ロード成功時
@@ -73,37 +75,61 @@ class Interface {
 
                 // 要素を生成・追加
                 let $elem = $('<div class="workarea-wordlist-item"></div>');
-                $elem.append('<div class="workarea-wordlist-item-spell">' + word.spell + '</div>');
-                $elem.append('<div class="workarea-wordlist-item-type">[' + this.wordTypes[translation.type] + ']</div>');
+                $elem.attr('id', 'wordListItem_' + word.index + '_' + translation.index);
 
-                if(translation.class != 'general')
-                    $elem.append('<div class="workarea-wordlist-item-class">[' + wordClass + ']</div>');
+                let $elemSpell = $('<div class="workarea-wordlist-item-spell"></div>');
+                let $elemType = $('<div class="workarea-wordlist-item-type"></div>');
 
-                $elem.append('<div class="workarea-wordlist-item-translation">' + translation.words.join(' ') + '</div>');
+                $elemSpell.text(word.spell);
+                $elemType.text('[' + this.wordTypes[translation.type] + ']');
 
-                // イベントを設定
+                $elem.append($elemSpell);
+                $elem.append($elemType);
+
+                if(translation.class != 'general') {
+                    let $elemClass = $('<div class="workarea-wordlist-item-class"></div>');
+                    $elemClass.text('[' + wordClass + ']');
+                    $elem.append($elemClass);
+                }
+
+                let $elemTranslation = $('<div class="workarea-wordlist-item-translation"></div>');
+                $elemTranslation.text(translation.words.join(' '));
+                $elem.append($elemTranslation);
+
+                // クリックイベントを設定
                 $elem.on('click', elem => {
+                    let $target = $(elem.target);
                     let formattedKeyword = this.dict.formatSearchKeyword($input.val());
+
+                    let $item = $target.eq(0);
+
+                    if($item.attr('class') != 'workarea-wordlist-item')
+                        $item = $item.parent();
+
+                    let index = $item.index() - 1;
+                    this.selectListItem(index);
 
                     // キーワードが異なる場合のみvalueを変更
                     if(formattedKeyword != word.spell) {
                         $input.val(word.spell);
                         // val() ではイベントが発火しないので手動で処理
                         $input.trigger('input');
-                    } else {
-                        let $item = $($(elem.target)).eq(0);
-
-                        if($item.attr('class') != 'workarea-wordlist-item')
-                            $item = $item.parent();
-
-                        let index = $item.index();
-                        this.selectListItem(index - 1);
                     }
                 });
 
                 $list.append($elem);
             });
         });
+
+        if(this.latestSelectedItemID != '') {
+            let $latestSelectedItem = $('#' + this.latestSelectedItemID);
+            let index = $latestSelectedItem.index() - 1;
+
+            // インデックスからは1を引かれてるので注意
+            if(index >= -1 && $latestSelectedItem.length == 1) {
+                this.selectListItem(index);
+            }
+        }
     }
 
     copyToClipboard(text) {
@@ -287,15 +313,19 @@ class Interface {
     }
 
     selectListItem(index) {
-        let $items = $('.workarea-wordlist-item');
+        let $itemList = $('.workarea-wordlist-item');
 
-        if(index >= $items.length)
+        if(index >= $itemList.length)
             return;
+
+        let $item = $itemList.eq(index);
+
+        let tmpLatestID = $item.attr('id');
 
         // 選択する前に他の選択を解除
         this.unslectListItem();
 
-        $items.eq(index).css('background-color', '#dddddd');
+        $item.css('background-color', '#dddddd');
 
         let $sideMenuItems = $('.workarea-sidemenu-item');
         let $sideMenuIcons = $('.workarea-sidemenu-item-icon');
@@ -303,6 +333,7 @@ class Interface {
         $sideMenuIcons.css('cursor', 'pointer');
 
         this.selectedItemIndex = index;
+        this.latestSelectedItemID = tmpLatestID;
     }
 
     setInitialKeyword() {
@@ -419,11 +450,12 @@ class Interface {
         $sideMenuIcons.css('cursor', 'not-allowed');
 
         this.selectedItemIndex = -1;
+        this.latestSelectedItemID = '';
     }
 
     updateWordList() {
         let $searchInput = $('#searchInput');
-        let $wordListItem = $('.workarea-wordlist-item');
+        let $wordListItems = $('.workarea-wordlist-item');
 
         // データの読み込みが未完了の場合はアラートを表示
         if(!this.dict.ready || !this.langPack.ready) {
@@ -433,8 +465,12 @@ class Interface {
             return;
         }
 
-        $wordListItem.remove();
+        $wordListItems.remove();
+
+        // 選択解除でlatestSelectedItemIDが初期化されるため保持
+        let tmpLatestID = this.latestSelectedItemID;
         this.unslectListItem();
+        this.latestSelectedItemID = tmpLatestID;
 
         let keyword = this.dict.formatSearchKeyword($searchInput.val());
 
