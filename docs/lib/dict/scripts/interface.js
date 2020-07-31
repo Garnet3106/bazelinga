@@ -12,7 +12,7 @@ class Interface {
             // ロード成功時
             let langData = this.langPack.getData();
             this.messages = langData.messages;
-            this.wordClasses = langData.classes;
+            this.translationClasses = langData.classes;
             this.wordTypes = langData.types;
 
             this.dict.load(() => {
@@ -71,7 +71,7 @@ class Interface {
 
         wordList.forEach(word => {
             word.translation.forEach(translation => {
-                let wordClass = this.wordClasses[translation.class];
+                let wordClass = this.translationClasses[translation.class];
 
                 // 要素を生成・追加
                 let $elem = $('<div class="workarea-wordlist-item"></div>');
@@ -254,14 +254,13 @@ class Interface {
 
             $pair.attr('id', pairID);
 
-            let $pairName = $('<div id="' + pairID + 'Name">' + this.messages[key] + '</div>')
-            let $pairInput = $('<input id="' + pairID + 'Input">')
-
+            let $pairName = $('<div></div>');
             $pairName.attr('id', pairID + 'Name');
             $pairName.text(this.messages[key]);
-            $pairInput.attr('id', pairID + 'Input');
-
             $pair.append($pairName);
+
+            let $pairInput = $('<input>');
+            $pairInput.attr('id', pairID + 'Input');
             $pair.append($pairInput);
 
             $inputArea.append($pair);
@@ -270,8 +269,10 @@ class Interface {
 
         // 最後の改行はいらないので削除
         $inputArea.find('br:last').remove();
+
         $main.append($inputArea);
 
+        // 戻るボタン
         this.addPopupBottomButton($popup, this.messages.back, () => {
             this.showConfirmationPopup(this.messages.closeConfirm, () => {
                 // Yesの場合
@@ -279,8 +280,70 @@ class Interface {
             });
         });
 
+        // 翻訳ボタン
+        this.addPopupBottomButton($popup, '翻訳', () => {
+            this.showPopup($popup => {
+                this.initAddPopup_translationPopup($popup);
+            });
+        });
+
+        // 単語ボタン
         this.addPopupBottomButton($popup, this.messages.add, () => {
-            // 単語の追加処理
+        });
+    }
+
+    initAddPopup_translationPopup($popup) {
+        let title = '翻訳編集';
+        let iconURI = '../../../lib/dict/img/edit.svg';
+
+        this.addPopupTopIcon($popup, iconURI);
+        this.addPopupTopTitle($popup, title);
+
+        let $main = $popup.find('.popup-content-main');
+        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
+
+        let addInputAreaPair = () => {
+            let $pair = $('<div class="popup-content-main-inputarea-pair">');
+            let $selectBox = $('<select class="popup-content-main-inputarea-selectbox"></select>');
+
+            for(let key in this.translationClasses) {
+                let $selectBoxItem = $('<option></option>');
+
+                $selectBoxItem.attr('value', key);
+                $selectBoxItem.text(this.translationClasses[key]);
+
+                $selectBox.append($selectBoxItem);
+                $pair.append($selectBox);
+            }
+
+            let $pairInput = $('<input>');
+            $pairInput.css('width', '200px');
+            $pair.append($pairInput);
+
+            let $pairRemoveIcon = $('<img>');
+            $pairRemoveIcon.attr('src', '../../../lib/dict/img/remove.svg');
+            $pair.append($pairRemoveIcon);
+
+            if($inputArea.children().length != 0)
+                $inputArea.append('<br>');
+
+            $inputArea.append($pair);
+        }
+
+        addInputAreaPair();
+        addInputAreaPair();
+        $main.append($inputArea);
+
+        this.addPopupBottomButton($popup, '戻る', () => {
+            this.showConfirmationPopup(this.messages.closeConfirm, () => {
+                $popup.hide();
+            });
+        });
+
+        this.addPopupBottomButton($popup, '保存', () => {
+            this.showNoticePopup('保存しました。', () => {
+                $popup.remove();
+            });
         });
     }
 
@@ -439,11 +502,14 @@ class Interface {
         let $content = $('<div class="popup-content"></div>');
         let $top = $('<div class="popup-content-top"></div>');
         let $main = $('<div class="popup-content-main"></div>');
-        let $bottom = $('<div class="popup-content-bottom" id="popupBottom"></div>');
+        let $bottom = $('<div class="popup-content-bottom"></div>');
 
         $content.append($top);
+        $content.append('<br>');
         $content.append($main);
+        $content.append('<br>');
         $content.append($bottom);
+
         $popup.append($content);
 
         onReady($popup);

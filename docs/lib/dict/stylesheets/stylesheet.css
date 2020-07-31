@@ -65,21 +65,30 @@ div.popup-content {
     background-color: #ffffff;
     border-radius: 5px;
     padding: 30px;
+    text-align: center;
 }
 
-div.popup-content > * {
+div.popup-content > div {
     margin-bottom: 25px;
 }
 
-div.popup-content > *:last-child {
+div.popup-content > div:last-child {
     margin: 0;
 }
 
 div.popup-content-bottom {
     align-items: center;
-    display: flex;
+    display: inline-flex;
     justify-content: space-around;
     width: 100%;
+}
+
+div.popup-content-bottom > div {
+    margin-right: 20px;
+}
+
+div.popup-content-bottom > div:last-child {
+    margin: 0;
 }
 
 div.popup-content-bottom-button {
@@ -97,6 +106,7 @@ div.popup-content-bottom-button {
 div.popup-content-main {
     background-color: #eeeeee;
     border-radius: 5px;
+    display: inline-block;
 }
 
 div.popup-content-main-inputarea {
@@ -116,10 +126,35 @@ div.popup-content-main-inputarea-pair:last-child {
     margin: 0;
 }
 
+div.popup-content-main-inputarea-pair > * {
+    margin-right: 15px;
+}
+
+div.popup-content-main-inputarea-pair > *:last-child {
+    margin: 0;
+}
+
 div.popup-content-main-inputarea-pair > div {
     display: inline-block;
-    margin-right: 10px;
     vertical-align: middle;
+}
+
+div.popup-content-main-inputarea-pair > img {
+    background-color: #ffffff;
+    border-radius: calc(25px / 2);
+    display: inline-block;
+    cursor: pointer;
+    height: 25px;
+    transition: all 200ms 0s ease;
+    width: 25px;
+}
+
+div.popup-content-main-inputarea-pair > img:hover {
+    background-color: #eeeeee;
+}
+
+div.popup-content-main-inputarea-pair > img:active {
+    background-color: #dddddd;
 }
 
 div.popup-content-main-inputarea-pair > input {
@@ -132,6 +167,15 @@ div.popup-content-main-inputarea-pair > input {
     width: 120px;
 }
 
+div.popup-content-main-inputarea-pair > select {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    height: 25px;
+    outline: none;
+    width: 80px;
+}
+
 div.popup-content-main-message {
     display: inline-block;
     margin: 20px;
@@ -139,12 +183,12 @@ div.popup-content-main-message {
 
 div.popup-content-top {
     align-items: center;
-    display: flex;
+    display: inline-flex;
     justify-content: center;
 }
 
 div.popup-content-top > * {
-    margin-left: 5px;
+    margin-right: 5px;
 }
 
 div.popup-content-top > *:last-child {
