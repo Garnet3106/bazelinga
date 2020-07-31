@@ -264,11 +264,7 @@ class Interface {
             $pair.append($pairInput);
 
             $inputArea.append($pair);
-            $inputArea.append('<br>');
         }
-
-        // 最後の改行はいらないので削除
-        $inputArea.find('br:last').remove();
 
         $main.append($inputArea);
 
@@ -323,9 +319,6 @@ class Interface {
             let $pairRemoveIcon = $('<img>');
             $pairRemoveIcon.attr('src', '../../../lib/dict/img/remove.svg');
             $pair.append($pairRemoveIcon);
-
-            if($inputArea.children().length != 0)
-                $inputArea.append('<br>');
 
             $inputArea.append($pair);
         }
@@ -505,9 +498,7 @@ class Interface {
         let $bottom = $('<div class="popup-content-bottom"></div>');
 
         $content.append($top);
-        $content.append('<br>');
         $content.append($main);
-        $content.append('<br>');
         $content.append($bottom);
 
         $popup.append($content);

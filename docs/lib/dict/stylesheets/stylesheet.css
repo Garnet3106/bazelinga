@@ -106,19 +106,17 @@ div.popup-content-bottom-button {
 div.popup-content-main {
     background-color: #eeeeee;
     border-radius: 5px;
-    display: inline-block;
 }
 
 div.popup-content-main-inputarea {
-    display: inline-block;
     padding: 20px;
-    text-align: right;
 }
 
 div.popup-content-main-inputarea-pair {
     align-items: center;
-    display: inline-block;
+    display: flex;
     font-size: 15px;
+    justify-content: center;
     margin-bottom: 20px;
 }
 
@@ -135,14 +133,13 @@ div.popup-content-main-inputarea-pair > *:last-child {
 }
 
 div.popup-content-main-inputarea-pair > div {
-    display: inline-block;
-    vertical-align: middle;
+    text-align: right;
+    width: 50px;
 }
 
 div.popup-content-main-inputarea-pair > img {
     background-color: #ffffff;
     border-radius: calc(25px / 2);
-    display: inline-block;
     cursor: pointer;
     height: 25px;
     transition: all 200ms 0s ease;
