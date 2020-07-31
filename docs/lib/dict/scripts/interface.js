@@ -318,12 +318,22 @@ class Interface {
 
             let $pairRemoveIcon = $('<img>');
             $pairRemoveIcon.attr('src', '../../../lib/dict/img/remove.svg');
+
+            $pairRemoveIcon.on('click', event => {
+                let $parent = $(event.target).parent();
+
+                if($parent.parent().children().length < 2) {
+                    this.showNoticePopup('これ以上削除できません。');
+                } else {
+                    $parent.remove();
+                }
+            });
+
             $pair.append($pairRemoveIcon);
 
             $inputArea.append($pair);
         }
 
-        addInputAreaPair();
         addInputAreaPair();
         $main.append($inputArea);
 
@@ -331,6 +341,10 @@ class Interface {
             this.showConfirmationPopup(this.messages.closeConfirm, () => {
                 $popup.hide();
             });
+        });
+
+        this.addPopupBottomButton($popup, '追加', () => {
+            addInputAreaPair();
         });
 
         this.addPopupBottomButton($popup, '保存', () => {
