@@ -45,7 +45,7 @@ class Interface {
         let $main = $popup.find('.popup-content-main');
         let $msg = $('<div class="popup-content-main-message"></div>');
 
-        $msg.text(message);
+        $msg.html(message);
         $main.append($msg);
     }
 
@@ -284,7 +284,9 @@ class Interface {
 
         // 戻るボタン
         this.addPopupBottomButton($popup, this.messages.back, () => {
-            this.showConfirmationPopup(this.messages.closeConfirm, () => {
+            let message = this.messages.doYouReallyClose + '<br>' + this.messages.dataWillBeDiscarded;
+
+            this.showConfirmationPopup(message, () => {
                 // Yesの場合
                 this.hidePopup($popup);
             });
@@ -437,7 +439,9 @@ class Interface {
         $main.append($inputArea);
 
         this.addPopupBottomButton($popup, this.messages.back, () => {
-            this.showConfirmationPopup(this.messages.closeConfirm, () => {
+            let message = this.messages.doYouReallyClose + '<br>' + this.messages.dataWillBeDiscarded;
+
+            this.showConfirmationPopup(message, () => {
                 this.hidePopup($popup);
             });
         });
