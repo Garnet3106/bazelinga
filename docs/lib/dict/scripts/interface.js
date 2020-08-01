@@ -299,9 +299,16 @@ class Interface {
                 return;
             }
 
+            if(translation.length == 0) {
+                this.showNoticePopup('翻訳が入力されていません。');
+                return;
+            }
+
             this.dict.addWord(spell, ipa, translation);
 
-            this.hidePopup($popup);
+            this.showNoticePopup('追加しました。', () => {
+                this.hidePopup($popup);
+            });
         });
     }
 
