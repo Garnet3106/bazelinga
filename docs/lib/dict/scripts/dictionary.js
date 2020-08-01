@@ -120,4 +120,17 @@ class Dictionary {
 
         return matchedWords;
     }
+
+    searchSpell(spell) {
+        let searchResult = this.search(spell);
+        let matchedWord = {};
+
+        searchResult.forEach(word => {
+            if(spell == word.spell) {
+                matchedWord = word;
+            }
+        });
+
+        return matchedWord;
+    }
 }

@@ -262,7 +262,20 @@ class Interface {
             $inputArea.append($pair);
         };
 
-        addInputAreaPair('spell', $('<input>'));
+        let $spellInput = $('<input>');
+
+        $spellInput.on('input', () => {
+            let formattedSpell = this.formatSearchKeyword($spellInput.val());
+            let searchResult = this.dict.searchSpell(formattedSpell);
+            let backColor = '#ffffff';
+
+            if(Object.keys(searchResult).length)
+                backColor = '#ffdddd';
+
+            $spellInput.css('background-color', backColor);
+        });
+
+        addInputAreaPair('spell', $spellInput);
         addInputAreaPair('ipa', $('<input>'));
 
         $main.append($inputArea);
@@ -293,6 +306,11 @@ class Interface {
 
             let spell = this.formatSearchKeyword($input_spell.val());
             let ipa = this.formatSearchKeyword($input_ipa.val());
+
+            if(this.dict.searchSpell(spell) == {}) {
+                this.showNoticePopup('スペルが重複しています。');
+                return;
+            }
 
             if(spell == '' || ipa == '') {
                 this.showNoticePopup('入力項目が不十分です。');
