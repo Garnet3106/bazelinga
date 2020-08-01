@@ -468,7 +468,24 @@ class Interface {
 
     onEditTopClicked() {}
 
-    onRemoveTopClicked() {}
+    onRemoveTopClicked() {
+        this.showConfirmationPopup(this.messages.doYouReallyRemoveTheWord, () => {
+            let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
+            let spell = $selectedItem.children('.workarea-wordlist-item-spell').text();
+            let searchResult = this.dict.searchSpell(spell);
+            console.log(spell);
+            console.log(searchResult);
+
+            if(!Object.keys(searchResult).length) {
+                this.showNoticePopup(this.messages.failedToRemoveTheWord);
+                return;
+            }
+
+            this.dict.removeWord(searchResult.index);
+            this.updateWordList();
+            this.showNoticePopup(this.messages.theWordHasBeenRemoved);
+        });
+    }
 
     onSearchKeywordInput() {
         this.updateWordList();

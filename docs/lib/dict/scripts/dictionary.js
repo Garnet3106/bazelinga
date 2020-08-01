@@ -73,6 +73,10 @@ class Dictionary {
             });
     }
 
+    removeWord(wordIndex) {
+        this.data.dict.splice(wordIndex, 1);
+    }
+
     search(keyword) {
         let matchedWords = [];
         let loweredKeyword = keyword.toLowerCase();
