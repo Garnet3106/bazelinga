@@ -317,6 +317,13 @@ class Interface {
                 return;
             }
 
+            let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
+
+            if(spell.match(invalidChars) || ipa.match(invalidChars)) {
+                this.showNoticePopup(this.messages.inputtedCharsAreInvalid);
+                return;
+            }
+
             if(translation.length == 0) {
                 this.showNoticePopup(this.messages.translationNotInputted);
                 return;
