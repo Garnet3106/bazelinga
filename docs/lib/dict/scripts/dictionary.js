@@ -6,6 +6,16 @@ class Dictionary {
         this.ready = false;
     }
 
+    addWord(spell, ipa, translation) {
+        let word = {};
+
+        word.spell = spell;
+        word.ipa = ipa;
+        word.translation = translation;
+
+        this.data.dict.push(word);
+    }
+
     formatSearchKeyword(keyword) {
         keyword = keyword.replace(/　/g, ' ');
         keyword = keyword.replace(/^ +/g, '');

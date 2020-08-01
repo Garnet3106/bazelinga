@@ -13,7 +13,7 @@ class Interface {
             let langData = this.langPack.getData();
             this.messages = langData.messages;
             this.translationClasses = langData.classes;
-            this.wordTypes = langData.types;
+            this.translationTypes = langData.types;
 
             this.dict.load(() => {
                 // ロード成功時
@@ -81,7 +81,7 @@ class Interface {
                 let $elemType = $('<div class="workarea-wordlist-item-type"></div>');
 
                 $elemSpell.text(word.spell);
-                $elemType.text('[' + this.wordTypes[translation.type] + ']');
+                $elemType.text('[' + this.translationTypes[translation.type] + ']');
 
                 $elem.append($elemSpell);
                 $elem.append($elemType);
@@ -93,13 +93,13 @@ class Interface {
                 }
 
                 let $elemTranslation = $('<div class="workarea-wordlist-item-translation"></div>');
-                $elemTranslation.text(translation.words.join(' '));
+                $elemTranslation.text(translation.words.join(', '));
                 $elem.append($elemTranslation);
 
                 // クリックイベントを設定
                 $elem.on('click', elem => {
                     let $target = $(elem.target);
-                    let formattedKeyword = this.dict.formatSearchKeyword($input.val());
+                    let formattedKeyword = this.formatSearchKeyword($input.val());
 
                     let $item = $target.eq(0);
 
@@ -148,6 +148,10 @@ class Interface {
         document.execCommand('copy');
 
         $clipboardText.remove();
+    }
+
+    formatSearchKeyword(keyword) {
+        return this.dict.formatSearchKeyword(keyword);
     }
 
     hideGuideMessage() {
@@ -245,28 +249,25 @@ class Interface {
 
         let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
 
-        // { メッセージ名: IDの末尾, ... }
-        let inputItems = { 'spell': 'Spell', 'ipa': 'IPA', 'type': 'Type' };
-
-        for(let key in inputItems) {
-            let pairID = 'popupAddInputArea' + inputItems[key];
+        let addInputAreaPair = (name, $pairInput) => {
             let $pair = $('<div class="popup-content-main-inputarea-pair">');
 
-            $pair.attr('id', pairID);
-
             let $pairName = $('<div></div>');
-            $pairName.attr('id', pairID + 'Name');
-            $pairName.text(this.messages[key]);
+            $pairName.text(this.messages[name]);
             $pair.append($pairName);
 
-            let $pairInput = $('<input>');
-            $pairInput.attr('id', pairID + 'Input');
+            $pairInput.attr('name', name);
             $pair.append($pairInput);
 
             $inputArea.append($pair);
-        }
+        };
+
+        addInputAreaPair('spell', $('<input>'));
+        addInputAreaPair('ipa', $('<input>'));
 
         $main.append($inputArea);
+
+        let translation = [];
 
         // 戻るボタン
         this.addPopupBottomButton($popup, this.messages.back, () => {
@@ -279,16 +280,32 @@ class Interface {
         // 翻訳ボタン
         this.addPopupBottomButton($popup, '翻訳', () => {
             this.showPopup($popup => {
-                this.initAddPopup_translationPopup($popup);
+                this.initAddPopup_translationPopup($popup, data => {
+                    translation = data;
+                });
             });
         });
 
-        // 単語ボタン
+        // 追加ボタン
         this.addPopupBottomButton($popup, this.messages.add, () => {
+            let $input_spell = $inputArea.find('[name=spell]').eq(0);
+            let $input_ipa = $inputArea.find('[name=ipa]').eq(0);
+
+            let spell = this.formatSearchKeyword($input_spell.val());
+            let ipa = this.formatSearchKeyword($input_ipa.val());
+
+            if(spell == '' || ipa == '') {
+                this.showNoticePopup('入力項目が不十分です。');
+                return;
+            }
+
+            this.dict.addWord(spell, ipa, translation);
+
+            this.hidePopup($popup);
         });
     }
 
-    initAddPopup_translationPopup($popup) {
+    initAddPopup_translationPopup($popup, onSaveButtonClicked = () => {}) {
         let title = '翻訳編集';
         let iconURI = '../../../lib/dict/img/edit.svg';
 
@@ -299,20 +316,38 @@ class Interface {
         let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
 
         let addInputAreaPair = () => {
-            let $pair = $('<div class="popup-content-main-inputarea-pair">');
-            let $selectBox = $('<select class="popup-content-main-inputarea-selectbox"></select>');
+            let $pair = $('<div class="popup-content-main-inputarea-pair"></div>');
 
-            for(let key in this.translationClasses) {
-                let $selectBoxItem = $('<option></option>');
+            let $pairType = $('<select></select>');
+            $pairType.attr('name', 'type');
 
-                $selectBoxItem.attr('value', key);
-                $selectBoxItem.text(this.translationClasses[key]);
+            for(let key in this.translationTypes) {
+                let $option = $('<option></option>');
 
-                $selectBox.append($selectBoxItem);
-                $pair.append($selectBox);
+                $option.attr('value', key);
+                $option.text(this.translationTypes[key]);
+
+                $pairType.append($option);
             }
 
+            $pair.append($pairType);
+
+            let $pairClass = $('<select></select>');
+            $pairClass.attr('name', 'class');
+
+            for(let key in this.translationClasses) {
+                let $option = $('<option></option>');
+
+                $option.attr('value', key);
+                $option.text(this.translationClasses[key]);
+
+                $pairClass.append($option);
+            }
+
+            $pair.append($pairClass);
+
             let $pairInput = $('<input>');
+            $pairInput.attr('name', 'words');
             $pairInput.css('width', '200px');
             $pair.append($pairInput);
 
@@ -332,14 +367,46 @@ class Interface {
             $pair.append($pairRemoveIcon);
 
             $inputArea.append($pair);
-        }
+        };
+
+        let getInputData = () => {
+            let $pairs = $inputArea.children();
+            let translation = [];
+
+            $pairs.each((i, elem) => {
+                let $item = $(elem);
+
+                let translationWords = $item.children('[name=words]').val().split(',');
+
+                translationWords.forEach((word, index) => {
+                    translationWords[index] = this.formatSearchKeyword(word);
+                });
+
+                if(translationWords == [ '' ])
+                    return;
+
+                let $inputType = $item.children('[name=type]');
+                let translationType = $inputType.children('option:selected').eq(0).val();
+
+                let $inputClass = $item.children('[name=class]');
+                let translationClass = $inputClass.children('option:selected').eq(0).val();
+
+                translation.push({
+                    type: translationType,
+                    class: translationClass,
+                    words: translationWords
+                });
+            });
+
+            return translation;
+        };
 
         addInputAreaPair();
         $main.append($inputArea);
 
         this.addPopupBottomButton($popup, '戻る', () => {
             this.showConfirmationPopup(this.messages.closeConfirm, () => {
-                $popup.hide();
+                this.hidePopup($popup);
             });
         });
 
@@ -349,7 +416,9 @@ class Interface {
 
         this.addPopupBottomButton($popup, '保存', () => {
             this.showNoticePopup('保存しました。', () => {
-                $popup.remove();
+                let inputData = getInputData();
+                onSaveButtonClicked(inputData);
+                this.hidePopup($popup);
             });
         });
     }
@@ -568,7 +637,7 @@ class Interface {
         this.unslectListItem();
         this.latestSelectedItemID = tmpLatestID;
 
-        let keyword = this.dict.formatSearchKeyword($searchInput.val());
+        let keyword = this.formatSearchKeyword($searchInput.val());
 
         if(keyword == '') {
             this.setGuideMessage(this.messages.displayResults);
