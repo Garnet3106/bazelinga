@@ -291,7 +291,7 @@ class Interface {
         });
 
         // 翻訳ボタン
-        this.addPopupBottomButton($popup, '翻訳', () => {
+        this.addPopupBottomButton($popup, this.messages.trans, () => {
             this.showPopup($popup => {
                 this.initAddPopup_translationPopup($popup, data => {
                     translation = data;
@@ -307,31 +307,31 @@ class Interface {
             let spell = this.formatSearchKeyword($input_spell.val());
             let ipa = this.formatSearchKeyword($input_ipa.val());
 
-            if(this.dict.searchSpell(spell) == {}) {
-                this.showNoticePopup('スペルが重複しています。');
+            if(Object.keys(this.dict.searchSpell(spell)).length) {
+                this.showNoticePopup(this.messages.spellIsDuplicated);
                 return;
             }
 
             if(spell == '' || ipa == '') {
-                this.showNoticePopup('入力項目が不十分です。');
+                this.showNoticePopup(this.messages.inputItemLacks);
                 return;
             }
 
             if(translation.length == 0) {
-                this.showNoticePopup('翻訳が入力されていません。');
+                this.showNoticePopup(this.messages.translationNotInputted);
                 return;
             }
 
             this.dict.addWord(spell, ipa, translation);
 
-            this.showNoticePopup('追加しました。', () => {
+            this.showNoticePopup(this.messages.wordHasAdded, () => {
                 this.hidePopup($popup);
             });
         });
     }
 
     initAddPopup_translationPopup($popup, onSaveButtonClicked = () => {}) {
-        let title = '翻訳編集';
+        let title = this.messages.translationEditing;
         let iconURI = '../../../lib/dict/img/edit.svg';
 
         this.addPopupTopIcon($popup, iconURI);
@@ -383,7 +383,7 @@ class Interface {
                 let $parent = $(event.target).parent();
 
                 if($parent.parent().children().length < 2) {
-                    this.showNoticePopup('これ以上削除できません。');
+                    this.showNoticePopup(this.messages.cannotRemoveAnyMore);
                 } else {
                     $parent.remove();
                 }
@@ -429,18 +429,18 @@ class Interface {
         addInputAreaPair();
         $main.append($inputArea);
 
-        this.addPopupBottomButton($popup, '戻る', () => {
+        this.addPopupBottomButton($popup, this.messages.back, () => {
             this.showConfirmationPopup(this.messages.closeConfirm, () => {
                 this.hidePopup($popup);
             });
         });
 
-        this.addPopupBottomButton($popup, '追加', () => {
+        this.addPopupBottomButton($popup, this.messages.add, () => {
             addInputAreaPair();
         });
 
-        this.addPopupBottomButton($popup, '保存', () => {
-            this.showNoticePopup('保存しました。', () => {
+        this.addPopupBottomButton($popup, this.messages.save, () => {
+            this.showNoticePopup(this.messages.translationHasSaved, () => {
                 let inputData = getInputData();
                 onSaveButtonClicked(inputData);
                 this.hidePopup($popup);
