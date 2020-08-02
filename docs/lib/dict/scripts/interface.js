@@ -491,7 +491,7 @@ class Interface {
 
         let $main = $popup.find('.popup-content-main');
 
-        let title = this.messages.wordEditing;
+        let title = this.messages.wordEdition;
         let iconURI = '../../../lib/dict/img/edit.svg';
 
         this.addPopupTopIcon($popup, iconURI);

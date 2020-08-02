@@ -23,6 +23,7 @@
             "displayResults": "The search results will be displayed here.",
             "doYouReallyClose": "Do you really close?",
             "doYouReallyRemoveTheWord": "Do you really remove the word?",
+            "doYouReallySaveTheWord": "Do you really save the word?",
             "failedToRemoveTheWord": "Failed to remove the word.",
             "inputItemLacks": "The input item(s) lack(s).",
             "inputtedCharsAreInvalid": "The inputted characters are invalid.",
@@ -42,7 +43,9 @@
             "translationNotInputted": "The translation is not inputted.",
             "type": "Type",
             "wordAddition": "Word Addition",
+            "wordEdition": "Word Edition",
             "wordHasAdded": "The word has added.",
+            "wordHasUpdated": "The word has updated.",
             "wordNotFound": "The word was not found.",
             "yes": "Yes"
         }
@@ -71,6 +74,7 @@
             "displayResults": "ここに検索結果が表示されます。",
             "doYouReallyClose": "本当に閉じますか？",
             "doYouReallyRemoveTheWord": "本当に単語を削除しますか？",
+            "doYouReallySaveTheWord": "本当に単語を保存しますか？",
             "failedToRemoveTheWord": "単語の削除に失敗しました。",
             "inputItemLacks": "入力項目が不十分です。",
             "inputtedCharsAreInvalid": "入力された文字が無効です。",
@@ -90,7 +94,9 @@
             "translationNotInputted": "翻訳が入力されていません。",
             "type": "種類",
             "wordAddition": "単語追加",
+            "wordEdition": "単語編集",
             "wordHasAdded": "単語が追加されました。",
+            "wordHasUpdated": "単語が更新されました。",
             "wordNotFound": "単語が見つかりませんでした。",
             "yes": "はい"
         }
