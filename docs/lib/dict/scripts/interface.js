@@ -289,7 +289,7 @@ class Interface {
 
         // 戻るボタン
         this.addPopupBottomButton($popup, this.messages.back, () => {
-            let message = this.messages.doYouReallyClose + '<br>' + this.messages.dataWillBeDiscarded;
+            let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
 
             this.showConfirmationPopup(message, () => {
                 // Yesの場合
@@ -315,30 +315,30 @@ class Interface {
             let ipa = this.formatSearchKeyword($input_ipa.val());
 
             if(Object.keys(this.dict.searchSpell(spell)).length) {
-                this.showNoticePopup(this.messages.spellIsDuplicated);
+                this.showNoticePopup(this.messages.theSpellIsDuplicated);
                 return;
             }
 
             if(spell == '' || ipa == '') {
-                this.showNoticePopup(this.messages.inputItemLacks);
+                this.showNoticePopup(this.messages.theInputItemLacks);
                 return;
             }
 
             let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
 
             if(spell.match(invalidChars) || ipa.match(invalidChars)) {
-                this.showNoticePopup(this.messages.inputtedCharsAreInvalid);
+                this.showNoticePopup(this.messages.theInputtedCharsAreInvalid);
                 return;
             }
 
             if(translation.length == 0) {
-                this.showNoticePopup(this.messages.translationNotInputted);
+                this.showNoticePopup(this.messages.theTranslationIsNotInputted);
                 return;
             }
 
             this.dict.addWord(spell, ipa, translation);
 
-            this.showNoticePopup(this.messages.wordHasAdded, () => {
+            this.showNoticePopup(this.messages.theWordHasBeenAdded, () => {
                 this.updateWordList();
                 this.hidePopup($popup);
             });
@@ -346,7 +346,7 @@ class Interface {
     }
 
     initAddPopup_translationPopup($popup, translation, onSaveButtonClicked = () => {}) {
-        let title = this.messages.translationEditing;
+        let title = this.messages.translationEdition;
         let iconURI = '../../../lib/dict/img/edit.svg';
 
         this.addPopupTopIcon($popup, iconURI);
@@ -409,7 +409,7 @@ class Interface {
                 let $parent = $(event.target).parent();
 
                 if($parent.parent().children().length < 2) {
-                    this.showNoticePopup(this.messages.cannotRemoveAnyMore);
+                    this.showNoticePopup(this.messages.youCannotRemoveAnyMore);
                 } else {
                     $parent.remove();
                 }
@@ -462,7 +462,7 @@ class Interface {
         $main.append($inputArea);
 
         this.addPopupBottomButton($popup, this.messages.back, () => {
-            let message = this.messages.doYouReallyClose + '<br>' + this.messages.dataWillBeDiscarded;
+            let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
 
             this.showConfirmationPopup(message, () => {
                 this.hidePopup($popup);
@@ -474,7 +474,7 @@ class Interface {
         });
 
         this.addPopupBottomButton($popup, this.messages.save, () => {
-            this.showNoticePopup(this.messages.translationHasSaved, () => {
+            this.showNoticePopup(this.messages.theTranslationHasBeenSaved, () => {
                 translation = getInputData();
                 console.log('translation')
                 console.log(translation)
@@ -539,7 +539,7 @@ class Interface {
 
         // 戻るボタン
         this.addPopupBottomButton($popup, this.messages.back, () => {
-            let message = this.messages.doYouReallyClose + '<br>' + this.messages.dataWillBeDiscarded;
+            let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
 
             this.showConfirmationPopup(message, () => {
                 // Yesの場合
@@ -568,31 +568,31 @@ class Interface {
                 let ipa = this.formatSearchKeyword($input_ipa.val());
 
                 if(spell != oldWord.spell && Object.keys(this.dict.searchSpell(spell)).length) {
-                    this.showNoticePopup(this.messages.spellIsDuplicated);
+                    this.showNoticePopup(this.messages.theSpellIsDuplicated);
                     return;
                 }
 
                 if(spell == '' || ipa == '') {
-                    this.showNoticePopup(this.messages.inputItemLacks);
+                    this.showNoticePopup(this.messages.theInputItemLacks);
                     return;
                 }
 
                 let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
 
                 if(spell.match(invalidChars) || ipa.match(invalidChars)) {
-                    this.showNoticePopup(this.messages.inputtedCharsAreInvalid);
+                    this.showNoticePopup(this.messages.theInputtedCharsAreInvalid);
                     return;
                 }
 
                 if(translation.length == 0) {
-                    this.showNoticePopup(this.messages.translationNotInputted);
+                    this.showNoticePopup(this.messages.theTranslationIsNotInputted);
                     return;
                 }
 
                 this.dict.removeWord(oldWord.index);
                 this.dict.addWord(spell, ipa, translation);
 
-                this.showNoticePopup(this.messages.wordHasUpdated, () => {
+                this.showNoticePopup(this.messages.theWordHasBeenUpdated, () => {
                     this.updateWordList();
                     this.hidePopup($popup);
                 });
@@ -601,7 +601,7 @@ class Interface {
     }
 
     initEditPopup_translationPopup($popup, translation, onSaveButtonClicked = () => {}) {
-        let title = this.messages.translationEditing;
+        let title = this.messages.translationEdition;
         let iconURI = '../../../lib/dict/img/edit.svg';
 
         this.addPopupTopIcon($popup, iconURI);
@@ -664,7 +664,7 @@ class Interface {
                 let $parent = $(event.target).parent();
 
                 if($parent.parent().children().length < 2) {
-                    this.showNoticePopup(this.messages.cannotRemoveAnyMore);
+                    this.showNoticePopup(this.messages.youCannotRemoveAnyMore);
                 } else {
                     $parent.remove();
                 }
@@ -714,7 +714,7 @@ class Interface {
         $main.append($inputArea);
 
         this.addPopupBottomButton($popup, this.messages.back, () => {
-            let message = this.messages.doYouReallyClose + '<br>' + this.messages.dataWillBeDiscarded;
+            let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
 
             this.showConfirmationPopup(message, () => {
                 this.hidePopup($popup);
@@ -726,7 +726,7 @@ class Interface {
         });
 
         this.addPopupBottomButton($popup, this.messages.save, () => {
-            this.showNoticePopup(this.messages.translationHasSaved, () => {
+            this.showNoticePopup(this.messages.theTranslationHasBeenSaved, () => {
                 let inputData = getInputData();
                 onSaveButtonClicked(inputData);
                 this.hidePopup($popup);
@@ -784,7 +784,7 @@ class Interface {
             // ドキュメントURLをクリップボードにコピー
             this.copyToClipboard(this.dict.getDocsURI(this.selectedItemIndex));
             this.hideMenu('rightMenuShare');
-            this.showNoticePopup(this.messages.copiedToClipboard);
+            this.showNoticePopup(this.messages.copiedToTheClipboard);
         });
 
         $twitterShareIcon.on('click', () => {
@@ -967,7 +967,7 @@ class Interface {
         let keyword = this.formatSearchKeyword($searchInput.val());
 
         if(keyword == '') {
-            this.setGuideMessage(this.messages.displayResults);
+            this.setGuideMessage(this.messages.theSearchResultsWillBeDisplayedHere);
             this.showGuideMessage();
             return;
         }
@@ -975,12 +975,12 @@ class Interface {
         let words = this.dict.search(keyword);
 
         if(words.length == 0) {
-            this.setGuideMessage(this.messages.wordNotFound);
+            this.setGuideMessage(this.messages.theWordHasNotFound);
             this.showGuideMessage();
             return;
         }
 
-        this.setGuideMessage(this.messages.displayResults);
+        this.setGuideMessage(this.messages.theSearchResultsWillBeDisplayedHere);
         this.hideGuideMessage();
         this.addWordsToList(words);
     }
