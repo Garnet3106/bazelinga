@@ -54,7 +54,7 @@ class Popup {
         }, 200);
     }
 
-    show(onReady = $popup => {}) {
+    show(onReady = () => {}) {
         if(this.isVisible)
             return;
 
@@ -72,7 +72,7 @@ class Popup {
         this.$popup.append($content);
 
         this.isVisible = true;
-        onReady(this.$popup);
+        onReady();
 
         $('#body').append(this.$popup);
         this.$popup.css('display', 'flex');
