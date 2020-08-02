@@ -222,7 +222,12 @@ class Interface {
         });
 
         $('#leftMenuEditTop').on('click', () => {
-            this.onEditTopClicked();
+            if(this.selectedItemIndex == -1)
+                return;
+
+            this.showPopup($popup => {
+                this.initEditPopup($popup);
+            });
         });
 
         $('#leftMenuRemoveTop').on('click', () => {
@@ -294,8 +299,8 @@ class Interface {
 
         // 翻訳ボタン
         this.addPopupBottomButton($popup, this.messages.trans, () => {
-            this.showPopup($popup => {
-                this.initAddPopup_translationPopup($popup, data => {
+            this.showPopup($translationPopup => {
+                this.initAddPopup_translationPopup($translationPopup, translation, data => {
                     translation = data;
                 });
             });
@@ -334,12 +339,13 @@ class Interface {
             this.dict.addWord(spell, ipa, translation);
 
             this.showNoticePopup(this.messages.wordHasAdded, () => {
+                this.updateWordList();
                 this.hidePopup($popup);
             });
         });
     }
 
-    initAddPopup_translationPopup($popup, onSaveButtonClicked = () => {}) {
+    initAddPopup_translationPopup($popup, translation, onSaveButtonClicked = () => {}) {
         let title = this.messages.translationEditing;
         let iconURI = '../../../lib/dict/img/edit.svg';
 
@@ -349,7 +355,8 @@ class Interface {
         let $main = $popup.find('.popup-content-main');
         let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
 
-        let addInputAreaPair = () => {
+        // words → 文字列の配列
+        let addInputAreaPair = (type, className, words) => {
             let $pair = $('<div class="popup-content-main-inputarea-pair"></div>');
 
             let $pairType = $('<select></select>');
@@ -363,6 +370,9 @@ class Interface {
 
                 $pairType.append($option);
             }
+
+            if(type !== undefined)
+                $pairType.val(type);
 
             $pair.append($pairType);
 
@@ -378,11 +388,18 @@ class Interface {
                 $pairClass.append($option);
             }
 
+            if(className !== undefined)
+                $pairClass.val(className);
+
             $pair.append($pairClass);
 
             let $pairInput = $('<input>');
             $pairInput.attr('name', 'words');
-            $pairInput.css('width', '200px');
+            $pairInput.css('width', '250px');
+
+            if(words !== undefined)
+                $pairInput.val(words.join(','));
+
             $pair.append($pairInput);
 
             let $pairRemoveIcon = $('<img>');
@@ -405,7 +422,7 @@ class Interface {
 
         let getInputData = () => {
             let $pairs = $inputArea.children();
-            let translation = [];
+            let newTranslation = [];
 
             $pairs.each((i, elem) => {
                 let $item = $(elem);
@@ -425,17 +442,275 @@ class Interface {
                 let $inputClass = $item.children('[name=class]');
                 let translationClass = $inputClass.children('option:selected').eq(0).val();
 
-                translation.push({
+                newTranslation.push({
                     type: translationType,
                     class: translationClass,
                     words: translationWords
                 });
             });
 
-            return translation;
+            return newTranslation;
         };
 
-        addInputAreaPair();
+        translation.forEach(item => {
+            addInputAreaPair(item.type, item.class, item.words);
+        });
+
+        if(translation.length == 0)
+            addInputAreaPair();
+
+        $main.append($inputArea);
+
+        this.addPopupBottomButton($popup, this.messages.back, () => {
+            let message = this.messages.doYouReallyClose + '<br>' + this.messages.dataWillBeDiscarded;
+
+            this.showConfirmationPopup(message, () => {
+                this.hidePopup($popup);
+            });
+        });
+
+        this.addPopupBottomButton($popup, this.messages.add, () => {
+            addInputAreaPair();
+        });
+
+        this.addPopupBottomButton($popup, this.messages.save, () => {
+            this.showNoticePopup(this.messages.translationHasSaved, () => {
+                translation = getInputData();
+                console.log('translation')
+                console.log(translation)
+                onSaveButtonClicked(translation);
+                this.hidePopup($popup);
+            });
+        });
+    }
+
+    initEditPopup($popup) {
+        let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
+        let oldWordSpell = $selectedItem.children('.workarea-wordlist-item-spell').text();
+        let oldWord = this.dict.searchSpell(oldWordSpell);
+
+        let $main = $popup.find('.popup-content-main');
+
+        let title = this.messages.wordEditing;
+        let iconURI = '../../../lib/dict/img/edit.svg';
+
+        this.addPopupTopIcon($popup, iconURI);
+        this.addPopupTopTitle($popup, title);
+
+        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
+
+        let addInputAreaPair = (name, $pairInput) => {
+            let $pair = $('<div class="popup-content-main-inputarea-pair">');
+
+            let $pairName = $('<div></div>');
+            $pairName.text(this.messages[name]);
+            $pair.append($pairName);
+
+            $pairInput.attr('name', name);
+            $pair.append($pairInput);
+
+            $inputArea.append($pair);
+        };
+
+        let $spellInput = $('<input>');
+        $spellInput.val(oldWord.spell);
+
+        $spellInput.on('input', () => {
+            let formattedSpell = this.formatSearchKeyword($spellInput.val());
+            let searchResult = this.dict.searchSpell(formattedSpell);
+            let backColor = '#ffffff';
+
+            if(oldWord.spell != formattedSpell && Object.keys(searchResult).length)
+                backColor = '#ffdddd';
+
+            $spellInput.css('background-color', backColor);
+        });
+
+        addInputAreaPair('spell', $spellInput);
+
+        let $ipaInput = $('<input>');
+        $ipaInput.val(oldWord.ipa);
+
+        addInputAreaPair('ipa', $ipaInput);
+
+        $main.append($inputArea);
+
+        let translation = oldWord.translation;
+
+        // 戻るボタン
+        this.addPopupBottomButton($popup, this.messages.back, () => {
+            let message = this.messages.doYouReallyClose + '<br>' + this.messages.dataWillBeDiscarded;
+
+            this.showConfirmationPopup(message, () => {
+                // Yesの場合
+                this.hidePopup($popup);
+            });
+        });
+
+        // 翻訳ボタン
+        this.addPopupBottomButton($popup, this.messages.trans, () => {
+            this.showPopup($translationPopup => {
+                this.initEditPopup_translationPopup($translationPopup, translation, data => {
+                    translation = data;
+                });
+            });
+        });
+
+        // 更新ボタン
+        this.addPopupBottomButton($popup, this.messages.save, () => {
+            let message = this.messages.doYouReallySaveTheWord;
+
+            this.showConfirmationPopup(message, () => {
+                let $input_spell = $inputArea.find('[name=spell]').eq(0);
+                let $input_ipa = $inputArea.find('[name=ipa]').eq(0);
+
+                let spell = this.formatSearchKeyword($input_spell.val());
+                let ipa = this.formatSearchKeyword($input_ipa.val());
+
+                if(spell != oldWord.spell && Object.keys(this.dict.searchSpell(spell)).length) {
+                    this.showNoticePopup(this.messages.spellIsDuplicated);
+                    return;
+                }
+
+                if(spell == '' || ipa == '') {
+                    this.showNoticePopup(this.messages.inputItemLacks);
+                    return;
+                }
+
+                let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
+
+                if(spell.match(invalidChars) || ipa.match(invalidChars)) {
+                    this.showNoticePopup(this.messages.inputtedCharsAreInvalid);
+                    return;
+                }
+
+                if(translation.length == 0) {
+                    this.showNoticePopup(this.messages.translationNotInputted);
+                    return;
+                }
+
+                this.dict.removeWord(oldWord.index);
+                this.dict.addWord(spell, ipa, translation);
+
+                this.showNoticePopup(this.messages.wordHasUpdated, () => {
+                    this.updateWordList();
+                    this.hidePopup($popup);
+                });
+            });
+        });
+    }
+
+    initEditPopup_translationPopup($popup, translation, onSaveButtonClicked = () => {}) {
+        let title = this.messages.translationEditing;
+        let iconURI = '../../../lib/dict/img/edit.svg';
+
+        this.addPopupTopIcon($popup, iconURI);
+        this.addPopupTopTitle($popup, title);
+
+        let $main = $popup.find('.popup-content-main');
+        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
+
+        // words → 文字列の配列
+        let addInputAreaPair = (type, className, words) => {
+            let $pair = $('<div class="popup-content-main-inputarea-pair"></div>');
+
+            let $pairType = $('<select></select>');
+            $pairType.attr('name', 'type');
+
+            for(let key in this.translationTypes) {
+                let $option = $('<option></option>');
+
+                $option.attr('value', key);
+                $option.text(this.translationTypes[key]);
+
+                $pairType.append($option);
+            }
+
+            if(type !== undefined)
+                $pairType.val(type);
+
+            $pair.append($pairType);
+
+            let $pairClass = $('<select></select>');
+            $pairClass.attr('name', 'class');
+
+            for(let key in this.translationClasses) {
+                let $option = $('<option></option>');
+
+                $option.attr('value', key);
+                $option.text(this.translationClasses[key]);
+
+                $pairClass.append($option);
+            }
+
+            if(className !== undefined)
+                $pairClass.val(className);
+
+            $pair.append($pairClass);
+
+            let $pairInput = $('<input>');
+            $pairInput.attr('name', 'words');
+            $pairInput.css('width', '250px');
+
+            if(words !== undefined)
+                $pairInput.val(words.join(','));
+
+            $pair.append($pairInput);
+
+            let $pairRemoveIcon = $('<img>');
+            $pairRemoveIcon.attr('src', '../../../lib/dict/img/remove.svg');
+
+            $pairRemoveIcon.on('click', event => {
+                let $parent = $(event.target).parent();
+
+                if($parent.parent().children().length < 2) {
+                    this.showNoticePopup(this.messages.cannotRemoveAnyMore);
+                } else {
+                    $parent.remove();
+                }
+            });
+
+            $pair.append($pairRemoveIcon);
+
+            $inputArea.append($pair);
+        };
+
+        let getInputData = () => {
+            let $pairs = $inputArea.children();
+            let newTranslation = [];
+
+            $pairs.each((i, elem) => {
+                let $item = $(elem);
+
+                let translationWords = $item.children('[name=words]').val().split(',');
+
+                translationWords.forEach((word, index) => {
+                    translationWords[index] = this.formatSearchKeyword(word);
+                });
+
+                if(translationWords == [ '' ])
+                    return;
+
+                let $inputType = $item.children('[name=type]');
+                let translationType = $inputType.children('option:selected').eq(0).val();
+
+                let $inputClass = $item.children('[name=class]');
+                let translationClass = $inputClass.children('option:selected').eq(0).val();
+
+                newTranslation.push({
+                    type: translationType,
+                    class: translationClass,
+                    words: translationWords
+                });
+            });
+
+            return newTranslation;
+        };
+
+        translation.forEach(item => {
+            addInputAreaPair(item.type, item.class, item.words);
+        });
+
         $main.append($inputArea);
 
         this.addPopupBottomButton($popup, this.messages.back, () => {
@@ -466,15 +741,14 @@ class Interface {
         location.href = this.dict.getDocsURI(this.selectedItemIndex);
     }
 
-    onEditTopClicked() {}
-
     onRemoveTopClicked() {
+        if(this.selectedItemIndex == -1)
+            return;
+
         this.showConfirmationPopup(this.messages.doYouReallyRemoveTheWord, () => {
             let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
             let spell = $selectedItem.children('.workarea-wordlist-item-spell').text();
             let searchResult = this.dict.searchSpell(spell);
-            console.log(spell);
-            console.log(searchResult);
 
             if(!Object.keys(searchResult).length) {
                 this.showNoticePopup(this.messages.failedToRemoveTheWord);
