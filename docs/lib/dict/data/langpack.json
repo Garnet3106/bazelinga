@@ -61,7 +61,7 @@
             "doYouReallyRemoveTheWord": "本当に単語を削除しますか？",
             "doYouReallySaveTheWord": "本当に単語を保存しますか？",
             "failedToRemoveTheWord": "単語の削除に失敗しました。",
-            "inputtedCharsAreInvalid": "入力された文字が無効です。",
+            "theInputtedCharsAreInvalid": "入力された文字が無効です。",
             "ipa": "IPA",
             "no": "いいえ",
             "ok": "OK",

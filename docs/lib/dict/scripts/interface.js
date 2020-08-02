@@ -28,43 +28,6 @@ class Interface {
         });
     }
 
-    addPopupBottomButton($popup, message, onClicked = () => {}) {
-        let $popupBottom = $popup.find('.popup-content-bottom');
-        let $button = $('<div class="popup-content-bottom-button"></div>');
-
-        $button.text(message);
-
-        $button.on('click', () => {
-            onClicked();
-        })
-
-        $popupBottom.append($button);
-    }
-
-    addPopupMainMessage($popup, message) {
-        let $main = $popup.find('.popup-content-main');
-        let $msg = $('<div class="popup-content-main-message"></div>');
-
-        $msg.html(message);
-        $main.append($msg);
-    }
-
-    addPopupTopIcon($popup, iconURI) {
-        let $top = $popup.find('.popup-content-top');
-        let $topIcon = $('<img class="popup-content-top-icon">');
-
-        $topIcon.attr('src', iconURI);
-        $top.append($topIcon);
-    }
-
-    addPopupTopTitle($popup, title) {
-        let $top = $popup.find('.popup-content-top');
-        let $topTitle = $('<div class="popup-content-top-title"></div>');
-
-        $topTitle.text(title);
-        $top.append($topTitle);
-    }
-
     addWordsToList(wordList) {
         let $input = $('#searchInput');
         let $list = $('#wordList');
@@ -191,14 +154,6 @@ class Interface {
         });
     }
 
-    hidePopup($popup) {
-        $popup.css('opacity', '0');
-
-        setTimeout(() => {
-            $popup.remove();
-        }, 200);
-    }
-
     init() {
         $(() => {
             this.initEvents();
@@ -212,12 +167,14 @@ class Interface {
 
     initEvents() {
         $('#searchInput').on('input', () => {
-            this.onSearchKeywordInput();
+            this.updateWordList();
         });
 
         $('#leftMenuAddTop').on('click', () => {
-            this.showPopup($popup => {
-                this.initAddPopup($popup);
+            let popup = new Popup(this.messages);
+
+            popup.show(() => {
+                this.initWordAdditionPopup(popup);
             });
         });
 
@@ -225,134 +182,84 @@ class Interface {
             if(this.selectedItemIndex == -1)
                 return;
 
-            this.showPopup($popup => {
-                this.initEditPopup($popup);
+            let popup = new Popup(this.messages);
+
+            popup.show(() => {
+                this.initWordEditionPopup(popup);
             });
         });
 
         $('#leftMenuRemoveTop').on('click', () => {
-            this.onRemoveTopClicked();
+            if(this.selectedItemIndex == -1)
+                return;
+
+            (new Popup(this.messages)).showConfirmation(this.messages.doYouReallyRemoveTheWord, () => {
+                let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
+                let spell = $selectedItem.children('.workarea-wordlist-item-spell').text();
+                let searchResult = this.dict.searchSpell(spell);
+
+                if(!Object.keys(searchResult).length) {
+                    (new Popup(this.messages)).showNotification(this.messages.failedToRemoveTheWord);
+                    return;
+                }
+
+                this.dict.removeWord(searchResult.index);
+                this.updateWordList();
+                (new Popup(this.messages)).showNotification(this.messages.theWordHasBeenRemoved);
+            });
         });
 
         $('#rightMenuDocsTop').on('click', () => {
-            this.onDocsTopClicked();
+            if(this.selectedItemIndex == -1)
+                return;
+
+            location.href = this.dict.getDocsURI(this.selectedItemIndex);
         });
 
         $('#rightMenuShareTop').on('click', () => {
-            this.onShareTopClicked();
+            let $rightMenuShare = $('#rightMenuShare');
+
+            // アイコンがすでに表示されている場合は閉じる
+            if($rightMenuShare.children().length > 1) {
+                this.hideMenu('rightMenuShare');
+                return;
+            }
+
+            if(this.selectedItemIndex == -1)
+                return;
+
+            let $linkShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareLink"></div>');
+            let $twitterShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareTwitter"></div>');
+
+            $linkShareIcon.on('click', () => {
+                // ドキュメントURLをクリップボードにコピー
+                this.copyToClipboard(this.dict.getDocsURI(this.selectedItemIndex));
+                this.hideMenu('rightMenuShare');
+                (new Popup(this.messages)).showNotification(this.messages.copiedToTheClipboard);
+            });
+
+            $twitterShareIcon.on('click', () => {
+                // Twitterのシェアリンクを新規タブで開く
+                open(this.dict.getTwitterShareLink(this.selectedItemIndex));
+                this.hideMenu('rightMenuShare');
+            });
+
+            $rightMenuShare.append($linkShareIcon);
+            $rightMenuShare.append($twitterShareIcon);
+
+            $rightMenuShare.find('.workarea-sidemenu-item-icon').css('cursor', 'pointer');
         });
     }
 
-    initAddPopup($popup) {
-        let $main = $popup.find('.popup-content-main');
-
-        let title = this.messages.wordAddition;
-        let iconURI = '../../../lib/dict/img/add.svg';
-
-        this.addPopupTopIcon($popup, iconURI);
-        this.addPopupTopTitle($popup, title);
-
-        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
-
-        let addInputAreaPair = (name, $pairInput) => {
-            let $pair = $('<div class="popup-content-main-inputarea-pair">');
-
-            let $pairName = $('<div></div>');
-            $pairName.text(this.messages[name]);
-            $pair.append($pairName);
-
-            $pairInput.attr('name', name);
-            $pair.append($pairInput);
-
-            $inputArea.append($pair);
-        };
-
-        let $spellInput = $('<input>');
-
-        $spellInput.on('input', () => {
-            let formattedSpell = this.formatSearchKeyword($spellInput.val());
-            let searchResult = this.dict.searchSpell(formattedSpell);
-            let backColor = '#ffffff';
-
-            if(Object.keys(searchResult).length)
-                backColor = '#ffdddd';
-
-            $spellInput.css('background-color', backColor);
-        });
-
-        addInputAreaPair('spell', $spellInput);
-        addInputAreaPair('ipa', $('<input>'));
-
-        $main.append($inputArea);
-
-        let translation = [];
-
-        // 戻るボタン
-        this.addPopupBottomButton($popup, this.messages.back, () => {
-            let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
-
-            this.showConfirmationPopup(message, () => {
-                // Yesの場合
-                this.hidePopup($popup);
-            });
-        });
-
-        // 翻訳ボタン
-        this.addPopupBottomButton($popup, this.messages.trans, () => {
-            this.showPopup($translationPopup => {
-                this.initAddPopup_translationPopup($translationPopup, translation, data => {
-                    translation = data;
-                });
-            });
-        });
-
-        // 追加ボタン
-        this.addPopupBottomButton($popup, this.messages.add, () => {
-            let $input_spell = $inputArea.find('[name=spell]').eq(0);
-            let $input_ipa = $inputArea.find('[name=ipa]').eq(0);
-
-            let spell = this.formatSearchKeyword($input_spell.val());
-            let ipa = this.formatSearchKeyword($input_ipa.val());
-
-            if(Object.keys(this.dict.searchSpell(spell)).length) {
-                this.showNoticePopup(this.messages.theSpellIsDuplicated);
-                return;
-            }
-
-            if(spell == '' || ipa == '') {
-                this.showNoticePopup(this.messages.theInputItemLacks);
-                return;
-            }
-
-            let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
-
-            if(spell.match(invalidChars) || ipa.match(invalidChars)) {
-                this.showNoticePopup(this.messages.theInputtedCharsAreInvalid);
-                return;
-            }
-
-            if(translation.length == 0) {
-                this.showNoticePopup(this.messages.theTranslationIsNotInputted);
-                return;
-            }
-
-            this.dict.addWord(spell, ipa, translation);
-
-            this.showNoticePopup(this.messages.theWordHasBeenAdded, () => {
-                this.updateWordList();
-                this.hidePopup($popup);
-            });
-        });
-    }
-
-    initAddPopup_translationPopup($popup, translation, onSaveButtonClicked = () => {}) {
+    /* 翻訳編集用のポップアップ */
+    initTranslationEditionPopup(popup, translation, onSaveButtonClicked = data => {}) {
         let title = this.messages.translationEdition;
         let iconURI = '../../../lib/dict/img/edit.svg';
 
-        this.addPopupTopIcon($popup, iconURI);
-        this.addPopupTopTitle($popup, title);
+        popup.addTopIcon(iconURI);
+        popup.addTopTitle(title);
 
-        let $main = $popup.find('.popup-content-main');
+        let $main = popup.$popup.find('.popup-content-main');
         let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
 
         // words → 文字列の配列
@@ -409,7 +316,7 @@ class Interface {
                 let $parent = $(event.target).parent();
 
                 if($parent.parent().children().length < 2) {
-                    this.showNoticePopup(this.messages.youCannotRemoveAnyMore);
+                    (new Popup(this.messages)).showNotification(this.messages.youCannotRemoveAnyMore);
                 } else {
                     $parent.remove();
                 }
@@ -461,41 +368,145 @@ class Interface {
 
         $main.append($inputArea);
 
-        this.addPopupBottomButton($popup, this.messages.back, () => {
+        popup.addBottomButton(this.messages.back, () => {
             let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
 
-            this.showConfirmationPopup(message, () => {
-                this.hidePopup($popup);
+            (new Popup(this.messages)).showConfirmation(message, () => {
+                popup.hide();
             });
         });
 
-        this.addPopupBottomButton($popup, this.messages.add, () => {
+        popup.addBottomButton(this.messages.add, () => {
             addInputAreaPair();
         });
 
-        this.addPopupBottomButton($popup, this.messages.save, () => {
-            this.showNoticePopup(this.messages.theTranslationHasBeenSaved, () => {
+        popup.addBottomButton(this.messages.save, () => {
+            (new Popup(this.messages)).showNotification(this.messages.theTranslationHasBeenSaved, () => {
                 translation = getInputData();
-                console.log('translation')
-                console.log(translation)
                 onSaveButtonClicked(translation);
-                this.hidePopup($popup);
+                popup.hide();
             });
         });
     }
 
-    initEditPopup($popup) {
+    /* 単語追加用のポップアップ */
+    initWordAdditionPopup(popup) {
+        let $main = popup.$popup.find('.popup-content-main');
+
+        let title = this.messages.wordAddition;
+        let iconURI = '../../../lib/dict/img/add.svg';
+
+        popup.addTopIcon(iconURI);
+        popup.addTopTitle(title);
+
+        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
+
+        let addInputAreaPair = (name, $pairInput) => {
+            let $pair = $('<div class="popup-content-main-inputarea-pair">');
+
+            let $pairName = $('<div></div>');
+            $pairName.text(this.messages[name]);
+            $pair.append($pairName);
+
+            $pairInput.attr('name', name);
+            $pair.append($pairInput);
+
+            $inputArea.append($pair);
+        };
+
+        let $spellInput = $('<input>');
+
+        $spellInput.on('input', () => {
+            let formattedSpell = this.formatSearchKeyword($spellInput.val());
+            let searchResult = this.dict.searchSpell(formattedSpell);
+            let backColor = '#ffffff';
+
+            if(Object.keys(searchResult).length)
+                backColor = '#ffdddd';
+
+            $spellInput.css('background-color', backColor);
+        });
+
+        addInputAreaPair('spell', $spellInput);
+        addInputAreaPair('ipa', $('<input>'));
+
+        $main.append($inputArea);
+
+        let translation = [];
+
+        // 戻るボタン
+        popup.addBottomButton(this.messages.back, () => {
+            let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
+
+            (new Popup(this.messages)).showConfirmation(message, () => {
+                // Yesの場合
+                popup.hide();
+            });
+        });
+
+        // 翻訳ボタン
+        popup.addBottomButton(this.messages.trans, () => {
+            let translationPopup = new Popup(this.messages);
+
+            translationPopup.show(() => {
+                this.initTranslationEditionPopup(translationPopup, translation, data => {
+                    translation = data;
+                });
+            });
+        });
+
+        // 追加ボタン
+        popup.addBottomButton(this.messages.add, () => {
+            let $input_spell = $inputArea.find('[name=spell]').eq(0);
+            let $input_ipa = $inputArea.find('[name=ipa]').eq(0);
+
+            let spell = this.formatSearchKeyword($input_spell.val());
+            let ipa = this.formatSearchKeyword($input_ipa.val());
+
+            if(Object.keys(this.dict.searchSpell(spell)).length) {
+                (new Popup(this.messages)).showNotification(this.messages.theSpellIsDuplicated);
+                return;
+            }
+
+            if(spell == '' || ipa == '') {
+                (new Popup(this.messages)).showNotification(this.messages.theInputItemLacks);
+                return;
+            }
+
+            let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
+
+            if(spell.match(invalidChars) || ipa.match(invalidChars)) {
+                (new Popup(this.messages)).showNotification(this.messages.theInputtedCharsAreInvalid);
+                return;
+            }
+
+            if(translation.length == 0) {
+                (new Popup(this.messages)).showNotification(this.messages.theTranslationIsNotInputted);
+                return;
+            }
+
+            this.dict.addWord(spell, ipa, translation);
+
+            (new Popup(this.messages)).showNotification(this.messages.theWordHasBeenAdded, () => {
+                this.updateWordList();
+                popup.hide();
+            });
+        });
+    }
+
+    /* 単語編集用のポップアップ */
+    initWordEditionPopup(popup) {
         let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
         let oldWordSpell = $selectedItem.children('.workarea-wordlist-item-spell').text();
         let oldWord = this.dict.searchSpell(oldWordSpell);
 
-        let $main = $popup.find('.popup-content-main');
+        let $main = popup.$popup.find('.popup-content-main');
 
         let title = this.messages.wordEdition;
         let iconURI = '../../../lib/dict/img/edit.svg';
 
-        this.addPopupTopIcon($popup, iconURI);
-        this.addPopupTopTitle($popup, title);
+        popup.addTopIcon(iconURI);
+        popup.addTopTitle(title);
 
         let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
 
@@ -538,29 +549,31 @@ class Interface {
         let translation = oldWord.translation;
 
         // 戻るボタン
-        this.addPopupBottomButton($popup, this.messages.back, () => {
+        popup.addBottomButton(this.messages.back, () => {
             let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
 
-            this.showConfirmationPopup(message, () => {
+            (new Popup(this.messages)).showConfirmation(message, () => {
                 // Yesの場合
-                this.hidePopup($popup);
+                popup.hide();
             });
         });
 
         // 翻訳ボタン
-        this.addPopupBottomButton($popup, this.messages.trans, () => {
-            this.showPopup($translationPopup => {
-                this.initEditPopup_translationPopup($translationPopup, translation, data => {
+        popup.addBottomButton(this.messages.trans, () => {
+            let translationPopup = new Popup(this.messages);
+
+            translationPopup.show(() => {
+                this.initTranslationEditionPopup(translationPopup, translation, data => {
                     translation = data;
                 });
             });
         });
 
         // 更新ボタン
-        this.addPopupBottomButton($popup, this.messages.save, () => {
+        popup.addBottomButton(this.messages.save, () => {
             let message = this.messages.doYouReallySaveTheWord;
 
-            this.showConfirmationPopup(message, () => {
+            (new Popup(this.messages)).showConfirmation(message, () => {
                 let $input_spell = $inputArea.find('[name=spell]').eq(0);
                 let $input_ipa = $inputArea.find('[name=ipa]').eq(0);
 
@@ -568,235 +581,36 @@ class Interface {
                 let ipa = this.formatSearchKeyword($input_ipa.val());
 
                 if(spell != oldWord.spell && Object.keys(this.dict.searchSpell(spell)).length) {
-                    this.showNoticePopup(this.messages.theSpellIsDuplicated);
+                    (new Popup(this.messages)).showNotification(this.messages.theSpellIsDuplicated);
                     return;
                 }
 
                 if(spell == '' || ipa == '') {
-                    this.showNoticePopup(this.messages.theInputItemLacks);
+                    (new Popup(this.messages)).showNotification(this.messages.theInputItemLacks);
                     return;
                 }
 
                 let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
 
                 if(spell.match(invalidChars) || ipa.match(invalidChars)) {
-                    this.showNoticePopup(this.messages.theInputtedCharsAreInvalid);
+                    (new Popup(this.messages)).showNotification(this.messages.theInputtedCharsAreInvalid);
                     return;
                 }
 
                 if(translation.length == 0) {
-                    this.showNoticePopup(this.messages.theTranslationIsNotInputted);
+                    (new Popup(this.messages)).showNotification(this.messages.theTranslationIsNotInputted);
                     return;
                 }
 
                 this.dict.removeWord(oldWord.index);
                 this.dict.addWord(spell, ipa, translation);
 
-                this.showNoticePopup(this.messages.theWordHasBeenUpdated, () => {
+                (new Popup(this.messages)).showNotification(this.messages.theWordHasBeenUpdated, () => {
                     this.updateWordList();
-                    this.hidePopup($popup);
+                    popup.hide();
                 });
             });
         });
-    }
-
-    initEditPopup_translationPopup($popup, translation, onSaveButtonClicked = () => {}) {
-        let title = this.messages.translationEdition;
-        let iconURI = '../../../lib/dict/img/edit.svg';
-
-        this.addPopupTopIcon($popup, iconURI);
-        this.addPopupTopTitle($popup, title);
-
-        let $main = $popup.find('.popup-content-main');
-        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
-
-        // words → 文字列の配列
-        let addInputAreaPair = (type, className, words) => {
-            let $pair = $('<div class="popup-content-main-inputarea-pair"></div>');
-
-            let $pairType = $('<select></select>');
-            $pairType.attr('name', 'type');
-
-            for(let key in this.translationTypes) {
-                let $option = $('<option></option>');
-
-                $option.attr('value', key);
-                $option.text(this.translationTypes[key]);
-
-                $pairType.append($option);
-            }
-
-            if(type !== undefined)
-                $pairType.val(type);
-
-            $pair.append($pairType);
-
-            let $pairClass = $('<select></select>');
-            $pairClass.attr('name', 'class');
-
-            for(let key in this.translationClasses) {
-                let $option = $('<option></option>');
-
-                $option.attr('value', key);
-                $option.text(this.translationClasses[key]);
-
-                $pairClass.append($option);
-            }
-
-            if(className !== undefined)
-                $pairClass.val(className);
-
-            $pair.append($pairClass);
-
-            let $pairInput = $('<input>');
-            $pairInput.attr('name', 'words');
-            $pairInput.css('width', '250px');
-
-            if(words !== undefined)
-                $pairInput.val(words.join(','));
-
-            $pair.append($pairInput);
-
-            let $pairRemoveIcon = $('<img>');
-            $pairRemoveIcon.attr('src', '../../../lib/dict/img/remove.svg');
-
-            $pairRemoveIcon.on('click', event => {
-                let $parent = $(event.target).parent();
-
-                if($parent.parent().children().length < 2) {
-                    this.showNoticePopup(this.messages.youCannotRemoveAnyMore);
-                } else {
-                    $parent.remove();
-                }
-            });
-
-            $pair.append($pairRemoveIcon);
-
-            $inputArea.append($pair);
-        };
-
-        let getInputData = () => {
-            let $pairs = $inputArea.children();
-            let newTranslation = [];
-
-            $pairs.each((i, elem) => {
-                let $item = $(elem);
-
-                let translationWords = $item.children('[name=words]').val().split(',');
-
-                translationWords.forEach((word, index) => {
-                    translationWords[index] = this.formatSearchKeyword(word);
-                });
-
-                if(translationWords == [ '' ])
-                    return;
-
-                let $inputType = $item.children('[name=type]');
-                let translationType = $inputType.children('option:selected').eq(0).val();
-
-                let $inputClass = $item.children('[name=class]');
-                let translationClass = $inputClass.children('option:selected').eq(0).val();
-
-                newTranslation.push({
-                    type: translationType,
-                    class: translationClass,
-                    words: translationWords
-                });
-            });
-
-            return newTranslation;
-        };
-
-        translation.forEach(item => {
-            addInputAreaPair(item.type, item.class, item.words);
-        });
-
-        $main.append($inputArea);
-
-        this.addPopupBottomButton($popup, this.messages.back, () => {
-            let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
-
-            this.showConfirmationPopup(message, () => {
-                this.hidePopup($popup);
-            });
-        });
-
-        this.addPopupBottomButton($popup, this.messages.add, () => {
-            addInputAreaPair();
-        });
-
-        this.addPopupBottomButton($popup, this.messages.save, () => {
-            this.showNoticePopup(this.messages.theTranslationHasBeenSaved, () => {
-                let inputData = getInputData();
-                onSaveButtonClicked(inputData);
-                this.hidePopup($popup);
-            });
-        });
-    }
-
-    onDocsTopClicked() {
-        if(this.selectedItemIndex == -1)
-            return;
-
-        location.href = this.dict.getDocsURI(this.selectedItemIndex);
-    }
-
-    onRemoveTopClicked() {
-        if(this.selectedItemIndex == -1)
-            return;
-
-        this.showConfirmationPopup(this.messages.doYouReallyRemoveTheWord, () => {
-            let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
-            let spell = $selectedItem.children('.workarea-wordlist-item-spell').text();
-            let searchResult = this.dict.searchSpell(spell);
-
-            if(!Object.keys(searchResult).length) {
-                this.showNoticePopup(this.messages.failedToRemoveTheWord);
-                return;
-            }
-
-            this.dict.removeWord(searchResult.index);
-            this.updateWordList();
-            this.showNoticePopup(this.messages.theWordHasBeenRemoved);
-        });
-    }
-
-    onSearchKeywordInput() {
-        this.updateWordList();
-    }
-
-    onShareTopClicked() {
-        let $rightMenuShare = $('#rightMenuShare');
-
-        // アイコンがすでに表示されている場合は閉じる
-        if($rightMenuShare.children().length > 1) {
-            this.hideMenu('rightMenuShare');
-            return;
-        }
-
-        if(this.selectedItemIndex == -1)
-            return;
-
-        let $linkShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareLink"></div>');
-        let $twitterShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareTwitter"></div>');
-
-        $linkShareIcon.on('click', () => {
-            // ドキュメントURLをクリップボードにコピー
-            this.copyToClipboard(this.dict.getDocsURI(this.selectedItemIndex));
-            this.hideMenu('rightMenuShare');
-            this.showNoticePopup(this.messages.copiedToTheClipboard);
-        });
-
-        $twitterShareIcon.on('click', () => {
-            // Twitterのシェアリンクを新規タブで開く
-            open(this.dict.getTwitterShareLink(this.selectedItemIndex));
-            this.hideMenu('rightMenuShare');
-        });
-
-        $rightMenuShare.append($linkShareIcon);
-        $rightMenuShare.append($twitterShareIcon);
-
-        $rightMenuShare.find('.workarea-sidemenu-item-icon').css('cursor', 'pointer');
     }
 
     selectListItem(index) {
@@ -864,64 +678,8 @@ class Interface {
         });
     }
 
-    showNoticePopup(message, onOKClicked = () => {}) {
-        this.showPopup($popup => {
-            let iconURI = '../../../lib/dict/img/notice.svg';
-            this.addPopupTopIcon($popup, iconURI);
-            this.addPopupMainMessage($popup, message);
-
-            this.addPopupBottomButton($popup, this.messages.ok, () => {
-                this.hidePopup($popup);
-                onOKClicked();
-            });
-        });
-    }
-
-    showConfirmationPopup(message, onYesClicked = () => {}, onNoClicked = () => {}) {
-        this.showPopup($popup => {
-            let iconURI = '../../../lib/dict/img/question.svg';
-            this.addPopupTopIcon($popup, iconURI);
-            this.addPopupMainMessage($popup, message);
-
-            this.addPopupBottomButton($popup, this.messages.no, () => {
-                this.hidePopup($popup);
-                onNoClicked();
-            });
-
-            this.addPopupBottomButton($popup, this.messages.yes, () => {
-                this.hidePopup($popup);
-                onYesClicked();
-            });
-        });
-    }
-
     showGuideMessage() {
         $('#wordListGuide').show();
-    }
-
-    showPopup(onReady = $popup => {}) {
-        // 初期化中に表示させないためにポップアップのスタイルは display: none に設定してある
-        let $popup = $('<div class="popup"></div>');
-        let $content = $('<div class="popup-content"></div>');
-        let $top = $('<div class="popup-content-top"></div>');
-        let $main = $('<div class="popup-content-main"></div>');
-        let $bottom = $('<div class="popup-content-bottom"></div>');
-
-        $content.append($top);
-        $content.append($main);
-        $content.append($bottom);
-
-        $popup.append($content);
-
-        onReady($popup);
-
-        $('#body').append($popup);
-        $popup.css('display', 'flex');
-
-        // なぜか直後だとアニメーションされないのでtimeoutをもうける
-        setTimeout(() => {
-            $popup.css('opacity', '1');
-        }, 50);
     }
 
     unslectListItem() {
@@ -951,7 +709,7 @@ class Interface {
 
         // データの読み込みが未完了の場合はアラートを表示
         if(!this.dict.ready || !this.langPack.ready) {
-            this.showNoticePopup(this.messages.pleaseWait);
+            (new Popup(this.messages)).showNotification(this.messages.pleaseWait);
             // 入力された文字列を残さない
             $searchInput.val('');
             return;
