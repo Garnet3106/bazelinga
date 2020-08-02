@@ -205,7 +205,6 @@ class Interface {
 
                 this.dict.removeWord(searchResult.index);
                 this.updateWordList();
-                (new Popup(this.messages)).showNotification(this.messages.theWordHasBeenRemoved);
             });
         });
 
@@ -381,11 +380,9 @@ class Interface {
         });
 
         popup.addBottomButton(this.messages.save, () => {
-            (new Popup(this.messages)).showNotification(this.messages.theTranslationHasBeenSaved, () => {
-                translation = getInputData();
-                onSaveButtonClicked(translation);
-                popup.hide();
-            });
+            translation = getInputData();
+            onSaveButtonClicked(translation);
+            popup.hide();
         });
     }
 
@@ -492,10 +489,8 @@ class Interface {
 
             this.dict.addWord(spell, ipa, translation);
 
-            (new Popup(this.messages)).showNotification(this.messages.theWordHasBeenAdded, () => {
-                this.updateWordList();
-                popup.hide();
-            });
+            this.updateWordList();
+            popup.hide();
         });
     }
 
@@ -615,10 +610,8 @@ class Interface {
                 this.dict.removeWord(oldWord.index);
                 this.dict.addWord(spell, ipa, translation);
 
-                (new Popup(this.messages)).showNotification(this.messages.theWordHasBeenUpdated, () => {
-                    this.updateWordList();
-                    popup.hide();
-                });
+                this.updateWordList();
+                popup.hide();
             });
         });
     }
