@@ -473,6 +473,11 @@ class Interface {
                 return;
             }
 
+            if(spell.length > 30 || ipa.length > 30) {
+                (new Popup(this.messages)).showNotification(this.messages.theInputtedTextIsTooLong);
+                return;
+            }
+
             let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
 
             if(spell.match(invalidChars) || ipa.match(invalidChars)) {
@@ -587,6 +592,11 @@ class Interface {
 
                 if(spell == '' || ipa == '') {
                     (new Popup(this.messages)).showNotification(this.messages.theInputItemLacks);
+                    return;
+                }
+
+                if(spell.length > 30 || ipa.length > 30) {
+                    (new Popup(this.messages)).showNotification(this.messages.theInputtedTextIsTooLong);
                     return;
                 }
 
