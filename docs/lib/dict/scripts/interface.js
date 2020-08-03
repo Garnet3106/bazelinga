@@ -159,9 +159,6 @@ class Interface {
             this.initEvents();
             this.setSideMenuObserver();
             this.setInitialKeyword();
-
-            let $leftMenuAddTop = $('#leftMenuAdd').children('.workarea-sidemenu-item-icon');
-            $leftMenuAddTop.css('cursor', 'pointer');
         });
     }
 
@@ -208,6 +205,14 @@ class Interface {
             });
         });
 
+        $('#leftMenuUploadTop').on('click', () => {
+            let popup = new Popup(this.messages);
+
+            popup.show(() => {
+                this.initUploadPopup(popup);
+            });
+        });
+
         $('#rightMenuDocsTop').on('click', () => {
             if(this.selectedItemIndex == -1)
                 return;
@@ -247,6 +252,60 @@ class Interface {
             $rightMenuShare.append($twitterShareIcon);
 
             $rightMenuShare.find('.workarea-sidemenu-item-icon').css('cursor', 'pointer');
+        });
+    }
+
+    initUploadPopup(popup) {
+        let title = this.messages.upload;
+        let iconURI = '../../../lib/dict/img/download.svg';
+
+        popup.addTopIcon(iconURI);
+        popup.addTopTitle(title);
+
+        let $main = popup.$popup.find('.popup-content-main');
+        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
+
+        let $pair = $('<div class="popup-content-main-inputarea-pair">');
+
+        let $pairName = $('<div></div>');
+        $pairName.text(this.messages.jsonData);
+        $pair.append($pairName);
+
+        let $pairInput = $('<input>')
+        $pairInput.attr('name', name);
+        $pair.append($pairInput);
+
+        $inputArea.append($pair);
+        $main.append($inputArea);
+
+        // 戻るボタン
+        popup.addBottomButton(this.messages.back, () => {
+            let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
+
+            (new Popup(this.messages)).showConfirmation(message, () => {
+                popup.hide();
+            });
+        });
+
+        // 保存ボタン
+        popup.addBottomButton(this.messages.save, () => {
+            // 入力されたJSONデータをパースしてデータを更新
+            let jsonData;
+
+            try {
+                jsonData = JSON.parse($pairInput.val());
+            } catch(error) {
+                let jsonErrorMessage = this.messages.failedToParseTheJSONData + '<br><br>[' + error.message + ']';
+                (new Popup(this.messages)).showNotification(jsonErrorMessage);
+                return;
+            }
+
+            let message = this.messages.doYouReallySaveTheWord;
+
+            (new Popup(this.messages)).showConfirmation(message, () => {
+                this.dict.data = jsonData;
+                popup.hide();
+            });
         });
     }
 

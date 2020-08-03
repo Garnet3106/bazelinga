@@ -5,8 +5,11 @@
             "general": "general"
         },
         "messages": {
+            "failedToParseTheJSONData": "Failed to parse the JSON data.",
             "add": "Add",
             "back": "Back",
+            "jsonData": "JSON Data",
+            "upload": "Upload",
             "copiedToTheClipboard": "Copied to the clipboard.",
             "doYouReallyClose": "Do you really close?",
             "doYouReallyRemoveTheWord": "Do you really remove the word?",
@@ -51,7 +54,10 @@
             "general": "一般"
         },
         "messages": {
+            "failedToParseTheJSONData": "JSONデータの解析に失敗しました。",
+            "jsonData": "JSONデータ",
             "add": "追加",
+            "upload": "アップロード",
             "back": "戻る",
             "copiedToTheClipboard": "クリップボードにコピーしました。",
             "doYouReallyClose": "本当に閉じますか？",

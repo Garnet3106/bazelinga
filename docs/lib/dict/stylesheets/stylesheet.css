@@ -134,7 +134,7 @@ div.popup-content-main-inputarea-pair > *:last-child {
 
 div.popup-content-main-inputarea-pair > div {
     text-align: right;
-    width: 80px;
+    width: 60px;
 }
 
 div.popup-content-main-inputarea-pair > img {
@@ -278,8 +278,9 @@ div.workarea-sidemenu-item-icon {
 }
 
 div.workarea-sidemenu-item-icon#leftMenuAddTop {
-    background-color: #ffffff !important;
+    background-color: #ffffff;
     background-image: url('../../dict/img/add.svg');
+    cursor: pointer;
 }
 
 div.workarea-sidemenu-item-icon#leftMenuEditTop {
@@ -288,6 +289,18 @@ div.workarea-sidemenu-item-icon#leftMenuEditTop {
 
 div.workarea-sidemenu-item-icon#leftMenuRemoveTop {
     background-image: url('../../dict/img/remove.svg');
+}
+
+div.workarea-sidemenu-item-icon#leftMenuDownloadTop {
+    background-color: #ffffff;
+    background-image: url('../../dict/img/download.svg');
+    cursor: pointer;
+}
+
+div.workarea-sidemenu-item-icon#leftMenuUploadTop {
+    background-color: #ffffff;
+    background-image: url('../../dict/img/upload.svg');
+    cursor: pointer;
 }
 
 div.workarea-sidemenu-item-icon#rightMenuDocsTop {
