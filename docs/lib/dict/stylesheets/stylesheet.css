@@ -324,11 +324,11 @@ div.workarea-sidemenu-item-icon:last-child {
 }
 
 div.workarea-sidemenu-item-icon:hover {
-    background-color: #dddddd;
+    background-color: #dddddd !important;
 }
 
 div.workarea-sidemenu-item-icon:active {
-    background-color: #cccccc;
+    background-color: #cccccc !important;
 }
 
 div.workarea-wordlist {
