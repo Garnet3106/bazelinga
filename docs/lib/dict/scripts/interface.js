@@ -311,6 +311,7 @@ class Interface {
         popup.addBottomButton(this.messages.copy, () => {
             this.copyToClipboard(stringifiedData);
             (new Popup(this.messages)).showNotification(this.messages.copiedToTheClipboard);
+            popup.hide();
         });
     }
 
@@ -349,7 +350,7 @@ class Interface {
             try {
                 jsonData = JSON.parse($pairInput.val());
             } catch(error) {
-                let jsonErrorMessage = this.messages.failedToParseTheJSONData + '<br><br>[' + error.message + ']';
+                let jsonErrorMessage = this.messages.failedToConvertTheJSONData + '<br><br>[' + error.message + ']';
                 (new Popup(this.messages)).showNotification(jsonErrorMessage);
                 return;
             }
