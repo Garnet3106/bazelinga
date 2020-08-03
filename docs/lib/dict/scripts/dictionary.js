@@ -6,10 +6,10 @@ class Dictionary {
         this.ready = false;
     }
 
-    addWord(spell, ipa, translation) {
+    addWord(spelling, ipa, translation) {
         let word = {};
 
-        word.spell = spell;
+        word.spelling = spelling;
         word.ipa = ipa;
         word.translation = translation;
 
@@ -27,20 +27,20 @@ class Dictionary {
 
     getDocsURI(index) {
         let $item = $('.workarea-wordlist-item').eq(index);
-        let spell = $item.children('.workarea-wordlist-item-spell').eq(0).text();
-        let dictURI = 'http://bazelinga.gant.work/docs/' + this.lang + '/dict/words/' + spell + '/';
+        let spelling = $item.children('.workarea-wordlist-item-spelling').eq(0).text();
+        let dictURI = 'http://bazelinga.gant.work/docs/' + this.lang + '/dict/words/' + spelling + '/';
 
         return dictURI;
     }
 
     getTwitterShareLink(index) {
         let $item = $('.workarea-wordlist-item').eq(index);
-        let spell = $item.children('.workarea-wordlist-item-spell').text();
+        let spelling = $item.children('.workarea-wordlist-item-spelling').text();
 
         let relatedAccount = 'Garnet3106';
 
-        let string = 'BazeLinga \'' + spell + '\'';
-        let link = 'http://bazelinga.gant.work/docs/' + this.lang + '/dict/search/#' + spell;
+        let string = 'BazeLinga \'' + spelling + '\'';
+        let link = 'http://bazelinga.gant.work/docs/' + this.lang + '/dict/search/#' + spelling;
         let mention = '@bazelinga';
         let hashtag = '#bazelinga';
 
@@ -84,7 +84,7 @@ class Dictionary {
         this.data.dict.forEach((word, wordIndex) => {
             let matched = false;
 
-            if(word.spell.includes(loweredKeyword))
+            if(word.spelling.includes(loweredKeyword))
                 matched = true;
 
             // 発音記号は大文字と小文字を区別することがあるので toLowerCase() をしない
@@ -125,12 +125,12 @@ class Dictionary {
         return matchedWords;
     }
 
-    searchSpell(spell) {
-        let searchResult = this.search(spell);
+    searchSpelling(spelling) {
+        let searchResult = this.search(spelling);
         let matchedWord = {};
 
         searchResult.forEach(word => {
-            if(spell == word.spell) {
+            if(spelling == word.spelling) {
                 matchedWord = word;
             }
         });

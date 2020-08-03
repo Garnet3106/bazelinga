@@ -40,13 +40,13 @@ class Interface {
                 let $elem = $('<div class="workarea-wordlist-item"></div>');
                 $elem.attr('id', 'wordListItem_' + word.index + '_' + translation.index);
 
-                let $elemSpell = $('<div class="workarea-wordlist-item-spell"></div>');
+                let $elemSpelling = $('<div class="workarea-wordlist-item-spelling"></div>');
                 let $elemType = $('<div class="workarea-wordlist-item-type"></div>');
 
-                $elemSpell.text(word.spell);
+                $elemSpelling.text(word.spelling);
                 $elemType.text('[' + this.translationTypes[translation.type] + ']');
 
-                $elem.append($elemSpell);
+                $elem.append($elemSpelling);
                 $elem.append($elemType);
 
                 if(translation.class != 'general') {
@@ -80,8 +80,8 @@ class Interface {
                     this.selectListItem(index);
 
                     // キーワードが変更された場合のみ入力欄のvalueを変更
-                    if(formattedKeyword != word.spell) {
-                        $input.val(word.spell);
+                    if(formattedKeyword != word.spelling) {
+                        $input.val(word.spelling);
                         // val() ではイベントが発火しないので手動で処理
                         $input.trigger('input');
                     }
@@ -195,8 +195,8 @@ class Interface {
 
             (new Popup(this.messages)).showConfirmation(this.messages.doYouReallyRemoveTheWord, () => {
                 let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
-                let spell = $selectedItem.children('.workarea-wordlist-item-spell').text();
-                let searchResult = this.dict.searchSpell(spell);
+                let spelling = $selectedItem.children('.workarea-wordlist-item-spelling').text();
+                let searchResult = this.dict.searchSpelling(spelling);
 
                 if(!Object.keys(searchResult).length) {
                     (new Popup(this.messages)).showNotification(this.messages.failedToRemoveTheWord);
@@ -411,20 +411,20 @@ class Interface {
             $inputArea.append($pair);
         };
 
-        let $spellInput = $('<input>');
+        let $spellingInput = $('<input>');
 
-        $spellInput.on('input', () => {
-            let formattedSpell = this.formatSearchKeyword($spellInput.val());
-            let searchResult = this.dict.searchSpell(formattedSpell);
+        $spellingInput.on('input', () => {
+            let formattedSpelling = this.formatSearchKeyword($spellingInput.val());
+            let searchResult = this.dict.searchSpelling(formattedSpelling);
             let backColor = '#ffffff';
 
             if(Object.keys(searchResult).length)
                 backColor = '#ffdddd';
 
-            $spellInput.css('background-color', backColor);
+            $spellingInput.css('background-color', backColor);
         });
 
-        addInputAreaPair('spell', $spellInput);
+        addInputAreaPair('spelling', $spellingInput);
         addInputAreaPair('ipa', $('<input>'));
 
         $main.append($inputArea);
@@ -454,30 +454,30 @@ class Interface {
 
         // 追加ボタン
         popup.addBottomButton(this.messages.add, () => {
-            let $input_spell = $inputArea.find('[name=spell]').eq(0);
+            let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
             let $input_ipa = $inputArea.find('[name=ipa]').eq(0);
 
-            let spell = this.formatSearchKeyword($input_spell.val());
+            let spelling = this.formatSearchKeyword($input_spelling.val());
             let ipa = this.formatSearchKeyword($input_ipa.val());
 
-            if(Object.keys(this.dict.searchSpell(spell)).length) {
-                (new Popup(this.messages)).showNotification(this.messages.theSpellIsDuplicated);
+            if(Object.keys(this.dict.searchSpelling(spelling)).length) {
+                (new Popup(this.messages)).showNotification(this.messages.theSpellingIsDuplicated);
                 return;
             }
 
-            if(spell == '' || ipa == '') {
+            if(spelling == '' || ipa == '') {
                 (new Popup(this.messages)).showNotification(this.messages.theInputItemLacks);
                 return;
             }
 
-            if(spell.length > 30 || ipa.length > 30) {
+            if(spelling.length > 30 || ipa.length > 30) {
                 (new Popup(this.messages)).showNotification(this.messages.theInputtedTextIsTooLong);
                 return;
             }
 
             let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
 
-            if(spell.match(invalidChars) || ipa.match(invalidChars)) {
+            if(spelling.match(invalidChars) || ipa.match(invalidChars)) {
                 (new Popup(this.messages)).showNotification(this.messages.theInputtedCharsAreInvalid);
                 return;
             }
@@ -487,7 +487,7 @@ class Interface {
                 return;
             }
 
-            this.dict.addWord(spell, ipa, translation);
+            this.dict.addWord(spelling, ipa, translation);
 
             this.updateWordList();
             popup.hide();
@@ -497,8 +497,8 @@ class Interface {
     /* 単語編集用のポップアップ */
     initWordEditionPopup(popup) {
         let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
-        let oldWordSpell = $selectedItem.children('.workarea-wordlist-item-spell').text();
-        let oldWord = this.dict.searchSpell(oldWordSpell);
+        let oldWordSpelling = $selectedItem.children('.workarea-wordlist-item-spelling').text();
+        let oldWord = this.dict.searchSpelling(oldWordSpelling);
 
         let $main = popup.$popup.find('.popup-content-main');
 
@@ -523,21 +523,21 @@ class Interface {
             $inputArea.append($pair);
         };
 
-        let $spellInput = $('<input>');
-        $spellInput.val(oldWord.spell);
+        let $spellingInput = $('<input>');
+        $spellingInput.val(oldWord.spelling);
 
-        $spellInput.on('input', () => {
-            let formattedSpell = this.formatSearchKeyword($spellInput.val());
-            let searchResult = this.dict.searchSpell(formattedSpell);
+        $spellingInput.on('input', () => {
+            let formattedSpelling = this.formatSearchKeyword($spellingInput.val());
+            let searchResult = this.dict.searchSpelling(formattedSpelling);
             let backColor = '#ffffff';
 
-            if(oldWord.spell != formattedSpell && Object.keys(searchResult).length)
+            if(oldWord.spelling != formattedSpelling && Object.keys(searchResult).length)
                 backColor = '#ffdddd';
 
-            $spellInput.css('background-color', backColor);
+            $spellingInput.css('background-color', backColor);
         });
 
-        addInputAreaPair('spell', $spellInput);
+        addInputAreaPair('spelling', $spellingInput);
 
         let $ipaInput = $('<input>');
         $ipaInput.val(oldWord.ipa);
@@ -574,30 +574,30 @@ class Interface {
             let message = this.messages.doYouReallySaveTheWord;
 
             (new Popup(this.messages)).showConfirmation(message, () => {
-                let $input_spell = $inputArea.find('[name=spell]').eq(0);
+                let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
                 let $input_ipa = $inputArea.find('[name=ipa]').eq(0);
 
-                let spell = this.formatSearchKeyword($input_spell.val());
+                let spelling = this.formatSearchKeyword($input_spelling.val());
                 let ipa = this.formatSearchKeyword($input_ipa.val());
 
-                if(spell != oldWord.spell && Object.keys(this.dict.searchSpell(spell)).length) {
-                    (new Popup(this.messages)).showNotification(this.messages.theSpellIsDuplicated);
+                if(spelling != oldWord.spelling && Object.keys(this.dict.searchSpelling(spelling)).length) {
+                    (new Popup(this.messages)).showNotification(this.messages.theSpellingIsDuplicated);
                     return;
                 }
 
-                if(spell == '' || ipa == '') {
+                if(spelling == '' || ipa == '') {
                     (new Popup(this.messages)).showNotification(this.messages.theInputItemLacks);
                     return;
                 }
 
-                if(spell.length > 30 || ipa.length > 30) {
+                if(spelling.length > 30 || ipa.length > 30) {
                     (new Popup(this.messages)).showNotification(this.messages.theInputtedTextIsTooLong);
                     return;
                 }
 
                 let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
 
-                if(spell.match(invalidChars) || ipa.match(invalidChars)) {
+                if(spelling.match(invalidChars) || ipa.match(invalidChars)) {
                     (new Popup(this.messages)).showNotification(this.messages.theInputtedCharsAreInvalid);
                     return;
                 }
@@ -608,7 +608,7 @@ class Interface {
                 }
 
                 this.dict.removeWord(oldWord.index);
-                this.dict.addWord(spell, ipa, translation);
+                this.dict.addWord(spelling, ipa, translation);
 
                 this.updateWordList();
                 popup.hide();

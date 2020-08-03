@@ -134,7 +134,7 @@ div.popup-content-main-inputarea-pair > *:last-child {
 
 div.popup-content-main-inputarea-pair > div {
     text-align: right;
-    width: 50px;
+    width: 80px;
 }
 
 div.popup-content-main-inputarea-pair > img {
@@ -368,7 +368,7 @@ div.workarea-wordlist-item-class {
     margin-right: 20px;
 }
 
-div.workarea-wordlist-item-spell {
+div.workarea-wordlist-item-spelling {
     margin-right: 20px;
 }
 
