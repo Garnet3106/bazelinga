@@ -350,12 +350,19 @@ class Interface {
             try {
                 jsonData = JSON.parse($pairInput.val());
             } catch(error) {
-                let jsonErrorMessage = this.messages.failedToConvertTheJSONData + '<br><br>[' + error.message + ']';
+                let jsonErrorMessage = this.messages.failedToConvertTheJSONData + '<br>[' + error.message + ']';
                 (new Popup(this.messages)).showNotification(jsonErrorMessage);
                 return;
             }
 
-            let message = this.messages.doYouReallySaveTheWord;
+            // dictプロパティの有無と形式をチェックする
+            if(jsonData.dict === undefined || !Array.isArray(jsonData.dict)) {
+                let jsonErrorMessage = this.messages.failedToConvertTheJSONData + '<br>' + this.messages.dictPropertyIsInvalid;
+                (new Popup(this.messages)).showNotification(jsonErrorMessage);
+                return;
+            }
+
+            let message = this.messages.doYouReallySaveTheData;
 
             (new Popup(this.messages)).showConfirmation(message, () => {
                 this.dict.data = jsonData;
