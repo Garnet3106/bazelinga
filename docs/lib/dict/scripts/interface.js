@@ -213,6 +213,14 @@ class Interface {
             });
         });
 
+        $('#leftMenuDownloadTop').on('click', () => {
+            let popup = new Popup(this.messages);
+
+            popup.show(() => {
+                this.initDownloadPopup(popup);
+            });
+        });
+
         $('#rightMenuDocsTop').on('click', () => {
             if(this.selectedItemIndex == -1)
                 return;
@@ -255,8 +263,8 @@ class Interface {
         });
     }
 
-    initUploadPopup(popup) {
-        let title = this.messages.upload;
+    initDownloadPopup(popup) {
+        let title = this.messages.download;
         let iconURI = '../../../lib/dict/img/download.svg';
 
         popup.addTopIcon(iconURI);
@@ -267,12 +275,28 @@ class Interface {
 
         let $pair = $('<div class="popup-content-main-inputarea-pair">');
 
+        // ペア名
         let $pairName = $('<div></div>');
-        $pairName.text(this.messages.jsonData);
+        $pairName.text(this.messages.data);
         $pair.append($pairName);
 
-        let $pairInput = $('<input>')
-        $pairInput.attr('name', name);
+        // コピペ用input
+        let $pairInput = $('<input>');
+        $pairInput.attr('readonly', true);
+
+        $pairInput.on('click', () => {
+            $pairInput.select();
+        });
+
+        let stringifiedData = '';
+
+        try {
+            stringifiedData = JSON.stringify(this.dict.data);
+        } catch(error) {
+            (new Popup(this.messages)).showConfirmation(this.messages.failedToConvertTheJSONData);
+        }
+
+        $pairInput.val(stringifiedData);
         $pair.append($pairInput);
 
         $inputArea.append($pair);
@@ -280,11 +304,41 @@ class Interface {
 
         // 戻るボタン
         popup.addBottomButton(this.messages.back, () => {
-            let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
+            popup.hide();
+        });
 
-            (new Popup(this.messages)).showConfirmation(message, () => {
-                popup.hide();
-            });
+        // コピーボタン
+        popup.addBottomButton(this.messages.copy, () => {
+            this.copyToClipboard(stringifiedData);
+            (new Popup(this.messages)).showNotification(this.messages.copiedToTheClipboard);
+        });
+    }
+
+    initUploadPopup(popup) {
+        let title = this.messages.upload;
+        let iconURI = '../../../lib/dict/img/upload.svg';
+
+        popup.addTopIcon(iconURI);
+        popup.addTopTitle(title);
+
+        let $main = popup.$popup.find('.popup-content-main');
+        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
+
+        let $pair = $('<div class="popup-content-main-inputarea-pair">');
+
+        let $pairName = $('<div></div>');
+        $pairName.text(this.messages.data);
+        $pair.append($pairName);
+
+        let $pairInput = $('<input>');
+        $pair.append($pairInput);
+
+        $inputArea.append($pair);
+        $main.append($inputArea);
+
+        // 戻るボタン
+        popup.addBottomButton(this.messages.back, () => {
+            popup.hide();
         });
 
         // 保存ボタン
