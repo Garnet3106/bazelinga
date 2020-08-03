@@ -1,12 +1,12 @@
 {
     "dict": [
         {
-            "spelling": "baze",
             "ipa": "baze",
+            "spelling": "baze",
             "translation": [
                 {
-                    "type": "noun",
                     "class": "general",
+                    "type": "noun",
                     "words": [
                         "基本",
                         "基礎",
@@ -18,8 +18,8 @@
                     ]
                 },
                 {
-                    "type": "noun-common",
                     "class": "architecture",
+                    "type": "noun-common",
                     "words": [
                         "基礎",
                         "基礎づくり",
@@ -28,24 +28,24 @@
                     ]
                 },
                 {
-                    "type": "verb-transitive",
                     "class": "general",
+                    "type": "verb-transitive",
                     "words": [
                         "基礎づける",
                         "基礎をおく"
                     ]
                 },
                 {
-                    "type": "verb-transitive",
                     "class": "architecture",
+                    "type": "verb-transitive",
                     "words": [
                         "基礎をつくる",
                         "基礎工事をする"
                     ]
                 },
                 {
-                    "type": "adjective",
                     "class": "general",
+                    "type": "adjective",
                     "words": [
                         "基本の",
                         "基本的な",
@@ -60,16 +60,16 @@
                     ]
                 },
                 {
-                    "type": "adjective",
                     "class": "architecture",
+                    "type": "adjective",
                     "words": [
                         "基礎の",
                         "土台の"
                     ]
                 },
                 {
-                    "type": "adverb",
                     "class": "general",
+                    "type": "adverb",
                     "words": [
                         "基本的に",
                         "基礎的に",
@@ -79,8 +79,8 @@
                     ]
                 },
                 {
-                    "type": "preposition",
                     "class": "general",
+                    "type": "preposition",
                     "words": [
                         "〜を基本とする",
                         "〜を土台とする",
