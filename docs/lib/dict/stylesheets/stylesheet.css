@@ -103,6 +103,18 @@ div.popup-content-bottom-button {
     width: 80px;
 }
 
+input.popup-content-bottom-button-file {
+    align-items: center;
+    background-color: #eeeeee;
+    border-radius: 5px;
+    cursor: pointer;
+    display: display;
+    font-size: 15px;
+    height: 30px;
+    justify-content: center;
+    width: 80px;
+}
+
 div.popup-content-main {
     background-color: #eeeeee;
     border-radius: 5px;

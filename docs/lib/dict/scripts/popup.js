@@ -5,7 +5,7 @@ class Popup {
         this.messages = langPackMessages;
     }
 
-    addBottomButton(message, onClicked = () => {}) {
+    addBottomButton(message, onClicked = () => {}, onReady = $button => {}) {
         let $popupBottom = this.$popup.find('.popup-content-bottom');
         let $button = $('<div class="popup-content-bottom-button"></div>');
 
@@ -15,7 +15,26 @@ class Popup {
             onClicked();
         })
 
+        onReady($button);
+
         $popupBottom.append($button);
+    }
+
+    addBottomFileButton(message, onClicked = () => {}, onReady = $input => {}) {
+        let $popupBottom = this.$popup.find('.popup-content-bottom');
+        let $input = $('<input class="popup-content-bottom-button-file">');
+
+        $input.attr('type', 'file');
+        $input.css('display', 'none');
+        $input.on('click', onClicked);
+
+        this.addBottomButton(message, () => {
+            $input.trigger('click');
+        });
+
+        onReady($input);
+
+        $popupBottom.append($input);
     }
 
     addMainMessage(message) {
