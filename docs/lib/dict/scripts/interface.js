@@ -432,7 +432,8 @@ class Interface {
                     translationWords[index] = this.formatSearchKeyword(word);
                 });
 
-                if(translationWords == [ '' ])
+                // [ '' ] で一致しなかったので配列の長さと最初のインデックスの値で比較
+                if(translationWords.length == 0 || translationWords[0] === '')
                     return;
 
                 let $inputType = $item.children('[name=type]');
