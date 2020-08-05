@@ -1,33 +1,19 @@
 'use strict';
 
+
+var langData;
+
+
 class Interface {
     constructor(lang) {
         this.lang = lang;
-        this.langPack = new LangPack(lang);
-        this.dict = new Dictionary(this.langPack);
+
         // 選択された単語リストの項目の番号 (未選択時: -1)
         this.selectedItemIndex = -1;
         // 最後に選択された単語リストの項目のID (未選択時: 空文字)
         this.latestSelectedItemID = '';
 
-        this.langPack.load(() => {
-            // ロード成功時
-            let langData = this.langPack.getData();
-            this.messages = langData.messages;
-            this.translationClasses = langData.classes;
-            this.translationTypes = langData.types;
-
-            this.dict.load(() => {
-                // ロード成功時
-                this.init();
-            }, (jqXHR, status, error) => {
-                // ロード失敗時
-                console.log('Failed to load data file.');
-            });
-        }, (jqXHR, status, error) => {
-            // ロード失敗時
-            console.log('Failed to load data file.');
-        });
+        this.loadDataFiles();
     }
 
     addWordsToList(wordList) {
@@ -36,7 +22,7 @@ class Interface {
 
         wordList.forEach(word => {
             word.translation.forEach(translation => {
-                let wordClass = this.translationClasses[translation.class];
+                let wordClass = langData.classes[translation.class];
 
                 // 要素を生成・追加
                 let $elem = $('<div class="workarea-wordlist-item"></div>');
@@ -46,7 +32,7 @@ class Interface {
                 let $elemType = $('<div class="workarea-wordlist-item-type"></div>');
 
                 $elemSpelling.text(word.spelling);
-                $elemType.text('[' + this.translationTypes[translation.type] + ']');
+                $elemType.text('[' + langData.types[translation.type] + ']');
 
                 $elem.append($elemSpelling);
                 $elem.append($elemType);
@@ -170,9 +156,7 @@ class Interface {
         });
 
         $('#leftMenuAddTop').on('click', () => {
-            let popup = new Popup(this.messages);
-
-            popup.show(() => {
+            Popup.show(popup => {
                 this.initWordAdditionPopup(popup);
             });
         });
@@ -181,9 +165,7 @@ class Interface {
             if(this.selectedItemIndex == -1)
                 return;
 
-            let popup = new Popup(this.messages);
-
-            popup.show(() => {
+            Popup.show(popup => {
                 this.initWordEditionPopup(popup);
             });
         });
@@ -192,13 +174,13 @@ class Interface {
             if(this.selectedItemIndex == -1)
                 return;
 
-            (new Popup(this.messages)).showConfirmation(this.messages.doYouReallyRemoveTheWord, () => {
+            Popup.showConfirmation(langData.messages.doYouReallyRemoveTheWord, () => {
                 let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
                 let spelling = $selectedItem.children('.workarea-wordlist-item-spelling').text();
                 let searchResult = this.dict.searchSpelling(spelling);
 
                 if(!Object.keys(searchResult).length) {
-                    (new Popup(this.messages)).showNotification(this.messages.failedToRemoveTheWord);
+                    Popup.showNotification(langData.messages.failedToRemoveTheWord);
                     return;
                 }
 
@@ -208,17 +190,13 @@ class Interface {
         });
 
         $('#leftMenuUploadTop').on('click', () => {
-            let popup = new Popup(this.messages);
-
-            popup.show(() => {
+            Popup.show(popup => {
                 this.initUploadPopup(popup);
             });
         });
 
         $('#leftMenuDownloadTop').on('click', () => {
-            let popup = new Popup(this.messages);
-
-            popup.show(() => {
+            Popup.show(popup => {
                 this.initDownloadPopup(popup);
             });
         });
@@ -249,7 +227,7 @@ class Interface {
                 // ドキュメントURLをクリップボードにコピー
                 this.copyToClipboard(this.dict.getDocsURI(this.selectedItemIndex));
                 this.hideMenu('rightMenuShare');
-                (new Popup(this.messages)).showNotification(this.messages.copiedToTheClipboard);
+                Popup.showNotification(langData.messages.copiedToTheClipboard);
             });
 
             $twitterShareIcon.on('click', () => {
@@ -266,20 +244,20 @@ class Interface {
     }
 
     initDownloadPopup(popup) {
-        let title = this.messages.download;
+        let title = langData.messages.download;
         let iconURI = '../../../lib/dict/img/download.svg';
 
         popup.addTopIcon(iconURI);
         popup.addTopTitle(title);
 
-        let $main = popup.$popup.find('.popup-content-main');
+        let $main = popup.$elem.find('.popup-content-main');
         let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
 
         let $pair = $('<div class="popup-content-main-inputarea-pair">');
 
         // ペア名
         let $pairName = $('<div></div>');
-        $pairName.text(this.messages.data);
+        $pairName.text(langData.messages.data);
         $pair.append($pairName);
 
         // コピペ用input
@@ -295,7 +273,7 @@ class Interface {
         try {
             stringifiedData = JSON.stringify(this.dict.data);
         } catch(error) {
-            (new Popup(this.messages)).showConfirmation(this.messages.failedToConvertTheJSONData);
+            Popup.showConfirmation(langData.messages.failedToConvertTheJSONData);
         }
 
         $pairInput.val(stringifiedData);
@@ -305,38 +283,38 @@ class Interface {
         $main.append($inputArea);
 
         // 戻るボタン
-        popup.addBottomButton(this.messages.back, () => {
+        popup.addBottomButton(langData.messages.back, () => {
             popup.hide();
         });
 
         // コピーボタン
-        popup.addBottomButton(this.messages.copy, () => {
+        popup.addBottomButton(langData.messages.copy, () => {
             this.copyToClipboard(stringifiedData);
-            (new Popup(this.messages)).showNotification(this.messages.copiedToTheClipboard);
+            Popup.showNotification(langData.messages.copiedToTheClipboard);
             popup.hide();
         });
     }
 
     initUploadPopup(popup) {
         let setDataByFile = file => {
-            (new Popup(this.messages)).showConfirmation(this.messages.doYouReallySaveTheData, () => {
-                this.dict.setDataByFile(file, this.messages, () => {
+            Popup.showConfirmation(langData.messages.doYouReallySaveTheData, () => {
+                this.dict.setDataByFile(file, langData.messages, () => {
                     // 成功時の処理
-                    (new Popup(this.messages)).showNotification(this.messages.theDataHasSaved);
+                    Popup.showNotification(langData.messages.theDataHasSaved);
                     popup.hide();
                 }, error => {
                     // エラー時の処理
-                    (new Popup(this.messages)).showNotification(this.messages.theDataHasSaved + '<br><br>[' + error.message + ']');
+                    Popup.showNotification(langData.messages.theDataHasSaved + '<br><br>[' + error.message + ']');
                 });
             });
         };
 
-        let title = this.messages.upload;
+        let title = langData.messages.upload;
         let iconURI = '../../../lib/dict/img/upload.svg';
 
         popup.addTopIcon(iconURI);
         popup.addTopTitle(title);
-        popup.addMainMessage(this.messages.selectOrDropYourFile + '<br><br>[' + this.messages.dropHere + ']');
+        popup.addMainMessage(langData.messages.selectOrDropYourFile + '<br><br>[' + langData.messages.dropHere + ']');
 
         popup.setFileDropEvent(event => {
             // ファイルは1つまで
@@ -345,14 +323,14 @@ class Interface {
         });
 
         // 戻るボタン
-        popup.addBottomButton(this.messages.back, () => {
+        popup.addBottomButton(langData.messages.back, () => {
             popup.hide();
         });
 
         // 選択ボタン
-        popup.addBottomFileButton(this.messages.select, () => {
+        popup.addBottomFileButton(langData.messages.select, () => {
             if(!window.File || !window.FileReader) {
-                (new Popup(this.messages)).showNotification(this.messages.thisFeatureIsNotAvailableForYourEnvironment);
+                Popup.showNotification(langData.messages.thisFeatureIsNotAvailableForYourEnvironment);
                 return;
             }
         }, $input => {
@@ -367,13 +345,13 @@ class Interface {
 
     /* 翻訳編集用のポップアップ */
     initTranslationEditionPopup(popup, translation, onSaveButtonClicked = data => {}) {
-        let title = this.messages.translationEdition;
+        let title = langData.messages.translationEdition;
         let iconURI = '../../../lib/dict/img/edit.svg';
 
         popup.addTopIcon(iconURI);
         popup.addTopTitle(title);
 
-        let $main = popup.$popup.find('.popup-content-main');
+        let $main = popup.$elem.find('.popup-content-main');
         let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
 
         // words → 文字列の配列
@@ -383,11 +361,11 @@ class Interface {
             let $pairType = $('<select></select>');
             $pairType.attr('name', 'type');
 
-            for(let key in this.translationTypes) {
+            for(let key in langData.types) {
                 let $option = $('<option></option>');
 
                 $option.attr('value', key);
-                $option.text(this.translationTypes[key]);
+                $option.text(langData.types[key]);
 
                 $pairType.append($option);
             }
@@ -400,11 +378,11 @@ class Interface {
             let $pairClass = $('<select></select>');
             $pairClass.attr('name', 'class');
 
-            for(let key in this.translationClasses) {
+            for(let key in langData.classes) {
                 let $option = $('<option></option>');
 
                 $option.attr('value', key);
-                $option.text(this.translationClasses[key]);
+                $option.text(langData.classes[key]);
 
                 $pairClass.append($option);
             }
@@ -430,7 +408,7 @@ class Interface {
                 let $parent = $(event.target).parent();
 
                 if($parent.parent().children().length < 2) {
-                    (new Popup(this.messages)).showNotification(this.messages.youCannotRemoveAnyMore);
+                    Popup.showNotification(langData.messages.youCannotRemoveAnyMore);
                 } else {
                     $parent.remove();
                 }
@@ -482,19 +460,19 @@ class Interface {
 
         $main.append($inputArea);
 
-        popup.addBottomButton(this.messages.back, () => {
-            let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
+        popup.addBottomButton(langData.messages.back, () => {
+            let message = langData.messages.doYouReallyClose + '<br>' + langData.messages.theDataWillBeDiscarded;
 
-            (new Popup(this.messages)).showConfirmation(message, () => {
+            Popup.showConfirmation(message, () => {
                 popup.hide();
             });
         });
 
-        popup.addBottomButton(this.messages.add, () => {
+        popup.addBottomButton(langData.messages.add, () => {
             addInputAreaPair();
         });
 
-        popup.addBottomButton(this.messages.save, () => {
+        popup.addBottomButton(langData.messages.save, () => {
             translation = getInputData();
             onSaveButtonClicked(translation);
             popup.hide();
@@ -503,9 +481,9 @@ class Interface {
 
     /* 単語追加用のポップアップ */
     initWordAdditionPopup(popup) {
-        let $main = popup.$popup.find('.popup-content-main');
+        let $main = popup.$elem.find('.popup-content-main');
 
-        let title = this.messages.wordAddition;
+        let title = langData.messages.wordAddition;
         let iconURI = '../../../lib/dict/img/add.svg';
 
         popup.addTopIcon(iconURI);
@@ -517,7 +495,7 @@ class Interface {
             let $pair = $('<div class="popup-content-main-inputarea-pair">');
 
             let $pairName = $('<div></div>');
-            $pairName.text(this.messages[name]);
+            $pairName.text(langData.messages[name]);
             $pair.append($pairName);
 
             $pairInput.attr('name', name);
@@ -547,20 +525,18 @@ class Interface {
         let translation = [];
 
         // 戻るボタン
-        popup.addBottomButton(this.messages.back, () => {
-            let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
+        popup.addBottomButton(langData.messages.back, () => {
+            let message = langData.messages.doYouReallyClose + '<br>' + langData.messages.theDataWillBeDiscarded;
 
-            (new Popup(this.messages)).showConfirmation(message, () => {
+            Popup.showConfirmation(message, () => {
                 // Yesの場合
                 popup.hide();
             });
         });
 
         // 翻訳ボタン
-        popup.addBottomButton(this.messages.trans, () => {
-            let translationPopup = new Popup(this.messages);
-
-            translationPopup.show(() => {
+        popup.addBottomButton(langData.messages.trans, () => {
+            Popup.show(translationPopup => {
                 this.initTranslationEditionPopup(translationPopup, translation, data => {
                     translation = data;
                 });
@@ -568,7 +544,7 @@ class Interface {
         });
 
         // 追加ボタン
-        popup.addBottomButton(this.messages.add, () => {
+        popup.addBottomButton(langData.messages.add, () => {
             let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
             let $input_ipa = $inputArea.find('[name=ipa]').eq(0);
 
@@ -576,29 +552,29 @@ class Interface {
             let ipa = this.formatSearchKeyword($input_ipa.val());
 
             if(Object.keys(this.dict.searchSpelling(spelling)).length) {
-                (new Popup(this.messages)).showNotification(this.messages.theSpellingIsDuplicated);
+                Popup.showNotification(langData.messages.theSpellingIsDuplicated);
                 return;
             }
 
             if(spelling == '' || ipa == '') {
-                (new Popup(this.messages)).showNotification(this.messages.theInputItemLacks);
+                Popup.showNotification(langData.messages.theInputItemLacks);
                 return;
             }
 
             if(spelling.length > 30 || ipa.length > 30) {
-                (new Popup(this.messages)).showNotification(this.messages.theInputtedTextIsTooLong);
+                Popup.showNotification(langData.messages.theInputtedTextIsTooLong);
                 return;
             }
 
             let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
 
             if(spelling.match(invalidChars) || ipa.match(invalidChars)) {
-                (new Popup(this.messages)).showNotification(this.messages.theInputtedCharsAreInvalid);
+                Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
                 return;
             }
 
             if(translation.length == 0) {
-                (new Popup(this.messages)).showNotification(this.messages.theTranslationIsNotInputted);
+                Popup.showNotification(langData.messages.theTranslationIsNotInputted);
                 return;
             }
 
@@ -615,9 +591,9 @@ class Interface {
         let oldWordSpelling = $selectedItem.children('.workarea-wordlist-item-spelling').text();
         let oldWord = this.dict.searchSpelling(oldWordSpelling);
 
-        let $main = popup.$popup.find('.popup-content-main');
+        let $main = popup.$elem.find('.popup-content-main');
 
-        let title = this.messages.wordEdition;
+        let title = langData.messages.wordEdition;
         let iconURI = '../../../lib/dict/img/edit.svg';
 
         popup.addTopIcon(iconURI);
@@ -629,7 +605,7 @@ class Interface {
             let $pair = $('<div class="popup-content-main-inputarea-pair">');
 
             let $pairName = $('<div></div>');
-            $pairName.text(this.messages[name]);
+            $pairName.text(langData.messages[name]);
             $pair.append($pairName);
 
             $pairInput.attr('name', name);
@@ -664,20 +640,18 @@ class Interface {
         let translation = oldWord.translation;
 
         // 戻るボタン
-        popup.addBottomButton(this.messages.back, () => {
-            let message = this.messages.doYouReallyClose + '<br>' + this.messages.theDataWillBeDiscarded;
+        popup.addBottomButton(langData.messages.back, () => {
+            let message = langData.messages.doYouReallyClose + '<br>' + langData.messages.theDataWillBeDiscarded;
 
-            (new Popup(this.messages)).showConfirmation(message, () => {
+            Popup.showConfirmation(message, () => {
                 // Yesの場合
                 popup.hide();
             });
         });
 
         // 翻訳ボタン
-        popup.addBottomButton(this.messages.trans, () => {
-            let translationPopup = new Popup(this.messages);
-
-            translationPopup.show(() => {
+        popup.addBottomButton(langData.messages.trans, () => {
+            Popup.show(translationPopup => {
                 this.initTranslationEditionPopup(translationPopup, translation, data => {
                     translation = data;
                 });
@@ -685,10 +659,10 @@ class Interface {
         });
 
         // 更新ボタン
-        popup.addBottomButton(this.messages.save, () => {
-            let message = this.messages.doYouReallySaveTheWord;
+        popup.addBottomButton(langData.messages.save, () => {
+            let message = langData.messages.doYouReallySaveTheWord;
 
-            (new Popup(this.messages)).showConfirmation(message, () => {
+            Popup.showConfirmation(message, () => {
                 let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
                 let $input_ipa = $inputArea.find('[name=ipa]').eq(0);
 
@@ -696,29 +670,29 @@ class Interface {
                 let ipa = this.formatSearchKeyword($input_ipa.val());
 
                 if(spelling != oldWord.spelling && Object.keys(this.dict.searchSpelling(spelling)).length) {
-                    (new Popup(this.messages)).showNotification(this.messages.theSpellingIsDuplicated);
+                    Popup.showNotification(langData.messages.theSpellingIsDuplicated);
                     return;
                 }
 
                 if(spelling == '' || ipa == '') {
-                    (new Popup(this.messages)).showNotification(this.messages.theInputItemLacks);
+                    Popup.showNotification(langData.messages.theInputItemLacks);
                     return;
                 }
 
                 if(spelling.length > 30 || ipa.length > 30) {
-                    (new Popup(this.messages)).showNotification(this.messages.theInputtedTextIsTooLong);
+                    Popup.showNotification(langData.messages.theInputtedTextIsTooLong);
                     return;
                 }
 
                 let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
 
                 if(spelling.match(invalidChars) || ipa.match(invalidChars)) {
-                    (new Popup(this.messages)).showNotification(this.messages.theInputtedCharsAreInvalid);
+                    Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
                     return;
                 }
 
                 if(translation.length == 0) {
-                    (new Popup(this.messages)).showNotification(this.messages.theTranslationIsNotInputted);
+                    Popup.showNotification(langData.messages.theTranslationIsNotInputted);
                     return;
                 }
 
@@ -729,6 +703,40 @@ class Interface {
                 popup.hide();
             });
         });
+    }
+
+    loadDataFiles() {
+        // 言語パックデータを読み込む
+        let loadLangPackData = () => {
+            this.langPack = new LangPack(this.lang);
+
+            this.langPack.load(() => {
+                // ロード成功時
+                langData = this.langPack.getData();
+                // 次のロードに移行する: 辞書データのロード
+                loadDictionaryData();
+            }, error => {
+                // ロード失敗時
+                console.log(error.message)
+            });
+        };
+
+        // 辞書データを読み込む
+        let loadDictionaryData = () => {
+            this.dict = new Dictionary(this.lang);
+
+            this.dict.load(() => {
+                // ロード成功時
+                // 次の処理に移行する: Interface.init() の実行
+                this.init();
+            }, error => {
+                // ロード失敗時
+                console.log(error.message);
+            });
+        };
+
+        // ロード処理を開始
+        loadLangPackData();
     }
 
     selectListItem(index) {
@@ -827,7 +835,7 @@ class Interface {
 
         // データの読み込みが未完了の場合はアラートを表示
         if(!this.dict.ready || !this.langPack.ready) {
-            (new Popup(this.messages)).showNotification(this.messages.pleaseWait);
+            Popup.showNotification(langData.messages.pleaseWait);
             // 入力された文字列を残さない
             $searchInput.val('');
             return;
@@ -843,7 +851,7 @@ class Interface {
         let keyword = this.formatSearchKeyword($searchInput.val());
 
         if(keyword == '') {
-            this.setGuideMessage(this.messages.theSearchResultsWillBeDisplayedHere);
+            this.setGuideMessage(langData.messages.theSearchResultsWillBeDisplayedHere);
             this.showGuideMessage();
             return;
         }
@@ -851,12 +859,12 @@ class Interface {
         let words = this.dict.search(keyword);
 
         if(words.length == 0) {
-            this.setGuideMessage(this.messages.theWordHasNotFound);
+            this.setGuideMessage(langData.messages.theWordHasNotFound);
             this.showGuideMessage();
             return;
         }
 
-        this.setGuideMessage(this.messages.theSearchResultsWillBeDisplayedHere);
+        this.setGuideMessage(langData.messages.theSearchResultsWillBeDisplayedHere);
         this.hideGuideMessage();
         this.addWordsToList(words);
     }

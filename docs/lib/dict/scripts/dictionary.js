@@ -1,10 +1,10 @@
 'use strict';
 
+
 class Dictionary {
-    constructor(langPack) {
+    constructor(lang) {
         this.data = {};
-        this.lang = langPack.lang;
-        this.langPack = langPack;
+        this.lang = lang;
         this.ready = false;
     }
 
@@ -52,7 +52,7 @@ class Dictionary {
         return 'https://twitter.com/share?related=' + relatedAccount + '&text=' + text;
     }
 
-    load(succeeded = () => {}, failed = (jqXHR, status, error) => {}) {
+    load(succeeded = () => {}, failed = error => {}) {
         let uri = 'http://bazelinga.gant.work/docs/lib/dict/data/' + this.lang + '.json';
 
         let options = {
@@ -69,9 +69,9 @@ class Dictionary {
 
                 succeeded();
             })
-            .fail((jqXHR, status, error) => {
+            .fail(error => {
                 // ロード失敗時
-                failed(jqXHR, status, error);
+                failed(error);
             });
     }
 
@@ -143,7 +143,7 @@ class Dictionary {
     setDataByFile(file, messages, onLoaded, onErrored) {
         // JSON形式でなければ弾く
         if(file.type != 'application/json') {
-            (new Popup(messages)).showNotification(messages.thisFileTypeIsNotSupported);
+            Popup.showNotification(messages.thisFileTypeIsNotSupported);
             return;
         }
 
@@ -162,8 +162,8 @@ class Dictionary {
                 try {
                     jsonData = JSON.parse(text);
                 } catch(error) {
-                    let jsonErrorMessage = this.messages.failedToConvertTheJSONData + '<br>[' + error.message + ']';
-                    (new Popup(messages)).showNotification(jsonErrorMessage);
+                    let jsonErrorMessage = langData.messages.failedToConvertTheJSONData + '<br>[' + error.message + ']';
+                    Popup.showNotification(jsonErrorMessage);
                     return;
                 }
 

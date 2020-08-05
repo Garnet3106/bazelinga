@@ -12,7 +12,7 @@ class LangPack {
         return this.data[this.lang];
     }
 
-    load(succeeded = () => {}, failed = (jqXHR, status, error) => {}) {
+    load(succeeded = () => {}, failed = error => {}) {
         let uri = 'http://bazelinga.gant.work/docs/lib/dict/data/langpack.json';
 
         let options = {
@@ -29,9 +29,9 @@ class LangPack {
 
                 succeeded();
             })
-            .fail((jqXHR, status, error) => {
+            .fail(error => {
                 // ロード失敗時
-                failed(jqXHR, status, error);
+                failed(error);
             });
     }
 }
