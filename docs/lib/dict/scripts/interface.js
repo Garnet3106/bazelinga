@@ -316,12 +316,31 @@ class Interface {
     }
 
     initUploadPopup(popup) {
+        let setDataByFile = file => {
+            (new Popup(this.messages)).showConfirmation(this.messages.doYouReallySaveTheData, () => {
+                this.dict.setDataByFile(file, this.messages, () => {
+                    // 成功時の処理
+                    (new Popup(this.messages)).showNotification(this.messages.theDataHasSaved);
+                    popup.hide();
+                }, error => {
+                    // エラー時の処理
+                    (new Popup(this.messages)).showNotification(this.messages.theDataHasSaved + '<br><br>[' + error.message + ']');
+                });
+            });
+        };
+
         let title = this.messages.upload;
         let iconURI = '../../../lib/dict/img/upload.svg';
 
         popup.addTopIcon(iconURI);
         popup.addTopTitle(title);
-        popup.addMainMessage(this.messages.selectOrDropYourFile + '<br><br>' + '[' + this.messages.dropHere + ']');
+        popup.addMainMessage(this.messages.selectOrDropYourFile + '<br><br>[' + this.messages.dropHere + ']');
+
+        popup.setFileDropEvent(event => {
+            // ファイルは1つまで
+            let file = event.originalEvent.dataTransfer.files[0];
+            setDataByFile(file);
+        });
 
         // 戻るボタン
         popup.addBottomButton(this.messages.back, () => {
@@ -337,48 +356,9 @@ class Interface {
         }, $input => {
             // ファイルが選択された場合
             $input.on('change', event => {
-                let target = event.target;
-
                 // ファイルは1つまで
-                let file = target.files[0];
-
-                // JSON形式でなければ弾く
-                if(file.type != 'application/json') {
-                    (new Popup(this.messages)).showNotification(this.messages.thisFileTypeIsNotSupported);
-                    return;
-                }
-
-                (new Popup(this.messages)).showConfirmation(this.messages.doYouReallySaveTheData, () => {
-                    // BlobのデフォルトでUTF-8を使用する
-                    var properties = {
-                        type: "application/json"
-                    };
-
-                    let blob = new Blob([ file ], properties);
-
-                    blob.text()
-                        .then(text => {
-                            // 読み込みが成功したらJSONをパースする
-                            let jsonData;
-
-                            try {
-                                jsonData = JSON.parse(text);
-                            } catch(error) {
-                                let jsonErrorMessage = this.messages.failedToConvertTheJSONData + '<br>[' + error.message + ']';
-                                (new Popup(this.messages)).showNotification(jsonErrorMessage);
-                                return;
-                            }
-
-                            this.dict.data = jsonData;
-
-                            (new Popup(this.messages)).showNotification(this.messages.theDataHasSaved);
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
-
-                    popup.hide();
-                });
+                let file = event.target.files[0];
+                setDataByFile(file);
             });
         });
     }

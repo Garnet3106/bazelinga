@@ -16,7 +16,6 @@ class Popup {
         })
 
         onReady($button);
-
         $popupBottom.append($button);
     }
 
@@ -71,6 +70,20 @@ class Popup {
         setTimeout(() => {
             this.$popup.remove();
         }, 200);
+    }
+
+    setFileDropEvent(onDropped = event => {}) {
+        this.$popup.on('dragover', event => {
+            event.originalEvent.preventDefault();
+        });
+
+        this.$popup.on('dragenter', event => {
+            event.originalEvent.preventDefault();
+        });
+
+        this.$popup.on('drop', event => {
+            onDropped(event);
+        });
     }
 
     show(onReady = () => {}) {

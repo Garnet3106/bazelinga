@@ -137,4 +137,39 @@ class Dictionary {
 
         return matchedWord;
     }
+
+    setDataByFile(file, messages, onLoaded, onErrored) {
+        // JSON形式でなければ弾く
+        if(file.type != 'application/json') {
+            (new Popup(messages)).showNotification(messages.thisFileTypeIsNotSupported);
+            return;
+        }
+
+        // BlobのデフォルトでUTF-8を使用する
+        var properties = {
+            type: "application/json"
+        };
+
+        let blob = new Blob([ file ], properties);
+
+        blob.text()
+            .then(text => {
+                // 読み込みが成功したらJSONをパースする
+                let jsonData;
+
+                try {
+                    jsonData = JSON.parse(text);
+                } catch(error) {
+                    let jsonErrorMessage = this.messages.failedToConvertTheJSONData + '<br>[' + error.message + ']';
+                    (new Popup(messages)).showNotification(jsonErrorMessage);
+                    return;
+                }
+
+                this.data = jsonData;
+                onLoaded();
+            })
+            .catch(error => {
+                onErrored(error);
+            });
+    }
 }
