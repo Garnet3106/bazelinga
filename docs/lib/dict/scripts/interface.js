@@ -322,10 +322,18 @@ class Interface {
         popup.addTopTitle(title);
         popup.addUploadPopupMessage(langData.messages.selectOrDropYourFile + '<br><br>[' + langData.messages.clickHereOrDropAllOver + ']');
 
+        let $main = popup.$elem.find('.popup-content-upload');
+
         popup.setFileDropEvent(event => {
             // ファイルは1つまで
             let file = event.dataTransfer.files[0];
             setDataByFile(file);
+        }, () => {
+            // ファイルを保持しているときのイベント
+            $main.css('background-color', '#dddddd');
+        }, () => {
+            // ファイルのドロップが終了したときのイベント
+            $main.css('background-color', '#ffffff');
         });
 
         // 選択エリアを設定

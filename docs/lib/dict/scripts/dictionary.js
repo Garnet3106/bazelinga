@@ -141,8 +141,9 @@ class Dictionary {
     }
 
     setDataByFile(file, messages, onLoaded, onErrored) {
+        // 文字列などがドロップされた際は undefined が渡されるので弾く
         // JSON形式でなければ弾く
-        if(file.type != 'application/json') {
+        if(file === undefined || file.type != 'application/json') {
             Popup.showNotification(messages.thisFileTypeIsNotSupported);
             return;
         }

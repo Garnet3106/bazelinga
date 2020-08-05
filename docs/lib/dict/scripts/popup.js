@@ -65,14 +65,20 @@ class Popup {
         }, 200);
     }
 
+    // ファイルドロップのイベントを設定します
     // onDropped() の第一引数には event.originalEvent が渡されます
-    setFileDropEvent(onFileDropped = event => {}) {
+    setFileDropEvent(onFileDropped = event => {}, onFileHeldUp = popup => {}, onFileDragLeft = popup => {}) {
         this.$elem.on('dragover', event => {
             event.originalEvent.preventDefault();
+            onFileHeldUp();
         });
 
         this.$elem.on('dragenter', event => {
             event.originalEvent.preventDefault();
+        });
+
+        this.$elem.on('dragleave', event => {
+            onFileDragLeft();
         });
 
         this.$elem.on('drop', event => {
@@ -81,6 +87,7 @@ class Popup {
         });
     }
 
+    // ファイル選択のイベントを設定します
     setFileSelectEvent(onFileSelected = event => {}) {
         let $popupBottom = this.$elem.find('.popup-content-bottom');
         let $input = $('<input class="popup-content-bottom-button-file">');
