@@ -321,21 +321,7 @@ class Interface {
 
         popup.addTopIcon(iconURI);
         popup.addTopTitle(title);
-
-        let $main = popup.$popup.find('.popup-content-main');
-        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
-
-        let $pair = $('<div class="popup-content-main-inputarea-pair">');
-
-        let $pairName = $('<div></div>');
-        $pairName.text(this.messages.data);
-        $pair.append($pairName);
-
-        let $pairInput = $('<input>');
-        $pair.append($pairInput);
-
-        $inputArea.append($pair);
-        $main.append($inputArea);
+        popup.addMainMessage(this.messages.selectOrDropYourFile + '<br><br>' + '[' + this.messages.dropHere + ']');
 
         // 戻るボタン
         popup.addBottomButton(this.messages.back, () => {
@@ -385,7 +371,7 @@ class Interface {
 
                             this.dict.data = jsonData;
 
-                            (new Popup(this.messages)).showNotification(this.messages.theDataHasSaved)
+                            (new Popup(this.messages)).showNotification(this.messages.theDataHasSaved);
                         })
                         .catch(error => {
                             console.log(error);
