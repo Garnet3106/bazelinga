@@ -296,6 +296,12 @@ class Interface {
     }
 
     initUploadPopup(popup) {
+        if(!window.File || !window.FileReader) {
+            Popup.showNotification(langData.messages.thisFeatureIsNotAvailableForYourEnvironment);
+            popup.hide();
+            return;
+        }
+
         let setDataByFile = file => {
             Popup.showConfirmation(langData.messages.doYouReallySaveTheData, () => {
                 this.dict.setDataByFile(file, langData.messages, () => {
@@ -314,7 +320,7 @@ class Interface {
 
         popup.addTopIcon(iconURI);
         popup.addTopTitle(title);
-        popup.addMainMessage(langData.messages.selectOrDropYourFile + '<br><br>[' + langData.messages.dropHere + ']');
+        popup.addMainMessage(langData.messages.selectOrDropYourFile + '<br><br>[' + langData.messages.clickOrDropHere + ']');
 
         popup.setFileDropEvent(event => {
             // ファイルは1つまで
@@ -322,24 +328,16 @@ class Interface {
             setDataByFile(file);
         });
 
+        // 選択エリアを設定
+        popup.setFileSelectEvent(event => {
+            // ファイルは1つまで
+            let file = event.target.files[0];
+            setDataByFile(file);
+        });
+
         // 戻るボタン
         popup.addBottomButton(langData.messages.back, () => {
             popup.hide();
-        });
-
-        // 選択ボタン
-        popup.addBottomFileButton(langData.messages.select, () => {
-            if(!window.File || !window.FileReader) {
-                Popup.showNotification(langData.messages.thisFeatureIsNotAvailableForYourEnvironment);
-                return;
-            }
-        }, $input => {
-            // ファイルが選択された場合
-            $input.on('change', event => {
-                // ファイルは1つまで
-                let file = event.target.files[0];
-                setDataByFile(file);
-            });
         });
     }
 

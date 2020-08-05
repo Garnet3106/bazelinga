@@ -21,24 +21,6 @@ class Popup {
         $popupBottom.append($button);
     }
 
-    addBottomFileButton(message, onButtonClicked = $input => {}, onButtonReady = $input => {}) {
-        let $popupBottom = this.$elem.find('.popup-content-bottom');
-        let $input = $('<input class="popup-content-bottom-button-file">');
-
-        $input.attr('type', 'file');
-        $input.css('display', 'none');
-        $input.on('click', () => {
-            onButtonClicked($input);
-        });
-
-        this.addBottomButton(message, () => {
-            $input.trigger('click');
-        });
-
-        onButtonReady($input);
-        $popupBottom.append($input);
-    }
-
     addMainMessage(message) {
         let $main = this.$elem.find('.popup-content-main');
         let $msg = $('<div class="popup-content-main-message"></div>');
@@ -88,6 +70,24 @@ class Popup {
         this.$elem.on('drop', event => {
             event.originalEvent.preventDefault();
             onFileDropped(event.originalEvent);
+        });
+    }
+
+    setFileSelectEvent(onFileSelected = event => {}) {
+        let $popupBottom = this.$elem.find('.popup-content-bottom');
+        let $input = $('<input class="popup-content-bottom-button-file">');
+
+        $input.attr('type', 'file');
+        $input.css('display', 'none');
+        $popupBottom.append($input);
+
+        this.$elem.find('.popup-content-main').on('click', () => {
+            $input.trigger('click');
+        });
+
+        // ファイルが選択された場合
+        this.$elem.on('change', event => {
+            onFileSelected(event.originalEvent);
         });
     }
 
