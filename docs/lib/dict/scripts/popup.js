@@ -1,3 +1,5 @@
+'use strict';
+
 class Popup {
     constructor(langPackMessages) {
         this.$popup = null;

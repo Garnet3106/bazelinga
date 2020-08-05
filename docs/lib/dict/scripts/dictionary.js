@@ -1,3 +1,5 @@
+'use strict';
+
 class Dictionary {
     constructor(langPack) {
         this.data = {};
