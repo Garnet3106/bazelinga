@@ -83,6 +83,7 @@ class Popup {
 
         this.$elem.on('drop', event => {
             event.originalEvent.preventDefault();
+            onFileDragLeft();
             onFileDropped(event.originalEvent);
         });
     }
@@ -90,20 +91,35 @@ class Popup {
     // ファイル選択のイベントを設定します
     setFileSelectEvent(onFileSelected = event => {}) {
         let $popupBottom = this.$elem.find('.popup-content-bottom');
-        let $input = $('<input class="popup-content-bottom-button-file">');
-
-        $input.attr('type', 'file');
-        $input.css('display', 'none');
-        $popupBottom.append($input);
-
         // アップロード用のクラス .popup-content-upload を使用する
-        this.$elem.find('.popup-content-upload').on('click', () => {
-            $input.trigger('click');
-        });
+        let $main = this.$elem.find('.popup-content-upload');
+        let $input;
 
-        // ファイルが選択された場合
-        this.$elem.on('change', event => {
-            onFileSelected(event.originalEvent);
+        // ファイル選択に必要なinput要素を作成する
+        let regenerateInputElem = () => {
+            if($input !== undefined)
+                $input.remove();
+
+            $input = $('<input class="popup-content-bottom-button-file">');
+            $input.attr('type', 'file');
+
+            // ファイルが選択された場合
+            $input.on('change', event => {
+                onFileSelected(event.originalEvent);
+                // 同じファイルを複数回選択するとイベントが発生しないので要素を作り直す
+                // value に空文字を設定する方法はブラウザによってできなかったりする
+                regenerateInputElem();
+            });
+
+            $popupBottom.append($input);
+            return $input;
+        };
+
+        regenerateInputElem();
+
+        // メイン要素がクリックされた場合はイベントをトリガーしてファイル選択画面を開く
+        $main.on('click', () => {
+            $input.trigger('click');
         });
     }
 

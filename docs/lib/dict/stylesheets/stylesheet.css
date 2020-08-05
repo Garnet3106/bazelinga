@@ -106,9 +106,8 @@ div.popup-content-bottom-button {
 input.popup-content-bottom-button-file {
     align-items: center;
     background-color: #eeeeee;
-    border-radius: 5px;
     cursor: pointer;
-    display: display;
+    display: none;
     font-size: 15px;
     height: 30px;
     justify-content: center;
