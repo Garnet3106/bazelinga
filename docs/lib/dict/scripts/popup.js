@@ -21,6 +21,14 @@ class Popup {
         $popupBottom.append($button);
     }
 
+    addUploadPopupMessage(message) {
+        let $main = this.$elem.find('.popup-content-upload');
+        let $msg = $('<div class="popup-content-upload-message"></div>');
+
+        $msg.html(message);
+        $main.append($msg);
+    }
+
     addMainMessage(message) {
         let $main = this.$elem.find('.popup-content-main');
         let $msg = $('<div class="popup-content-main-message"></div>');
@@ -81,7 +89,8 @@ class Popup {
         $input.css('display', 'none');
         $popupBottom.append($input);
 
-        this.$elem.find('.popup-content-main').on('click', () => {
+        // アップロード用のクラス .popup-content-upload を使用する
+        this.$elem.find('.popup-content-upload').on('click', () => {
             $input.trigger('click');
         });
 
@@ -91,7 +100,7 @@ class Popup {
         });
     }
 
-    static show(onReady = popup => {}) {
+    static show(onPopupReady = popup => {}) {
         let popup = new Popup();
 
         // 初期化中に表示させないためにポップアップのスタイルは display: none に設定してある
@@ -109,7 +118,7 @@ class Popup {
         popup.$elem = $elem;
         popup.isVisible = true;
 
-        onReady(popup);
+        onPopupReady(popup);
 
         $('#body').append($elem);
         $elem.css('display', 'flex');
@@ -135,6 +144,16 @@ class Popup {
                 popup.hide();
                 onYesButtonClicked($button);
             });
+        });
+    }
+
+    static showUploadPopup(onPopupReady = popup => {}) {
+        Popup.show(popup => {
+            // メイン要素を popup-content-upload に置き換える
+            let $main = popup.$elem.find('.popup-content-main');
+            $main.attr('class', 'popup-content-upload');
+
+            onPopupReady(popup);
         });
     }
 

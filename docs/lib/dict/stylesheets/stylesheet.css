@@ -115,6 +115,26 @@ input.popup-content-bottom-button-file {
     width: 80px;
 }
 
+div.popup-content-upload {
+    background-color: #ffffff;
+    border: dashed 1px #333333;
+    border-radius: 5px;
+    transition: all 200ms 0s ease;
+}
+
+div.popup-content-upload:hover {
+    background-color: #eeeeee;
+}
+
+div.popup-content-upload:active {
+    background-color: #dddddd;
+}
+
+div.popup-content-upload-message {
+    display: inline-block;
+    margin: 20px;
+}
+
 div.popup-content-main {
     background-color: #eeeeee;
     border-radius: 5px;

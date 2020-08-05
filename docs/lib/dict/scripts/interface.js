@@ -190,7 +190,7 @@ class Interface {
         });
 
         $('#leftMenuUploadTop').on('click', () => {
-            Popup.show(popup => {
+            Popup.showUploadPopup(popup => {
                 this.initUploadPopup(popup);
             });
         });
@@ -320,7 +320,7 @@ class Interface {
 
         popup.addTopIcon(iconURI);
         popup.addTopTitle(title);
-        popup.addMainMessage(langData.messages.selectOrDropYourFile + '<br><br>[' + langData.messages.clickOrDropHere + ']');
+        popup.addUploadPopupMessage(langData.messages.selectOrDropYourFile + '<br><br>[' + langData.messages.clickHereOrDropAllOver + ']');
 
         popup.setFileDropEvent(event => {
             // ファイルは1つまで
