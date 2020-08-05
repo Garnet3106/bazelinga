@@ -31,11 +31,11 @@ class Popup {
             onButtonClicked($input);
         });
 
-        this.onButtonReady(message, () => {
+        this.addBottomButton(message, () => {
             $input.trigger('click');
         });
 
-        onReady($input);
+        onButtonReady($input);
         $popupBottom.append($input);
     }
 
@@ -77,15 +77,16 @@ class Popup {
 
     // onDropped() の第一引数には event.originalEvent が渡されます
     setFileDropEvent(onFileDropped = event => {}) {
-        this.$popup.on('dragover', event => {
+        this.$elem.on('dragover', event => {
             event.originalEvent.preventDefault();
         });
 
-        this.$popup.on('dragenter', event => {
+        this.$elem.on('dragenter', event => {
             event.originalEvent.preventDefault();
         });
 
-        this.$popup.on('drop', event => {
+        this.$elem.on('drop', event => {
+            event.originalEvent.preventDefault();
             onFileDropped(event.originalEvent);
         });
     }

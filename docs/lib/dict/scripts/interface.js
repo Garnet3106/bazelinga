@@ -318,7 +318,7 @@ class Interface {
 
         popup.setFileDropEvent(event => {
             // ファイルは1つまで
-            let file = event.originalEvent.dataTransfer.files[0];
+            let file = event.dataTransfer.files[0];
             setDataByFile(file);
         });
 
