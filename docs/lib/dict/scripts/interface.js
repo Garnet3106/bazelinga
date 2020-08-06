@@ -329,11 +329,13 @@ class Interface {
             let file = event.dataTransfer.files[0];
             setDataByFile(file);
         }, () => {
-            // ファイルを保持しているときのイベント
+            // ファイルを掴んでいるときのイベント
             $main.css('background-color', '#dddddd');
+            popup.$elem.css('cursor', 'grabbing');
         }, () => {
             // ファイルのドロップが終了したときのイベント
             $main.css('background-color', '#ffffff');
+            popup.$elem.css('cursor', 'auto');
         });
 
         // 選択エリアを設定

@@ -118,15 +118,16 @@ div.popup-content-upload {
     background-color: #ffffff;
     border: dashed 1px #333333;
     border-radius: 5px;
+    cursor: pointer;
     transition: all 200ms 0s ease;
 }
 
 div.popup-content-upload:hover {
-    background-color: #eeeeee;
+    background-color: #eeeeee !important;
 }
 
 div.popup-content-upload:active {
-    background-color: #dddddd;
+    background-color: #dddddd !important;
 }
 
 div.popup-content-upload-message {
