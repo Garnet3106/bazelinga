@@ -100,19 +100,20 @@ class Popup {
             if($input !== undefined)
                 $input.remove();
 
-            $input = $('<input class="popup-content-bottom-button-file">');
-            $input.attr('type', 'file');
+            Popup.addBottomButton('', () => {}, $button => {
+                $button.css('display', 'none');
+                $button.attr('type', 'file');
 
-            // ファイルが選択された場合
-            $input.on('change', event => {
-                onFileSelected(event.originalEvent);
-                // 同じファイルを複数回選択するとイベントが発生しないので要素を作り直す
-                // value に空文字を設定する方法はブラウザによってできなかったりする
-                regenerateInputElem();
+                // ファイルが選択された場合
+                $button.on('change', event => {
+                    onFileSelected(event.originalEvent);
+                    // 同じファイルを連続で選択するとchangeイベントが発火しないので要素を作り直す
+                    regenerateInputElem();
+                });
+
+                $popupBottom.append($input);
+                $input = $button;
             });
-
-            $popupBottom.append($input);
-            return $input;
         };
 
         regenerateInputElem();
