@@ -140,7 +140,7 @@ class Dictionary {
         return matchedWord;
     }
 
-    setDataByFile(file, messages, onLoaded, onErrored) {
+    setDataByFile(file, messages, onLoaded = () => {}, onErrored = error => {}) {
         // 文字列などがドロップされた際は undefined が渡されるので弾く
         // JSON形式でなければ弾く
         if(file === undefined || file.type != 'application/json') {
@@ -149,7 +149,7 @@ class Dictionary {
         }
 
         // BlobのデフォルトでUTF-8を使用する
-        var properties = {
+        let properties = {
             type: "application/json"
         };
 

@@ -7,9 +7,9 @@ class Popup {
         this.isVisible = false;
     }
 
-    addBottomButton(message, onButtonClicked = $button => {}, onButtonReady = $button => {}) {
+    // 引数 $button はボタンに使用される要素です (デフォルトはdiv要素)
+    addBottomButton(message, onButtonClicked = $button => {}, onButtonReady = $button => {}, $button = $('<div class="popup-content-bottom-button"></div>')) {
         let $popupBottom = this.$elem.find('.popup-content-bottom');
-        let $button = $('<div class="popup-content-bottom-button"></div>');
 
         $button.text(message);
 

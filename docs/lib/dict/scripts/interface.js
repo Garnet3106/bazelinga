@@ -244,59 +244,55 @@ class Interface {
     }
 
     initDownloadPopup(popup) {
+        if(!window.Blob) {
+            Popup.showNotification(langData.messages.thisFeatureIsNotAvailableForYourEnvironment);
+            popup.hide();
+            return;
+        }
+
         let title = langData.messages.download;
         let iconURI = '../../../lib/dict/img/download.svg';
 
         popup.addTopIcon(iconURI);
         popup.addTopTitle(title);
 
-        let $main = popup.$elem.find('.popup-content-main');
-        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
-
-        let $pair = $('<div class="popup-content-main-inputarea-pair">');
-
-        // ペア名
-        let $pairName = $('<div></div>');
-        $pairName.text(langData.messages.data);
-        $pair.append($pairName);
-
-        // コピペ用input
-        let $pairInput = $('<input>');
-        $pairInput.attr('readonly', true);
-
-        $pairInput.on('click', () => {
-            $pairInput.select();
-        });
-
-        let stringifiedData = '';
-
-        try {
-            stringifiedData = JSON.stringify(this.dict.data);
-        } catch(error) {
-            Popup.showConfirmation(langData.messages.failedToConvertTheJSONData);
-        }
-
-        $pairInput.val(stringifiedData);
-        $pair.append($pairInput);
-
-        $inputArea.append($pair);
-        $main.append($inputArea);
+        let $link = $('<a></a>');
+        $link.attr('href', '//bazelinga.gant.work/');
+        $link.text(langData.messages.pleaseReadTheLicense + '');
+        popup.addMainMessage($link);
 
         // 戻るボタン
         popup.addBottomButton(langData.messages.back, () => {
             popup.hide();
         });
 
-        // コピーボタン
-        popup.addBottomButton(langData.messages.copy, () => {
-            this.copyToClipboard(stringifiedData);
-            Popup.showNotification(langData.messages.copiedToTheClipboard);
+        let url;
+
+        // 保存ボタン
+        popup.addBottomButton(langData.messages.save, $button => {
+            // BlobのデフォルトでUTF-8を使用する
+            let data = [ JSON.stringify(this.data) ];
+            let properties = {
+                type: "text/plain"
+            };
+
+            let blob = new Blob(data, properties);
+            url = URL.createObjectURL(blob);
+
+            $button.attr('download', this.lang + '.txt');
+            $button.attr('href', url);
+            $button.attr('text', 'url');
+            $button.css('display', 'none');
+
             popup.hide();
-        });
+        }, () => {
+            // ブラウザによってはrevoke処理にタイムアウトを入れる必要がありそう (要検証)
+            URL.revokeObjectURL(url);
+        }, $('<a class="popup-content-bottom-button"></a>'));
     }
 
     initUploadPopup(popup) {
-        if(!window.File || !window.FileReader) {
+        if(!window.File || !window.FileReader || !window.Blob) {
             Popup.showNotification(langData.messages.thisFeatureIsNotAvailableForYourEnvironment);
             popup.hide();
             return;
