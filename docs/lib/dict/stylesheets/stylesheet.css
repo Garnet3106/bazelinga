@@ -101,7 +101,12 @@ div.popup-content-bottom > div:last-child {
     font-size: 15px;
     height: 30px;
     justify-content: center;
+    transition: all 200ms 0s ease;
     width: 80px;
+}
+
+.popup-content-bottom-button:active {
+    background-color: #dddddd !important;
 }
 
 div.popup-content-upload {
