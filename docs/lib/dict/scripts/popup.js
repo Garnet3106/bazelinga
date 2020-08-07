@@ -21,16 +21,8 @@ class Popup {
         $popupBottom.append($button);
     }
 
-    addUploadPopupMessage(message) {
-        let $main = this.$elem.find('.popup-content-upload');
-        let $msg = $('<div class="popup-content-upload-message"></div>');
-
-        $msg.html(message);
-        $main.append($msg);
-    }
-
     addMainMessage(message) {
-        let $main = this.$elem.find('.popup-content-main');
+        let $main = this.$elem.find('.popup-content-main,.popup-content-upload');
         let $msg = $('<div class="popup-content-main-message"></div>');
 
         $msg.html(message);

@@ -316,7 +316,7 @@ class Interface {
 
         popup.addTopIcon(iconURI);
         popup.addTopTitle(title);
-        popup.addUploadPopupMessage(langData.messages.selectOrDropYourFile + '<br><br>[' + langData.messages.clickHereOrDropAllOver + ']');
+        popup.addMainMessage(langData.messages.selectOrDropYourFile + '<br><br>[' + langData.messages.clickHereOrDropAllOver + ']');
 
         let $main = popup.$elem.find('.popup-content-upload');
 
