@@ -100,7 +100,7 @@ class Popup {
             if($input !== undefined)
                 $input.remove();
 
-            Popup.addBottomButton('', () => {}, $button => {
+            this.addBottomButton('', () => {}, $button => {
                 $button.css('display', 'none');
                 $button.attr('type', 'file');
 
@@ -111,17 +111,17 @@ class Popup {
                     regenerateInputElem();
                 });
 
+                // メイン要素がクリックされた場合はイベントをトリガーしてファイル選択画面を開く
+                $main.on('click', () => {
+                    $button.trigger('click');
+                });
+
                 $popupBottom.append($input);
                 $input = $button;
-            });
+            }, $('<input>'));
         };
 
         regenerateInputElem();
-
-        // メイン要素がクリックされた場合はイベントをトリガーしてファイル選択画面を開く
-        $main.on('click', () => {
-            $input.trigger('click');
-        });
     }
 
     static show(onPopupReady = popup => {}) {
