@@ -258,7 +258,7 @@ class Interface {
 
         let $link = $('<a></a>');
         $link.attr('href', '//bazelinga.gant.work/');
-        $link.text(langData.messages.pleaseReadTheLicense + '');
+        $link.text(langData.messages.pleaseReadTheLicenseBeforeUsingTheData + '');
         popup.addMainMessage($link);
 
         // 戻るボタン
