@@ -291,23 +291,21 @@ div.workarea-sidemenu {
 }
 
 div.workarea-sidemenu-item {
-    background-color: #dddddd;
+    background-color: #ffffff;
     display: flex;
     transition: all 200ms 0s ease;
 }
 
 div.workarea-sidemenu-item-icon {
     background-size: 100% 100%;
-    cursor: not-allowed;
+    cursor: pointer;
     height: 40px;
     transition: all 200ms 0s ease;
     width: 40px;
 }
 
 div.workarea-sidemenu-item-icon#leftMenuAddTop {
-    background-color: #ffffff;
     background-image: url('../../dict/img/add.svg');
-    cursor: pointer;
 }
 
 div.workarea-sidemenu-item-icon#leftMenuEditTop {
@@ -319,15 +317,11 @@ div.workarea-sidemenu-item-icon#leftMenuRemoveTop {
 }
 
 div.workarea-sidemenu-item-icon#leftMenuDownloadTop {
-    background-color: #ffffff;
     background-image: url('../../dict/img/download.svg');
-    cursor: pointer;
 }
 
 div.workarea-sidemenu-item-icon#leftMenuUploadTop {
-    background-color: #ffffff;
     background-image: url('../../dict/img/upload.svg');
-    cursor: pointer;
 }
 
 div.workarea-sidemenu-item-icon#rightMenuDocsTop {

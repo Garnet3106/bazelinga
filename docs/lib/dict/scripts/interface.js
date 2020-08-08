@@ -10,8 +10,18 @@ class Interface {
 
         // 選択された単語リストの項目の番号 (未選択時: -1)
         this.selectedItemIndex = -1;
+
         // 最後に選択された単語リストの項目のID (未選択時: 空文字)
         this.latestSelectedItemID = '';
+
+        // 選択が変更された際にスタイルを変更する項目のIDセレクタ
+        this.susceptibleSideMenuItems = [
+            '#leftMenuEdit',
+            '#leftMenuRemove',
+            '#rightMenuDocs',
+            '#rightMenuShare'
+        ];
+
 
         this.loadDataFiles();
     }
@@ -101,6 +111,32 @@ class Interface {
         $clipboardText.remove();
     }
 
+    // サイドメニューの一部項目を選択不可にします (単語が選択解除されたときの処理)
+    disableSideMenuItems() {
+        let $sideMenus = $('.workarea-sidemenu');
+        let $targetItems = $sideMenus.children(this.susceptibleSideMenuItems.join(','));
+        let $targetItemIcons = $targetItems.children('.workarea-sidemenu-item-icon');
+
+        // 背景色とカーソルを切り替える
+        $targetItems.css('background-color', '#dddddd');
+        // カーソルはitemにではなくiconに設定する必要がある
+        $targetItemIcons.css('cursor', 'not-allowed');
+
+        // 共有項目を閉じる
+        this.hideMenu('rightMenuShare');
+    }
+
+    // サイドメニューの全項目を選択可能にします (単語が選択解除されたときの処理)
+    enableSideMenuItems() {
+        let $targetItems = $('.workarea-sidemenu-item');
+        let $targetItemIcons = $targetItems.children('.workarea-sidemenu-item-icon');
+
+        // 背景色とカーソルを切り替える
+        $targetItems.css('background-color', '#ffffff');
+        // カーソルはitemにではなくiconに設定する必要がある
+        $targetItemIcons.css('cursor', 'pointer');
+    }
+
     formatSearchKeyword(keyword) {
         return this.dict.formatSearchKeyword(keyword);
     }
@@ -144,6 +180,7 @@ class Interface {
 
     init() {
         $(() => {
+            this.disableSideMenuItems();
             this.initEvents();
             this.setSideMenuObserver();
             this.setInitialKeyword();
@@ -814,21 +851,11 @@ class Interface {
     }
 
     unslectListItem() {
+        // 選択されていた単語の背景を戻す
         let $items = $('.workarea-wordlist-item');
         $items.css('background-color', '#ffffff');
 
-        this.hideMenu('rightMenuShare');
-
-        let $sideMenuItems = $('.workarea-sidemenu-item');
-        let $sideMenuIcons = $('.workarea-sidemenu-item-icon');
-
-        $sideMenuItems.css('background-color', '#dddddd');
-        $sideMenuIcons.css('cursor', 'not-allowed');
-
-        let $leftMenu = $('#leftMenuAdd');
-        let $leftMenuAddTop = $leftMenu.children('.workarea-sidemenu-item-icon');
-
-        $leftMenuAddTop.css('cursor', 'pointer');
+        this.disableSideMenuItems();
 
         this.selectedItemIndex = -1;
         this.latestSelectedItemID = '';
