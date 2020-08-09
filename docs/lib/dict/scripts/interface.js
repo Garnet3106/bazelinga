@@ -192,6 +192,14 @@ class Interface {
     }
 
     initEvents() {
+        $('.bottomlinks-item').on('click', event => {
+            // 下部リンクの項目のIDは 'bottomLinkItem_{言語名}' である必要があります
+            let $target = $(event.target);
+            let langName = $target.attr('id').split('_')[1];
+
+            location.href = 'http://bazelinga.gant.work/docs/' + langName + '/dict/search';
+        });
+
         $('#searchInput').on('input', () => {
             this.updateWordList();
         });
