@@ -293,6 +293,9 @@ class Interface {
 
         let $link = $('<a></a>');
         $link.attr('href', '//bazelinga.gant.work/');
+        // target="_blank" での脆弱性対策のためrel値を設定
+        $link.attr('rel', 'noopener noreferrer');
+        $link.attr('target', '_blank');
         $link.text(langData.messages.pleaseReadTheLicenseBeforeUsingTheData + '');
         popup.addMainMessage($link);
 
