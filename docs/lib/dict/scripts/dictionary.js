@@ -12,8 +12,8 @@ class Dictionary {
         let translation = {};
 
         translation.spelling = spelling;
-        translation.translationClass = translationClass;
-        translation.translationType = translationType;
+        translation.class = translationClass;
+        translation.type = translationType;
         translation.words = translationWords;
 
         this.data.push(translation);
