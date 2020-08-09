@@ -97,7 +97,7 @@ class Dictionary {
     }
 
     isInputtedTextValid(text) {
-        return !text.match(/[^a-zA-z0-9 !?.,+*-=/_%()\[\]{}\'"']/);
+        return !text.match(/[#@|\n]/);
     }
 
     load(succeeded = () => {}, failed = error => {}) {

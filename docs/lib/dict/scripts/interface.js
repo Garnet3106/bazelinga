@@ -176,6 +176,40 @@ class Interface {
         });
     }
 
+    isSpellingInputValid(inputtedText) {
+        let formattedInput = this.formatSearchKeyword(inputtedText);
+        let searchResult = this.dict.searchSpelling(formattedInput);
+
+        if(formattedInput == '')
+            return false;
+
+        if(formattedInput.length > 30)
+            return false;
+
+        if(!this.dict.isInputtedTextValid(formattedInput))
+            return false;
+
+        if(Object.keys(searchResult).length)
+            return false;
+
+        return true;
+    }
+
+    isTranslationInputValid(inputtedText) {
+        let formattedInput = this.formatSearchKeyword(inputtedText);
+
+        if(formattedInput == '')
+            return false;
+
+        if(formattedInput.length > 50)
+            return false;
+
+        if(!this.dict.isInputtedTextValid(formattedInput))
+            return false;
+
+        return true;
+    }
+
     init() {
         $(() => {
             $('title').text(langData.dictionary.pageTitle);
@@ -461,22 +495,7 @@ class Interface {
             }
 
             $pairInput.on('input', () => {
-                let formattedInput = this.formatSearchKeyword($pairInput.val());
-
-                let isTranslationInputValid = () => {
-                    if(formattedInput == '')
-                        return false;
-
-                    if(formattedInput.length > 50)
-                        return false;
-
-                    if(!this.dict.isInputtedTextValid(formattedInput))
-                        return false;
-
-                    return true;
-                };
-
-                $pairInput.css('background-color', isTranslationInputValid() ? '#ffffff' : '#ffdddd');
+                $pairInput.css('background-color', this.isTranslationInputValid($pairInput.val()) ? '#ffffff' : '#ffdddd');
             });
 
             $pair.append($pairInput);
@@ -590,26 +609,7 @@ class Interface {
         $spellingInput.css('background-color', '#ffdddd');
 
         $spellingInput.on('input', () => {
-            let formattedSpelling = this.formatSearchKeyword($spellingInput.val());
-            let searchResult = this.dict.searchSpelling(formattedSpelling);
-
-            let isSpellingInputValid = () => {
-                if(formattedSpelling == '')
-                    return false;
-
-                if(formattedSpelling.length > 30)
-                    return false;
-
-                if(!this.dict.isInputtedTextValid(formattedSpelling))
-                    return false;
-
-                if(Object.keys(searchResult).length)
-                    return false;
-
-                return true;
-            };
-
-            $spellingInput.css('background-color', isSpellingInputValid() ? '#ffffff' : '#ffdddd');
+            $spellingInput.css('background-color', this.isSpellingInputValid($spellingInput.val()) ? '#ffffff' : '#ffdddd');
         });
 
         addInputAreaPair('spelling', $spellingInput);
@@ -668,16 +668,6 @@ class Interface {
                 return;
             }
 
-            // 翻訳に無効な文字が含まれていた場合は弾く
-            for(let i = 0; i < translation.length; i++) {
-                for(let j = 0; j < translation[i].words.length; j++) {
-                    if(!this.dict.isInputtedTextValid(translation[i].words[j])) {
-                        Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
-                        return;
-                    }
-                }
-            }
-
             translation.forEach(trans => {
                 this.dict.addTranslation(spelling, trans.class, trans.type, trans.words);
             });
@@ -721,28 +711,9 @@ class Interface {
 
         $spellingInput.on('input', () => {
             let formattedSpelling = this.formatSearchKeyword($spellingInput.val());
-            let searchResult = this.dict.searchSpelling(formattedSpelling);
-
-            let isSpellingInputValid = () => {
-                if(oldSpelling == formattedSpelling)
-                    return true;
-
-                if(formattedSpelling == '')
-                    return false;
-
-                if(formattedSpelling.length > 30)
-                    return false;
-
-                if(!this.dict.isInputtedTextValid(formattedSpelling))
-                    return false;
-
-                if(Object.keys(searchResult).length)
-                    return false;
-
-                return true;
-            };
-
-            $spellingInput.css('background-color', isSpellingInputValid() ? '#ffffff' : '#ffdddd');
+            // 元のスペルと一致した場合は赤背景から除外する
+            let isInputValid = oldSpelling == formattedSpelling || this.isSpellingInputValid($spellingInput.val());
+            $spellingInput.css('background-color', isInputValid ? '#ffffff' : '#ffdddd');
         });
 
         addInputAreaPair('spelling', $spellingInput);
@@ -769,7 +740,7 @@ class Interface {
             });
         });
 
-        // 更新ボタン
+        // 保存ボタン
         popup.addBottomButton(langData.messages.save, () => {
             let message = langData.messages.doYouReallySaveTheWord;
 
@@ -800,16 +771,6 @@ class Interface {
                 if(translation.length == 0) {
                     Popup.showNotification(langData.messages.theTranslationIsNotInputted);
                     return;
-                }
-
-                // 翻訳に無効な文字が含まれていた場合は弾く
-                for(let i = 0; i < translation.length; i++) {
-                    for(let j = 0; j < translation[i].words.length; j++) {
-                        if(!this.dict.isInputtedTextValid(translation[i].words[j])) {
-                            Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
-                            return;
-                        }
-                    }
                 }
 
                 this.dict.removeAllTranslation(translation);
