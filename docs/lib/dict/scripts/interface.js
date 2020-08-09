@@ -5,6 +5,7 @@ var langData;
 
 
 class Interface {
+    // ページのロードが完了していなくても呼び出せます
     constructor(lang) {
         this.lang = lang;
 
@@ -177,6 +178,12 @@ class Interface {
 
     init() {
         $(() => {
+            $('title').text(langData.dictionary.pageTitle);
+
+            // 単語リストの初期的なガイドメッセージを設定
+            this.setGuideMessage(langData.messages.theSearchResultsWillBeDisplayedHere);
+            this.showGuideMessage();
+
             this.disableSideMenuItems();
             this.initEvents();
             this.setSideMenuObserver();

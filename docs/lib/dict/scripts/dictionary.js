@@ -41,7 +41,7 @@ class Dictionary {
         });
 
         let result = '';
-        result += langData.dictionaryData.licenseGuideMessage + '\n';
+        result += langData.dictionary.licenseGuideMessage + '\n';
 
         for(let spelling in words) {
             let transClasses = words[spelling];
