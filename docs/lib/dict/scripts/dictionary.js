@@ -8,14 +8,13 @@ class Dictionary {
         this.ready = false;
     }
 
-    addWord(spelling, ipa, translation) {
+    addWord(spelling, translation) {
         let word = {};
 
         word.spelling = spelling;
-        word.ipa = ipa;
-        word.translation = translation;
+        word.words = translation;
 
-        this.data.dict.push(word);
+        this.data.push(word);
     }
 
     formatSearchKeyword(keyword) {
@@ -76,8 +75,8 @@ class Dictionary {
 
     parseToData(text) {
         let translation = [];
-        console.log(text)
         let lines = text.split('\n');
+
         let latestSpell = '';
         let latestClass = '';
 
@@ -105,7 +104,6 @@ class Dictionary {
                 continue;
 
             let elems = lines[line_i].split('|');
-            console.log(elems);
 
             // データの数が不正な場合は飛ばす
             if(elems.length != 2)
@@ -113,67 +111,44 @@ class Dictionary {
 
             translation.push({
                 class: latestClass,
-                spell: latestSpell,
+                spelling: latestSpell,
                 type: elems[0],
                 words: elems[1].split(',')
             });
         }
 
-        console.log(translation);
-
         return translation;
     }
 
     removeWord(wordIndex) {
-        this.data.dict.splice(wordIndex, 1);
+        this.data.splice(wordIndex, 1);
     }
 
     search(keyword) {
-        let matchedWords = [];
-        let loweredKeyword = keyword.toLowerCase();
+        let matchedTranslation = [];
 
-        this.data.dict.forEach((word, wordIndex) => {
+        this.data.forEach((translation, translationIndex) => {
             let matched = false;
 
-            if(word.spelling.includes(loweredKeyword))
+            if(translation.spelling.includes(keyword))
                 matched = true;
 
-            // 発音記号は大文字と小文字を区別することがあるので toLowerCase() をしない
-            if(word.ipa.includes(keyword))
-                matched = true;
-
-            // word のコピーを作成する (参照渡し防止)
-            let tmpWord = $.extend(true, {}, word);
-            let tmpTranslationList = [];
-
-            tmpWord.index = wordIndex;
-
-            word.translation.forEach((translation, translationIndex) => {
-                // スペルなどがマッチしていた場合はデフォルトでtrue
-                let matchedTranslationWord = matched;
-
-                if(!matchedTranslationWord) {
-                    translation.words.forEach(translationWords => {
-                        if(translationWords.includes(loweredKeyword)) {
-                            matchedTranslationWord = true;
-                        }
-                    });
-                }
-
-                if(matchedTranslationWord) {
-                    let tmpTranslation = $.extend(true, {}, translation);
-                    tmpTranslation.index = translationIndex;
-                    tmpTranslationList.push(tmpTranslation);
+            translation.words.forEach(word => {
+                if(word.includes(keyword)) {
+                    matched = true;
                 }
             });
 
-            if(tmpTranslationList.length != 0) {
-                tmpWord.translation = tmpTranslationList;
-                matchedWords.push(tmpWord);
+            if(matched) {
+                // 翻訳のコピーを作成する (参照渡し防止)
+                let tmpTranslation = $.extend(true, {}, translation);
+                // コピーした翻訳にインデックスを追加する
+                tmpTranslation.index = translationIndex;
+                matchedTranslation.push(tmpTranslation);
             }
         });
 
-        return matchedWords;
+        return matchedTranslation;
     }
 
     searchSpelling(spelling) {

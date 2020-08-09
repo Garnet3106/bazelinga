@@ -26,67 +26,65 @@ class Interface {
         this.loadDataFiles();
     }
 
-    addWordsToList(wordList) {
+    addWordsToList(translationList) {
         let $input = $('#searchInput');
         let $list = $('#wordList');
 
-        wordList.forEach(word => {
-            word.translation.forEach(translation => {
-                let wordClass = langData.classes[translation.class];
+        translationList.forEach(translation => {
+            let translationClass = langData.classes[translation.class];
 
-                // 要素を生成・追加
-                let $elem = $('<div class="workarea-wordlist-item"></div>');
-                $elem.attr('id', 'wordListItem_' + word.index + '_' + translation.index);
+            // 要素を生成・追加
+            let $elem = $('<div class="workarea-wordlist-item"></div>');
+            $elem.attr('id', 'wordListItem_' + translation.index);
 
-                let $elemSpelling = $('<div class="workarea-wordlist-item-spelling"></div>');
-                let $elemType = $('<div class="workarea-wordlist-item-type"></div>');
+            let $elemSpelling = $('<div class="workarea-wordlist-item-spelling"></div>');
+            let $elemType = $('<div class="workarea-wordlist-item-type"></div>');
 
-                $elemSpelling.text(word.spelling);
-                $elemType.text('[' + langData.types[translation.type] + ']');
+            $elemSpelling.text(translation.spelling);
+            $elemType.text('[' + langData.types[translation.type] + ']');
 
-                $elem.append($elemSpelling);
-                $elem.append($elemType);
+            $elem.append($elemSpelling);
+            $elem.append($elemType);
 
-                if(translation.class != 'general') {
-                    let $elemClass = $('<div class="workarea-wordlist-item-class"></div>');
-                    $elemClass.text('[' + wordClass + ']');
-                    $elem.append($elemClass);
+            if(translation.class != 'gen') {
+                let $elemClass = $('<div class="workarea-wordlist-item-class"></div>');
+                $elemClass.text('[' + translationClass + ']');
+                $elem.append($elemClass);
+            }
+
+            let $elemTranslationWords = $('<div class="workarea-wordlist-item-translation"></div>');
+            $elemTranslationWords.text(translation.words.join(', '));
+            $elem.append($elemTranslationWords);
+
+            // クリックイベントを設定
+            $elem.on('click', elem => {
+                let $target = $(elem.target);
+                let formattedKeyword = this.formatSearchKeyword($input.val());
+
+                let $item = $target.eq(0);
+
+                if($item.attr('class') != 'workarea-wordlist-item')
+                    $item = $item.parent();
+
+                let index = $item.index() - 1;
+
+                // 選択済みの項目がクリックされた場合
+                if($item.attr('id') == this.latestSelectedItemID) {
+                    this.unslectListItem();
+                    return;
                 }
 
-                let $elemTranslation = $('<div class="workarea-wordlist-item-translation"></div>');
-                $elemTranslation.text(translation.words.join(', '));
-                $elem.append($elemTranslation);
+                this.selectListItem(index);
 
-                // クリックイベントを設定
-                $elem.on('click', elem => {
-                    let $target = $(elem.target);
-                    let formattedKeyword = this.formatSearchKeyword($input.val());
-
-                    let $item = $target.eq(0);
-
-                    if($item.attr('class') != 'workarea-wordlist-item')
-                        $item = $item.parent();
-
-                    let index = $item.index() - 1;
-
-                    // 選択済みの項目がクリックされた場合
-                    if($item.attr('id') == this.latestSelectedItemID) {
-                        this.unslectListItem();
-                        return;
-                    }
-
-                    this.selectListItem(index);
-
-                    // キーワードが変更された場合のみ入力欄のvalueを変更
-                    if(formattedKeyword != word.spelling) {
-                        $input.val(word.spelling);
-                        // val() ではイベントが発火しないので手動で処理
-                        $input.trigger('input');
-                    }
-                });
-
-                $list.append($elem);
+                // キーワードが変更された場合のみ入力欄のvalueを変更
+                if(formattedKeyword != translation.spelling) {
+                    $input.val(translation.spelling);
+                    // val() ではイベントが発火しないので手動で処理
+                    $input.trigger('input');
+                }
             });
+
+            $list.append($elem);
         });
 
         if(this.latestSelectedItemID != '') {
@@ -588,29 +586,26 @@ class Interface {
         // 追加ボタン
         popup.addBottomButton(langData.messages.add, () => {
             let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
-            let $input_ipa = $inputArea.find('[name=ipa]').eq(0);
-
             let spelling = this.formatSearchKeyword($input_spelling.val());
-            let ipa = this.formatSearchKeyword($input_ipa.val());
 
             if(Object.keys(this.dict.searchSpelling(spelling)).length) {
                 Popup.showNotification(langData.messages.theSpellingIsDuplicated);
                 return;
             }
 
-            if(spelling == '' || ipa == '') {
+            if(spelling == '') {
                 Popup.showNotification(langData.messages.theInputItemLacks);
                 return;
             }
 
-            if(spelling.length > 30 || ipa.length > 30) {
+            if(spelling.length > 30) {
                 Popup.showNotification(langData.messages.theInputtedTextIsTooLong);
                 return;
             }
 
             let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
 
-            if(spelling.match(invalidChars) || ipa.match(invalidChars)) {
+            if(spelling.match(invalidChars)) {
                 Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
                 return;
             }
@@ -620,7 +615,7 @@ class Interface {
                 return;
             }
 
-            this.dict.addWord(spelling, ipa, translation);
+            this.dict.addWord(spelling, translation);
 
             this.updateWordList();
             popup.hide();
@@ -706,29 +701,26 @@ class Interface {
 
             Popup.showConfirmation(message, () => {
                 let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
-                let $input_ipa = $inputArea.find('[name=ipa]').eq(0);
-
                 let spelling = this.formatSearchKeyword($input_spelling.val());
-                let ipa = this.formatSearchKeyword($input_ipa.val());
 
                 if(spelling != oldWord.spelling && Object.keys(this.dict.searchSpelling(spelling)).length) {
                     Popup.showNotification(langData.messages.theSpellingIsDuplicated);
                     return;
                 }
 
-                if(spelling == '' || ipa == '') {
+                if(spelling == '') {
                     Popup.showNotification(langData.messages.theInputItemLacks);
                     return;
                 }
 
-                if(spelling.length > 30 || ipa.length > 30) {
+                if(spelling.length > 30) {
                     Popup.showNotification(langData.messages.theInputtedTextIsTooLong);
                     return;
                 }
 
                 let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
 
-                if(spelling.match(invalidChars) || ipa.match(invalidChars)) {
+                if(spelling.match(invalidChars)) {
                     Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
                     return;
                 }
@@ -739,7 +731,7 @@ class Interface {
                 }
 
                 this.dict.removeWord(oldWord.index);
-                this.dict.addWord(spelling, ipa, translation);
+                this.dict.addWord(spelling, translation);
 
                 this.updateWordList();
                 popup.hide();
@@ -888,16 +880,16 @@ class Interface {
             return;
         }
 
-        let words = this.dict.search(keyword);
+        let translationList = this.dict.search(keyword);
 
-        if(words.length == 0) {
+        if(translationList.length == 0) {
             this.setGuideMessage(langData.messages.theWordHasNotFound);
             this.showGuideMessage();
             return;
         }
 
-        this.setGuideMessage(langData.messages.theSearchResultsWillBeDisplayedHere);
+        //this.setGuideMessage(langData.messages.theSearchResultsWillBeDisplayedHere);
         this.hideGuideMessage();
-        this.addWordsToList(words);
+        this.addWordsToList(translationList);
     }
 }
