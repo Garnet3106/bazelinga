@@ -452,8 +452,32 @@ class Interface {
             $pairInput.attr('name', 'words');
             $pairInput.css('width', '250px');
 
-            if(words !== undefined)
+            if(words !== undefined) {
+                // words が undefined でない場合は入力欄を埋める
                 $pairInput.val(words.join(','));
+            } else {
+                // words が undefined な場合は赤背景にする
+                $pairInput.css('background-color', '#ffdddd');
+            }
+
+            $pairInput.on('input', () => {
+                let formattedInput = this.formatSearchKeyword($pairInput.val());
+
+                let isTranslationInputValid = () => {
+                    if(formattedInput == '')
+                        return false;
+
+                    if(formattedInput.length > 50)
+                        return false;
+
+                    if(!this.dict.isInputtedTextValid(formattedInput))
+                        return false;
+
+                    return true;
+                };
+
+                $pairInput.css('background-color', isTranslationInputValid() ? '#ffffff' : '#ffdddd');
+            });
 
             $pair.append($pairInput);
 
@@ -488,7 +512,7 @@ class Interface {
                     translationWords[index] = this.formatSearchKeyword(word);
                 });
 
-                // [ '' ] で一致しなかったので配列の長さと最初のインデックスの値で比較
+                // translationWords の空配列判定が [ '' ] でできなかったので配列の長さと最初のインデックスの値で比較
                 if(translationWords.length == 0 || translationWords[0] === '')
                     return;
 
@@ -562,6 +586,7 @@ class Interface {
         };
 
         let $spellingInput = $('<input>');
+        // 単語追加時は入力欄が空のためデフォルトで赤背景にする (編集時は白のままで問題ない)
         $spellingInput.css('background-color', '#ffdddd');
 
         $spellingInput.on('input', () => {
