@@ -48,14 +48,13 @@
             "youCannotRemoveAnyMore": "You cannot remove it any more."
         },
         "types": {
-            "adjective": "adj.",
-            "adverb": "adv.",
+            "adj": "adj.",
+            "adv": "adv.",
             "noun": "noun",
-            "noun-common": "noun",
-            "preposition": "prep.",
+            "prep": "prep.",
             "verb": "verb",
-            "verb-intransitive": "v.i.",
-            "verb-transitive": "v.t."
+            "verb-intr": "v.i.",
+            "verb-trans": "v.t."
         }
     },
     "ja": {
@@ -107,13 +106,13 @@
             "youCannotRemoveAnyMore": "これ以上削除できません。"
         },
         "types": {
-            "adjective": "形",
-            "adverb": "副",
-            "noun-common": "名",
-            "preposition": "前",
+            "adj": "形",
+            "adv": "副",
+            "noun": "名",
+            "prep": "前",
             "verb": "動詞",
-            "verb-intransitive": "自動",
-            "verb-transitive": "他動"
+            "verb-intr": "自動",
+            "verb-trans": "他動"
         }
     }
 }
