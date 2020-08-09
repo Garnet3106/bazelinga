@@ -1,8 +1,8 @@
 {
     "en": {
         "classes": {
-            "architecture": "archit.",
-            "general": "general"
+            "archit": "archit.",
+            "gen": "general"
         },
         "messages": {
             "add": "Add",
@@ -59,8 +59,8 @@
     },
     "ja": {
         "classes": {
-            "architecture": "建築",
-            "general": "一般"
+            "archit": "建築",
+            "gen": "一般"
         },
         "messages": {
             "add": "追加",
