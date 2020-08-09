@@ -562,16 +562,29 @@ class Interface {
         };
 
         let $spellingInput = $('<input>');
+        $spellingInput.css('background-color', '#ffdddd');
 
         $spellingInput.on('input', () => {
             let formattedSpelling = this.formatSearchKeyword($spellingInput.val());
             let searchResult = this.dict.searchSpelling(formattedSpelling);
-            let backColor = '#ffffff';
 
-            if(Object.keys(searchResult).length)
-                backColor = '#ffdddd';
+            let isSpellingInputValid = () => {
+                if(formattedSpelling == '')
+                    return false;
 
-            $spellingInput.css('background-color', backColor);
+                if(formattedSpelling.length > 30)
+                    return false;
+
+                if(!this.dict.isInputtedTextValid(formattedSpelling))
+                    return false;
+
+                if(Object.keys(searchResult).length)
+                    return false;
+
+                return true;
+            };
+
+            $spellingInput.css('background-color', isSpellingInputValid() ? '#ffffff' : '#ffdddd');
         });
 
         addInputAreaPair('spelling', $spellingInput);
@@ -684,12 +697,27 @@ class Interface {
         $spellingInput.on('input', () => {
             let formattedSpelling = this.formatSearchKeyword($spellingInput.val());
             let searchResult = this.dict.searchSpelling(formattedSpelling);
-            let backColor = '#ffffff';
 
-            if(oldSpelling != formattedSpelling && Object.keys(searchResult).length)
-                backColor = '#ffdddd';
+            let isSpellingInputValid = () => {
+                if(oldSpelling == formattedSpelling)
+                    return true;
 
-            $spellingInput.css('background-color', backColor);
+                if(formattedSpelling == '')
+                    return false;
+
+                if(formattedSpelling.length > 30)
+                    return false;
+
+                if(!this.dict.isInputtedTextValid(formattedSpelling))
+                    return false;
+
+                if(Object.keys(searchResult).length)
+                    return false;
+
+                return true;
+            };
+
+            $spellingInput.css('background-color', isSpellingInputValid() ? '#ffffff' : '#ffdddd');
         });
 
         addInputAreaPair('spelling', $spellingInput);
