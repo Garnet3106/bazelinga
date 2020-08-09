@@ -603,9 +603,9 @@ class Interface {
                 return;
             }
 
-            let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
+            let allowedChars = /[^a-zA-z0-9 !?.,+*-=/_%()\[\]{}\'"']/;
 
-            if(spelling.match(invalidChars)) {
+            if(spelling.match(allowedChars)) {
                 Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
                 return;
             }
@@ -613,6 +613,16 @@ class Interface {
             if(translation.length == 0) {
                 Popup.showNotification(langData.messages.theTranslationIsNotInputted);
                 return;
+            }
+
+            // 翻訳に無効な文字が含まれていた場合は弾く
+            for(let i = 0; i < translation.length; i++) {
+                for(let j = 0; j < translation[i].words.length; j++) {
+                    if(translation[i].words[j].match(allowedChars)) {
+                        Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
+                        return;
+                    }
+                }
             }
 
             translation.forEach(trans => {
@@ -714,9 +724,9 @@ class Interface {
                     return;
                 }
 
-                let invalidChars = /[^a-zA-z0-9 !?.,+*-=/_#%()\[\]{}\'"']/;
+                let allowedChars = /[^a-zA-z0-9 !?.,+*-=/_%()\[\]{}\'"']/;
 
-                if(spelling.match(invalidChars)) {
+                if(spelling.match(allowedChars)) {
                     Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
                     return;
                 }
@@ -724,6 +734,16 @@ class Interface {
                 if(translation.length == 0) {
                     Popup.showNotification(langData.messages.theTranslationIsNotInputted);
                     return;
+                }
+
+                // 翻訳に無効な文字が含まれていた場合は弾く
+                for(let i = 0; i < translation.length; i++) {
+                    for(let j = 0; j < translation[i].words.length; j++) {
+                        if(translation[i].words[j].match(allowedChars)) {
+                            Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
+                            return;
+                        }
+                    }
                 }
 
                 this.dict.removeAllTranslation(translation);
