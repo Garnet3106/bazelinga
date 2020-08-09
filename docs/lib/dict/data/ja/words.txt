@@ -1,3 +1,39 @@
+; 
+; < BZ-JA DICTIONARY DATA FILE >
+; 
+; Please check the license for using this data.
+; 
+;   Homepage: http://bazelinga.gant.work/
+;   Repository: https://github.com/Garnet3106/bazelinga
+; 
+;   Official Twitter: https://twitter.com/bazelinga
+;   Creator's Twitter: https://twitter.com/Garnet3106
+; 
+
+; 
+; < BZ-JA Vortaro-Dateno-Dosiero >
+; 
+; Bonvolu konfirmi la permesilon por uzi ĉi tiun dateno.
+; 
+;   Hejmpaĝo: http://bazelinga.gant.work/
+;   Hangaro: https://github.com/Garnet3106/bazelinga
+; 
+;   Oficiala Twitter: https://twitter.com/bazelinga
+;   Kreanta Twitter: https://twitter.com/Garnet3106
+; 
+
+; 
+; < 把日辞書データファイル >
+; 
+; データの利用に関してはライセンスを確認してください。
+; 
+;   ホームページ: http://bazelinga.gant.work/
+;   リポジトリ: https://github.com/Garnet3106/bazelinga
+; 
+;   公式Twitter: https://twitter.com/bazelinga
+;   制作者Twitter: https://twitter.com/Garnet3106
+; 
+
 #baze
 
 @gen
