@@ -96,6 +96,10 @@ class Dictionary {
         return 'https://twitter.com/share?related=' + relatedAccount + '&text=' + text;
     }
 
+    isInputtedTextValid(text) {
+        return !text.match(/[^a-zA-z0-9 !?.,+*-=/_%()\[\]{}\'"']/);
+    }
+
     load(succeeded = () => {}, failed = error => {}) {
         let uri = 'http://bazelinga.gant.work/docs/lib/dict/data/' + this.lang + '/words.txt';
 

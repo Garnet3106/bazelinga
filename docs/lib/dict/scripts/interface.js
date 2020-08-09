@@ -22,7 +22,6 @@ class Interface {
             '#rightMenuShare'
         ];
 
-
         this.loadDataFiles();
     }
 
@@ -606,9 +605,7 @@ class Interface {
                 return;
             }
 
-            let allowedChars = /[^a-zA-z0-9 !?.,+*-=/_%()\[\]{}\'"']/;
-
-            if(spelling.match(allowedChars)) {
+            if(!this.dict.isInputtedTextValid(spelling)) {
                 Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
                 return;
             }
@@ -621,7 +618,7 @@ class Interface {
             // 翻訳に無効な文字が含まれていた場合は弾く
             for(let i = 0; i < translation.length; i++) {
                 for(let j = 0; j < translation[i].words.length; j++) {
-                    if(translation[i].words[j].match(allowedChars)) {
+                    if(!this.dict.isInputtedTextValid(translation[i].words[j])) {
                         Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
                         return;
                     }
@@ -727,9 +724,7 @@ class Interface {
                     return;
                 }
 
-                let allowedChars = /[^a-zA-z0-9 !?.,+*-=/_%()\[\]{}\'"']/;
-
-                if(spelling.match(allowedChars)) {
+                if(!this.dict.isInputtedTextValid(spelling)) {
                     Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
                     return;
                 }
@@ -742,7 +737,7 @@ class Interface {
                 // 翻訳に無効な文字が含まれていた場合は弾く
                 for(let i = 0; i < translation.length; i++) {
                     for(let j = 0; j < translation[i].words.length; j++) {
-                        if(translation[i].words[j].match(allowedChars)) {
+                        if(!this.dict.isInputtedTextValid(translation[i].words[j])) {
                             Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
                             return;
                         }
