@@ -4,6 +4,9 @@
             "archit": "archit.",
             "gen": "general"
         },
+        "dictionaryData": {
+            "licenseGuideMessage": "; \n; < BZ-JA DICTIONARY DATA FILE >\n; \n; Please check the license for using this data.\n; \n;   Homepage: http://bazelinga.gant.work/\n;   Repository: https://github.com/Garnet3106/bazelinga\n; \n;   Official Twitter: https://twitter.com/bazelinga\n;   Creator's Twitter: https://twitter.com/Garnet3106\n; "
+        },
         "messages": {
             "add": "Add",
             "back": "Back",
@@ -62,6 +65,9 @@
         "classes": {
             "archit": "建築",
             "gen": "一般"
+        },
+        "dictionaryData": {
+            "licenseGuideMessage": "; \n; < 把日辞書データファイル >\n; \n; データの利用に関してはライセンスを確認してください。\n; \n;   ホームページ: http://bazelinga.gant.work/\n;   リポジトリ: https://github.com/Garnet3106/bazelinga\n; \n;   公式Twitter: https://twitter.com/bazelinga\n;   制作者Twitter: https://twitter.com/Garnet3106\n; "
         },
         "messages": {
             "add": "追加",

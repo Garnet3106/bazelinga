@@ -19,6 +19,47 @@ class Dictionary {
         this.data.push(translation);
     }
 
+    converDataToString(data) {
+        let words = {};
+
+        data.forEach(trans => {
+            let spelling = trans.spelling;
+            let transClass = trans.class;
+            let transType = trans.type;
+            let transWords = trans.words;
+
+            // スペルが見つからない場合は初期化する
+            if(!(spelling in words))
+                words[spelling] = {};
+
+            // 翻訳のクラスが見つからない場合は初期化する
+            if(!(transClass in words[spelling]))
+                words[spelling][transClass] = [];
+
+            // '種類|訳1,訳2...' の部分を追加する
+            words[spelling][transClass].push([ transType, transWords.join(',') ]);
+        });
+
+        let result = '';
+        result += langData.dictionaryData.licenseGuideMessage + '\n';
+
+        for(let spelling in words) {
+            let transClasses = words[spelling];
+            result += '\n#' + spelling + '\n';
+
+            for(let transClassName in transClasses) {
+                let transList = transClasses[transClassName];
+                result += '\n@' + transClassName + '\n';
+
+                transList.forEach(transItem => {
+                    result += transItem.join('|') + '\n';
+                });
+            }
+        }
+
+        return result;
+    }
+
     formatSearchKeyword(keyword) {
         keyword = keyword.replace(/　/g, ' ');
         keyword = keyword.replace(/^ +/g, '');
@@ -177,33 +218,23 @@ class Dictionary {
 
     setDataByFile(file, messages, onLoaded = () => {}, onErrored = error => {}) {
         // 文字列などがドロップされた際は undefined が渡されるので弾く
-        // JSON形式でなければ弾く
-        if(file === undefined || file.type != 'application/json') {
+        // プレーンテキスト形式でなければ弾く
+        if(file === undefined || file.type != 'text/plain') {
             Popup.showNotification(messages.thisFileTypeIsNotSupported);
             return;
         }
 
         // BlobのデフォルトでUTF-8を使用する
         let properties = {
-            type: "application/json"
+            type: "text/plain"
         };
 
         let blob = new Blob([ file ], properties);
 
         blob.text()
             .then(text => {
-                // 読み込みが成功したらJSONをパースする
-                let jsonData;
-
-                try {
-                    jsonData = JSON.parse(text);
-                } catch(error) {
-                    let jsonErrorMessage = langData.messages.failedToConvertTheJSONData + '<br>[' + error.message + ']';
-                    Popup.showNotification(jsonErrorMessage);
-                    return;
-                }
-
-                this.data = jsonData;
+                // 読み込みが成功したらデータをパースする
+                this.data = this.parseToData(text);
                 onLoaded();
             })
             .catch(error => {

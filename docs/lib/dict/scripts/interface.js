@@ -309,7 +309,7 @@ class Interface {
         // 保存ボタン
         popup.addBottomButton(langData.messages.save, $button => {
             // BlobのデフォルトでUTF-8を使用する
-            let data = [ JSON.stringify(this.data) ];
+            let data = [ this.dict.converDataToString(this.dict.data) ];
             let properties = {
                 type: "text/plain"
             };
