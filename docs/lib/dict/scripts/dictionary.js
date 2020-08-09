@@ -122,8 +122,15 @@ class Dictionary {
         return translation;
     }
 
-    removeWord(wordIndex) {
-        this.data.splice(wordIndex, 1);
+    removeAllTranslation(translation) {
+        translation.forEach((trans, index) => {
+            // 削除時は要素数が減っていくのでインデックスを1つずつ減らしていく
+            this.removeTranslation(trans.index - index);
+        });
+    }
+
+    removeTranslation(index) {
+        this.data.splice(index, 1);
     }
 
     search(keyword) {
@@ -155,15 +162,15 @@ class Dictionary {
 
     searchSpelling(spelling) {
         let searchResult = this.search(spelling);
-        let matchedWord = {};
+        let matchedTranslation = [];
 
-        searchResult.forEach(word => {
-            if(spelling == word.spelling) {
-                matchedWord = word;
+        searchResult.forEach(translation => {
+            if(spelling == translation.spelling) {
+                matchedTranslation.push(translation);
             }
         });
 
-        return matchedWord;
+        return matchedTranslation;
     }
 
     setDataByFile(file, messages, onLoaded = () => {}, onErrored = error => {}) {

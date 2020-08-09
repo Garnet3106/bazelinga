@@ -219,7 +219,7 @@ class Interface {
                     return;
                 }
 
-                this.dict.removeWord(searchResult.index);
+                this.dict.removeAllTranslation(searchResult);
                 this.updateWordList();
             });
         });
@@ -393,7 +393,7 @@ class Interface {
         let $main = popup.$elem.find('.popup-content-main');
         let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
 
-        // words → 文字列の配列
+        // words は文字列配列
         let addInputAreaPair = (type, className, words) => {
             let $pair = $('<div class="popup-content-main-inputarea-pair"></div>');
 
@@ -627,8 +627,8 @@ class Interface {
     /* 単語編集用のポップアップ */
     initWordEditionPopup(popup) {
         let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
-        let oldWordSpelling = $selectedItem.children('.workarea-wordlist-item-spelling').text();
-        let oldWord = this.dict.searchSpelling(oldWordSpelling);
+        let oldSpelling = $selectedItem.children('.workarea-wordlist-item-spelling').text();
+        let oldTranslation = this.dict.searchSpelling(oldSpelling);
 
         let $main = popup.$elem.find('.popup-content-main');
 
@@ -654,14 +654,14 @@ class Interface {
         };
 
         let $spellingInput = $('<input>');
-        $spellingInput.val(oldWord.spelling);
+        $spellingInput.val(oldSpelling);
 
         $spellingInput.on('input', () => {
             let formattedSpelling = this.formatSearchKeyword($spellingInput.val());
             let searchResult = this.dict.searchSpelling(formattedSpelling);
             let backColor = '#ffffff';
 
-            if(oldWord.spelling != formattedSpelling && Object.keys(searchResult).length)
+            if(oldSpelling != formattedSpelling && Object.keys(searchResult).length)
                 backColor = '#ffdddd';
 
             $spellingInput.css('background-color', backColor);
@@ -670,7 +670,7 @@ class Interface {
         addInputAreaPair('spelling', $spellingInput);
         $main.append($inputArea);
 
-        let translation = oldWord.translation;
+        let translation = oldTranslation;
 
         // 戻るボタン
         popup.addBottomButton(langData.messages.back, () => {
@@ -699,7 +699,7 @@ class Interface {
                 let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
                 let spelling = this.formatSearchKeyword($input_spelling.val());
 
-                if(spelling != oldWord.spelling && Object.keys(this.dict.searchSpelling(spelling)).length) {
+                if(spelling != oldSpelling && Object.keys(this.dict.searchSpelling(spelling)).length) {
                     Popup.showNotification(langData.messages.theSpellingIsDuplicated);
                     return;
                 }
@@ -726,8 +726,11 @@ class Interface {
                     return;
                 }
 
-                this.dict.removeWord(oldWord.index);
-                this.dict.addWord(spelling, translation);
+                this.dict.removeAllTranslation(translation);
+
+                translation.forEach(trans => {
+                    this.dict.addTranslation(spelling, trans.class, trans.type, trans.words);
+                });
 
                 this.updateWordList();
                 popup.hide();
