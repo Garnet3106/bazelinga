@@ -25,6 +25,8 @@ class Dictionary {
         keyword = keyword.replace(/ {2,}/g, ' ');
         keyword = keyword.replace(/ +$/g, '');
 
+        keyword = keyword.toLowerCase();
+
         return keyword;
     }
 
