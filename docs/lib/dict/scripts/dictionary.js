@@ -53,10 +53,9 @@ class Dictionary {
     }
 
     load(succeeded = () => {}, failed = error => {}) {
-        let uri = 'http://bazelinga.gant.work/docs/lib/dict/data/' + this.lang + '.json';
+        let uri = 'http://bazelinga.gant.work/docs/lib/dict/data/' + this.lang + '/words.txt';
 
         let options = {
-            dataType: 'json',
             timespan: 5000,
             url: uri
         };
@@ -64,7 +63,7 @@ class Dictionary {
         $.ajax(options)
             .done(data => {
                 // ロード成功時
-                this.data = data;
+                this.data = this.parseToData(data);
                 this.ready = true;
 
                 succeeded();
@@ -73,6 +72,56 @@ class Dictionary {
                 // ロード失敗時
                 failed(error);
             });
+    }
+
+    parseToData(text) {
+        let translation = [];
+        console.log(text)
+        let lines = text.split('\n');
+        let latestSpell = '';
+        let latestClass = '';
+
+        for(let line_i = 0; line_i < lines.length; line_i++) {
+            // 空行またはコメントアウトの場合は飛ばす
+            if(lines[line_i] == '' || lines[line_i].startsWith(';'))
+                continue;
+
+                if(lines[line_i].startsWith('#')) {
+                // スペルを設定する
+                latestSpell = lines[line_i].substring(1);
+                continue;
+            }
+
+            if(lines[line_i].startsWith('@')) {
+                if(latestSpell == '')
+                    continue;
+
+                // クラスを設定する
+                latestClass = lines[line_i].substring(1);
+                continue;
+            }
+
+            if(latestClass == '')
+                continue;
+
+            let elems = lines[line_i].split('|');
+            console.log(elems);
+
+            // データの数が不正な場合は飛ばす
+            if(elems.length != 2)
+                continue;
+
+            translation.push({
+                class: latestClass,
+                spell: latestSpell,
+                type: elems[0],
+                words: elems[1].split(',')
+            });
+        }
+
+        console.log(translation);
+
+        return translation;
     }
 
     removeWord(wordIndex) {
