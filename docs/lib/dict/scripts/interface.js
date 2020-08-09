@@ -558,8 +558,6 @@ class Interface {
         });
 
         addInputAreaPair('spelling', $spellingInput);
-        addInputAreaPair('ipa', $('<input>'));
-
         $main.append($inputArea);
 
         let translation = [];
@@ -588,6 +586,8 @@ class Interface {
             let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
             let spelling = this.formatSearchKeyword($input_spelling.val());
 
+            // スペルをチェック
+
             if(Object.keys(this.dict.searchSpelling(spelling)).length) {
                 Popup.showNotification(langData.messages.theSpellingIsDuplicated);
                 return;
@@ -615,7 +615,9 @@ class Interface {
                 return;
             }
 
-            this.dict.addWord(spelling, translation);
+            translation.forEach(trans => {
+                this.dict.addTranslation(spelling, trans.class, trans.type, trans.words);
+            });
 
             this.updateWordList();
             popup.hide();
@@ -666,12 +668,6 @@ class Interface {
         });
 
         addInputAreaPair('spelling', $spellingInput);
-
-        let $ipaInput = $('<input>');
-        $ipaInput.val(oldWord.ipa);
-
-        addInputAreaPair('ipa', $ipaInput);
-
         $main.append($inputArea);
 
         let translation = oldWord.translation;

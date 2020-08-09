@@ -8,13 +8,15 @@ class Dictionary {
         this.ready = false;
     }
 
-    addWord(spelling, translation) {
-        let word = {};
+    addTranslation(spelling, translationClass, translationType, translationWords) {
+        let translation = {};
 
-        word.spelling = spelling;
-        word.words = translation;
+        translation.spelling = spelling;
+        translation.translationClass = translationClass;
+        translation.translationType = translationType;
+        translation.words = translationWords;
 
-        this.data.push(word);
+        this.data.push(translation);
     }
 
     formatSearchKeyword(keyword) {
