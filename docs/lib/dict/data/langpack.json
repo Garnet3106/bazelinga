@@ -53,8 +53,8 @@
             "noun": "noun",
             "prep": "prep.",
             "verb": "verb",
-            "verb-intr": "v.i.",
-            "verb-trans": "v.t."
+            "verb,intr": "v.i.",
+            "verb,trans": "v.t."
         }
     },
     "ja": {
@@ -111,8 +111,8 @@
             "noun": "名",
             "prep": "前",
             "verb": "動詞",
-            "verb-intr": "自動",
-            "verb-trans": "他動"
+            "verb,intr": "自動",
+            "verb,trans": "他動"
         }
     }
 }
