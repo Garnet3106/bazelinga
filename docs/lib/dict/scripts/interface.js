@@ -177,6 +177,7 @@ class Interface {
     init() {
         $(() => {
             $('title').text(langData.dictionary.pageTitle);
+            $('#searchInput').attr('placeholder', langData.messages.searchKeyword);
 
             // 単語リストの初期的なガイドメッセージを設定
             this.setGuideMessage(langData.messages.theSearchResultsWillBeDisplayedHere);
