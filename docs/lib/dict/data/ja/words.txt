@@ -1,28 +1,4 @@
 ; 
-; < BZ-JA DICTIONARY DATA FILE >
-; 
-; Please check the license for using this data.
-; 
-;   Homepage: http://bazelinga.gant.work/
-;   Repository: https://github.com/Garnet3106/bazelinga
-; 
-;   Official Twitter: https://twitter.com/bazelinga
-;   Creator's Twitter: https://twitter.com/Garnet3106
-; 
-
-; 
-; < BZ-JA Vortaro-Dateno-Dosiero >
-; 
-; Bonvolu konfirmi la permesilon por uzi ĉi tiun dateno.
-; 
-;   Hejmpaĝo: http://bazelinga.gant.work/
-;   Hangaro: https://github.com/Garnet3106/bazelinga
-; 
-;   Oficiala Twitter: https://twitter.com/bazelinga
-;   Kreanta Twitter: https://twitter.com/Garnet3106
-; 
-
-; 
 ; < 把日辞書データファイル >
 ; 
 ; データの利用に関してはライセンスを確認してください。
@@ -37,15 +13,19 @@
 #baze
 
 @gen
-noun|基本,基礎,土台,根本,本質,根源
-verb,trans|基礎づける,基礎をおく
-adj|基本の,基本的な,基礎の,基盤の,土台の,根本の,根本的な,本質の,本質的な,根本の
-adv|基本的に,根本的に,本質的に,根本的に
-prep|〜を基本とする,〜を土台とする,〜を根源とする
+noun|基本,基礎,基盤,土台,本質,原理
+adj|基本の,基本的な,基礎の,基盤の,土台の,本質の,本質的な,原理の,原理的な
+adv|基本的に,本質的に,原理的に
+prep|〜を基本とする,〜を土台とする,〜を基盤とする
+
+#fundas
+
+@gen
+noun|土台,底,基底
+adj|土台の,底の,基底の
 
 @archit
-noun|基礎,基礎づくり,土台,土台づくり
-verb,trans|基礎をつくる,基礎工事をする
+noun|基礎,土台
 adj|基礎の,土台の
 
 #ja

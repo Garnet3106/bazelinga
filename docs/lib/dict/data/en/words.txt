@@ -1,0 +1,36 @@
+; 
+; < BZ-JA DICTIONARY DATA FILE >
+; 
+; Please check the license for using this data.
+; 
+;   Homepage: http://bazelinga.gant.work/
+;   Repository: https://github.com/Garnet3106/bazelinga
+; 
+;   Official Twitter: https://twitter.com/bazelinga
+;   Creator's Twitter: https://twitter.com/Garnet3106
+; 
+
+#baze
+
+@gen
+noun|base,basic,basis,foundation,fundamental of,essence,nature,principle
+adj|basic,basal,fundamental,essential
+adv|basely,basicallu,fundamentally,essentially,in principle
+prep|based on
+
+#fundas
+
+@gen
+adj|base,bottom
+adj|basal,bottom
+
+@archit
+noun|foundation (of a building),sill,bedsill
+adj|fundamental, 
+
+#ja
+
+@gen
+noun|affirmation,agreement,approval,consent,assent,acceptance
+verb,trans|affrm,agree,approve,assent,approve of,subscribe to,accept,acknowledge,recognize
+interj|yes,yeah

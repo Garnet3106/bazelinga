@@ -1,0 +1,36 @@
+; 
+; < BZ-JA Vortaro-Dateno-Dosiero >
+; 
+; Bonvolu konfirmi la permesilon por uzi ĉi tiun dateno.
+; 
+;   Hejmpaĝo: http://bazelinga.gant.work/
+;   Hangaro: https://github.com/Garnet3106/bazelinga
+; 
+;   Oficiala Twitter: https://twitter.com/bazelinga
+;   Kreanta Twitter: https://twitter.com/Garnet3106
+; 
+
+#baze
+
+@gen
+noun|bazo
+adj|baza
+adv|baze
+prep|bazita de
+
+#fundas
+
+@gen
+noun|fundo
+adj|funda
+
+@archit
+noun|fundamento,subkonstruaĵo
+adj|fundamenta,subkonstruaĵa
+
+#ja
+
+@gen
+noun|jeso,aprobo,akcepto,agnosko,koncento
+verb,trans|jesi,aprobi,akcepti,agnoski,koncedi,konsentiĝi
+interj|jes
