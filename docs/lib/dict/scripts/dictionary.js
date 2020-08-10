@@ -19,7 +19,7 @@ class Dictionary {
         this.data.push(translation);
     }
 
-    converDataToString(data) {
+    static convertDataToString(data) {
         let words = {};
 
         data.forEach(trans => {
@@ -60,7 +60,7 @@ class Dictionary {
         return result;
     }
 
-    formatSearchKeyword(keyword) {
+    static formatSearchKeyword(keyword) {
         keyword = keyword.replace(/　/g, ' ');
         keyword = keyword.replace(/^ +/g, '');
         keyword = keyword.replace(/ {2,}/g, ' ');
@@ -96,8 +96,40 @@ class Dictionary {
         return 'https://twitter.com/share?related=' + relatedAccount + '&text=' + text;
     }
 
-    isInputtedTextValid(text) {
-        return !text.match(/[#@|\n]/);
+    // スペルに使用するテキストが有効かどうかを判断する (無効の場合はエラーメッセージを返す)
+    isSpellingValid(inputtedText) {
+        let formattedInput = Dictionary.formatSearchKeyword(inputtedText);
+        let searchResult = this.searchSpelling(formattedInput);
+
+        if(formattedInput == '')
+            return langData.messages.theInputItemLacks;
+
+        if(formattedInput.length > 30)
+            return langData.messages.theInputtedTextIsTooLong;
+
+        if(formattedInput.match(/[#@|\n]/))
+            return langData.messages.theInputtedCharsAreInvalid;
+
+        if(Object.keys(searchResult).length)
+            return langData.messages.theSpellingIsDuplicated;
+
+        return true;
+    }
+
+    // 翻訳に使用するテキストが有効かどうかを判断する (無効の場合はエラーメッセージを返す)
+    isTranslationValid(inputtedText) {
+        let formattedInput = Dictionary.formatSearchKeyword(inputtedText);
+
+        if(formattedInput == '')
+            return langData.messages.theInputItemLacks;
+
+        if(formattedInput.length > 50)
+            return langData.messages.theInputtedTextIsTooLong;
+
+        if(formattedInput.match(/[#@|\n]/))
+            return langData.messages.theInputtedCharsAreInvalid;
+
+        return true;
     }
 
     load(succeeded = () => {}, failed = error => {}) {
@@ -111,7 +143,7 @@ class Dictionary {
         $.ajax(options)
             .done(data => {
                 // ロード成功時
-                this.data = this.parseToData(data);
+                this.data = Dictionary.parseToData(data);
                 this.ready = true;
 
                 succeeded();
@@ -122,7 +154,7 @@ class Dictionary {
             });
     }
 
-    parseToData(text) {
+    static parseToData(text) {
         let translation = [];
         let lines = text.split('\n');
 
@@ -238,7 +270,7 @@ class Dictionary {
         blob.text()
             .then(text => {
                 // 読み込みが成功したらデータをパースする
-                this.data = this.parseToData(text);
+                this.data = Dictionary.parseToData(text);
                 onLoaded();
             })
             .catch(error => {

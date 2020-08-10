@@ -59,7 +59,7 @@ class Interface {
             // クリックイベントを設定
             $elem.on('click', elem => {
                 let $target = $(elem.target);
-                let formattedKeyword = this.formatSearchKeyword($input.val());
+                let formattedKeyword = Dictionary.formatSearchKeyword($input.val());
 
                 let $item = $target.eq(0);
 
@@ -135,10 +135,6 @@ class Interface {
         $targetItemIcons.css('cursor', 'pointer');
     }
 
-    formatSearchKeyword(keyword) {
-        return this.dict.formatSearchKeyword(keyword);
-    }
-
     hideGuideMessage() {
         $('#wordListGuide').hide();
     }
@@ -174,40 +170,6 @@ class Interface {
                 $(icon).remove();
             });
         });
-    }
-
-    isSpellingInputValid(inputtedText) {
-        let formattedInput = this.formatSearchKeyword(inputtedText);
-        let searchResult = this.dict.searchSpelling(formattedInput);
-
-        if(formattedInput == '')
-            return langData.messages.theInputItemLacks;
-
-        if(formattedInput.length > 30)
-            return langData.messages.theInputtedTextIsTooLong;
-
-        if(!this.dict.isInputtedTextValid(formattedInput))
-            return langData.messages.theInputtedCharsAreInvalid;
-
-        if(Object.keys(searchResult).length)
-            return langData.messages.theSpellingIsDuplicated;
-
-        return true;
-    }
-
-    isTranslationInputValid(inputtedText) {
-        let formattedInput = this.formatSearchKeyword(inputtedText);
-
-        if(formattedInput == '')
-            return langData.messages.theInputItemLacks;
-
-        if(formattedInput.length > 50)
-            return langData.messages.theInputtedTextIsTooLong;
-
-        if(!this.dict.isInputtedTextValid(formattedInput))
-            return langData.messages.theInputtedCharsAreInvalid;
-
-        return true;
     }
 
     init() {
@@ -357,7 +319,7 @@ class Interface {
         // 保存ボタン
         popup.addBottomButton(langData.messages.save, $button => {
             // BlobのデフォルトでUTF-8を使用する
-            let data = [ this.dict.converDataToString(this.dict.data) ];
+            let data = [ Dictionary.convertDataToString(this.dict.data) ];
             let properties = {
                 type: "text/plain"
             };
@@ -495,7 +457,7 @@ class Interface {
             }
 
             $pairInput.on('input', () => {
-                $pairInput.css('background-color', this.isTranslationInputValid($pairInput.val()) === true ? '#ffffff' : '#ffdddd');
+                $pairInput.css('background-color', this.dict.isTranslationValid($pairInput.val()) === true ? '#ffffff' : '#ffdddd');
             });
 
             $pair.append($pairInput);
@@ -528,7 +490,7 @@ class Interface {
                 let translationWords = $item.children('[name=words]').val().split(',');
 
                 translationWords.forEach((word, index) => {
-                    translationWords[index] = this.formatSearchKeyword(word);
+                    translationWords[index] = Dictionary.formatSearchKeyword(word);
                 });
 
                 // translationWords の空配列判定が [ '' ] でできなかったので配列の長さと最初のインデックスの値で比較
@@ -609,7 +571,7 @@ class Interface {
         $spellingInput.css('background-color', '#ffdddd');
 
         $spellingInput.on('input', () => {
-            $spellingInput.css('background-color', this.isSpellingInputValid($spellingInput.val()) === true ? '#ffffff' : '#ffdddd');
+            $spellingInput.css('background-color', this.dict.isSpellingValid($spellingInput.val()) === true ? '#ffffff' : '#ffdddd');
         });
 
         addInputAreaPair('spelling', $spellingInput);
@@ -639,8 +601,8 @@ class Interface {
         // 追加ボタン
         popup.addBottomButton(langData.messages.add, () => {
             let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
-            let spelling = this.formatSearchKeyword($input_spelling.val());
-            let isSpellingValid = this.isSpellingInputValid(spelling);
+            let spelling = Dictionary.formatSearchKeyword($input_spelling.val());
+            let isSpellingValid = this.dict.isSpellingValid(spelling);
 
             if(isSpellingValid !== true) {
                 Popup.showNotification(isSpellingValid);
@@ -690,9 +652,9 @@ class Interface {
         $spellingInput.val(oldSpelling);
 
         $spellingInput.on('input', () => {
-            let formattedSpelling = this.formatSearchKeyword($spellingInput.val());
+            let formattedSpelling = Dictionary.formatSearchKeyword($spellingInput.val());
             // 元のスペルと一致した場合は赤背景から除外する
-            let isInputValid = oldSpelling == formattedSpelling || this.isSpellingInputValid($spellingInput.val()) === true;
+            let isInputValid = oldSpelling == formattedSpelling || this.dict.isSpellingValid($spellingInput.val()) === true;
             $spellingInput.css('background-color', isInputValid ? '#ffffff' : '#ffdddd');
         });
 
@@ -726,8 +688,8 @@ class Interface {
 
             Popup.showConfirmation(message, () => {
                 let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
-                let spelling = this.formatSearchKeyword($input_spelling.val());
-                let isSpellingValid = this.isSpellingInputValid(spelling);
+                let spelling = Dictionary.formatSearchKeyword($input_spelling.val());
+                let isSpellingValid = this.dict.isSpellingValid(spelling);
 
                 // 前のスペルと同じ場合はエラーから除外
                 if(spelling != oldSpelling && isSpellingValid !== true) {
@@ -880,7 +842,7 @@ class Interface {
         this.unslectListItem();
         this.latestSelectedItemID = tmpLatestID;
 
-        let keyword = this.formatSearchKeyword($searchInput.val());
+        let keyword = Dictionary.formatSearchKeyword($searchInput.val());
 
         if(keyword == '') {
             this.setGuideMessage(langData.messages.theSearchResultsWillBeDisplayedHere);
