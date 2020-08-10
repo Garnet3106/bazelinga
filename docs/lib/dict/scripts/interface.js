@@ -181,16 +181,16 @@ class Interface {
         let searchResult = this.dict.searchSpelling(formattedInput);
 
         if(formattedInput == '')
-            return false;
+            return langData.messages.theInputItemLacks;
 
         if(formattedInput.length > 30)
-            return false;
+            return langData.messages.theInputtedTextIsTooLong;
 
         if(!this.dict.isInputtedTextValid(formattedInput))
-            return false;
+            return langData.messages.theInputtedCharsAreInvalid;
 
         if(Object.keys(searchResult).length)
-            return false;
+            return langData.messages.theSpellingIsDuplicated;
 
         return true;
     }
@@ -199,13 +199,13 @@ class Interface {
         let formattedInput = this.formatSearchKeyword(inputtedText);
 
         if(formattedInput == '')
-            return false;
+            return langData.messages.theInputItemLacks;
 
         if(formattedInput.length > 50)
-            return false;
+            return langData.messages.theInputtedTextIsTooLong;
 
         if(!this.dict.isInputtedTextValid(formattedInput))
-            return false;
+            return langData.messages.theInputtedCharsAreInvalid;
 
         return true;
     }
@@ -495,7 +495,7 @@ class Interface {
             }
 
             $pairInput.on('input', () => {
-                $pairInput.css('background-color', this.isTranslationInputValid($pairInput.val()) ? '#ffffff' : '#ffdddd');
+                $pairInput.css('background-color', this.isTranslationInputValid($pairInput.val()) === true ? '#ffffff' : '#ffdddd');
             });
 
             $pair.append($pairInput);
@@ -609,7 +609,7 @@ class Interface {
         $spellingInput.css('background-color', '#ffdddd');
 
         $spellingInput.on('input', () => {
-            $spellingInput.css('background-color', this.isSpellingInputValid($spellingInput.val()) ? '#ffffff' : '#ffdddd');
+            $spellingInput.css('background-color', this.isSpellingInputValid($spellingInput.val()) === true ? '#ffffff' : '#ffdddd');
         });
 
         addInputAreaPair('spelling', $spellingInput);
@@ -640,34 +640,14 @@ class Interface {
         popup.addBottomButton(langData.messages.add, () => {
             let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
             let spelling = this.formatSearchKeyword($input_spelling.val());
+            let isSpellingValid = this.isSpellingInputValid(spelling);
 
-            // スペルをチェック
-
-            if(Object.keys(this.dict.searchSpelling(spelling)).length) {
-                Popup.showNotification(langData.messages.theSpellingIsDuplicated);
+            if(isSpellingValid !== true) {
+                Popup.showNotification(isSpellingValid);
                 return;
             }
 
-            if(spelling == '') {
-                Popup.showNotification(langData.messages.theInputItemLacks);
-                return;
-            }
-
-            if(spelling.length > 30) {
-                Popup.showNotification(langData.messages.theInputtedTextIsTooLong);
-                return;
-            }
-
-            if(!this.dict.isInputtedTextValid(spelling)) {
-                Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
-                return;
-            }
-
-            if(translation.length == 0) {
-                Popup.showNotification(langData.messages.theTranslationIsNotInputted);
-                return;
-            }
-
+            // 入力された翻訳を追加
             translation.forEach(trans => {
                 this.dict.addTranslation(spelling, trans.class, trans.type, trans.words);
             });
@@ -712,7 +692,7 @@ class Interface {
         $spellingInput.on('input', () => {
             let formattedSpelling = this.formatSearchKeyword($spellingInput.val());
             // 元のスペルと一致した場合は赤背景から除外する
-            let isInputValid = oldSpelling == formattedSpelling || this.isSpellingInputValid($spellingInput.val());
+            let isInputValid = oldSpelling == formattedSpelling || this.isSpellingInputValid($spellingInput.val()) === true;
             $spellingInput.css('background-color', isInputValid ? '#ffffff' : '#ffdddd');
         });
 
@@ -747,29 +727,11 @@ class Interface {
             Popup.showConfirmation(message, () => {
                 let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
                 let spelling = this.formatSearchKeyword($input_spelling.val());
+                let isSpellingValid = this.isSpellingInputValid(spelling);
 
-                if(spelling != oldSpelling && Object.keys(this.dict.searchSpelling(spelling)).length) {
-                    Popup.showNotification(langData.messages.theSpellingIsDuplicated);
-                    return;
-                }
-
-                if(spelling == '') {
-                    Popup.showNotification(langData.messages.theInputItemLacks);
-                    return;
-                }
-
-                if(spelling.length > 30) {
-                    Popup.showNotification(langData.messages.theInputtedTextIsTooLong);
-                    return;
-                }
-
-                if(!this.dict.isInputtedTextValid(spelling)) {
-                    Popup.showNotification(langData.messages.theInputtedCharsAreInvalid);
-                    return;
-                }
-
-                if(translation.length == 0) {
-                    Popup.showNotification(langData.messages.theTranslationIsNotInputted);
+                // 前のスペルと同じ場合はエラーから除外
+                if(spelling != oldSpelling && isSpellingValid !== true) {
+                    Popup.showNotification(isSpellingValid);
                     return;
                 }
 
