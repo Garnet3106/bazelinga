@@ -23,6 +23,8 @@ class Interface {
             '#rightMenuShare'
         ];
 
+        this.inputErrorColor = '#ffdddd';
+
         this.loadDataFiles();
     }
 
@@ -453,12 +455,12 @@ class Interface {
                 $pairInput.val(words.join(','));
             } else {
                 // words が undefined な場合は赤背景にする
-                $pairInput.css('background-color', '#ffdddd');
+                $pairInput.css('background-color', this.inputErrorColor);
             }
 
             $pairInput.on('input', () => {
                 let isTranslationValid = this.dict.isTranslationValid($pairInput.val()) === true;
-                $pairInput.css('background-color', isTranslationValid ? '#ffffff' : '#ffdddd');
+                $pairInput.css('background-color', isTranslationValid ? '#ffffff' : this.inputErrorColor);
             });
 
             $pair.append($pairInput);
@@ -589,10 +591,10 @@ class Interface {
 
         let $spellingInput = $('<input>');
         // 単語追加時は入力欄が空のためデフォルトで赤背景にする (編集時は白のままで問題ない)
-        $spellingInput.css('background-color', '#ffdddd');
+        $spellingInput.css('background-color', this.inputErrorColor);
 
         $spellingInput.on('input', () => {
-            $spellingInput.css('background-color', this.dict.isSpellingValid($spellingInput.val()) === true ? '#ffffff' : '#ffdddd');
+            $spellingInput.css('background-color', this.dict.isSpellingValid($spellingInput.val()) === true ? '#ffffff' : this.inputErrorColor);
         });
 
         addInputAreaPair('spelling', $spellingInput);
@@ -676,7 +678,7 @@ class Interface {
             let formattedSpelling = Dictionary.formatSearchKeyword($spellingInput.val());
             // 元のスペルと一致した場合は赤背景から除外する
             let isInputValid = oldSpelling == formattedSpelling || this.dict.isSpellingValid($spellingInput.val()) === true;
-            $spellingInput.css('background-color', isInputValid ? '#ffffff' : '#ffdddd');
+            $spellingInput.css('background-color', isInputValid ? '#ffffff' : this.inputErrorColor);
         });
 
         addInputAreaPair('spelling', $spellingInput);
