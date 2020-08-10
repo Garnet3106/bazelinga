@@ -457,7 +457,8 @@ class Interface {
             }
 
             $pairInput.on('input', () => {
-                $pairInput.css('background-color', this.dict.isTranslationValid($pairInput.val()) === true ? '#ffffff' : '#ffdddd');
+                let isTranslationValid = this.dict.isTranslationValid($pairInput.val()) === true;
+                $pairInput.css('background-color', isTranslationValid ? '#ffffff' : '#ffdddd');
             });
 
             $pair.append($pairInput);
@@ -522,6 +523,7 @@ class Interface {
 
         $main.append($inputArea);
 
+        // 戻るボタン
         popup.addBottomButton(langData.messages.back, () => {
             let message = langData.messages.doYouReallyClose + '<br>' + langData.messages.theDataWillBeDiscarded;
 
@@ -530,12 +532,31 @@ class Interface {
             });
         });
 
+        // 追加ボタン
         popup.addBottomButton(langData.messages.add, () => {
             addInputAreaPair();
         });
 
+        // 保存ボタン
         popup.addBottomButton(langData.messages.save, () => {
-            translation = getInputData();
+            let newTranslation = getInputData();
+
+            if(newTranslation.length == 0) {
+                Popup.showNotification(langData.messages.theTranslationIsNotInputted);
+                return;
+            }
+
+            // 入力が正しくない場合は弾く
+            for(let transInput of $inputArea.find('input')) {
+                let isTranslationValid = this.dict.isTranslationValid($(transInput).val());
+
+                if(isTranslationValid !== true) {
+                    Popup.showNotification(isTranslationValid);
+                    return;
+                }
+            }
+
+            translation = newTranslation;
             onSaveButtonClicked(translation);
             popup.hide();
         });
