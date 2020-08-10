@@ -245,7 +245,12 @@ div.top-icons {
     margin-bottom: 10px;
 }
 
-div.top-icons-item {
+img.top-icons-item {
+    margin-right: 10px;
+}
+
+img.top-icons-item:last-child {
+    margin: 0;
 }
 
 img.top-icons-item#topIconLogo {
