@@ -15,7 +15,7 @@
 @gen
 noun|base,basic,basis,foundation,fundamental of,essence,nature,principle
 adj|basic,basal,fundamental,essential
-adv|basely,basicallu,fundamentally,essentially,in principle
+adv|basely,basically,fundamentally,essentially,in principle
 prep|based on
 
 #fundas
