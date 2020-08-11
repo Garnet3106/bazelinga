@@ -99,7 +99,8 @@ class Dictionary {
     // スペルに使用するテキストが有効かどうかを判断する (無効の場合はエラーメッセージを返す)
     isSpellingValid(inputtedText) {
         let formattedInput = Dictionary.formatSearchKeyword(inputtedText);
-        let searchResult = this.searchSpelling(formattedInput);
+        let searchResult = this.search(formattedInput, -1, true, true);
+        console.log(searchResult)
 
         if(formattedInput == '')
             return langData.messages.theInputItemLacks;
@@ -212,42 +213,49 @@ class Dictionary {
         this.data.splice(index, 1);
     }
 
-    search(keyword) {
+    // wordLimit ... 返される検索結果の最大の長さ; -1 の場合は制限なし
+    // matchOnlySpelling ... スペリングにのみでの検索にするかどうか
+    // 特にこの関数では速度を重視してforEachなどを使用しない
+    search(keyword, wordLimit = 30, perfectMatching = false, matchOnlySpelling = false) {
         let matchedTranslation = [];
+        // 検索条件にマッチした単語の合計
+        let matchedCount = 0;
 
-        this.data.forEach((translation, translationIndex) => {
+        let judgeMatchingText = source =>
+            perfectMatching ? source == keyword : source.includes(keyword);
+
+        for(let trans_i = 0; trans_i < this.data.length; trans_i++) {
+            if(matchedCount >= wordLimit && wordLimit != -1)
+                break;
+
+            let translation = this.data[trans_i];
+            // 検索条件にマッチするかどうか
             let matched = false;
 
-            if(translation.spelling.includes(keyword))
+            // スペリングにマッチするかを判定
+            if(judgeMatchingText(translation.spelling))
                 matched = true;
 
-            translation.words.forEach(word => {
-                if(word.includes(keyword)) {
-                    matched = true;
+            // 上の条件にマッチしなかった場合は訳語にマッチするかを判定
+            if(!matched && !matchOnlySpelling) {
+                for(let word_i = 0; word_i < translation.words.length; word_i++) {
+                    if(judgeMatchingText(translation.words[word_i])) {
+                        matched = true;
+                        break;
+                    }
                 }
-            });
+            }
 
             if(matched) {
                 // 翻訳のコピーを作成する (参照渡し防止)
                 let tmpTranslation = $.extend(true, {}, translation);
                 // コピーした翻訳にインデックスを追加する
-                tmpTranslation.index = translationIndex;
+                tmpTranslation.index = trans_i;
                 matchedTranslation.push(tmpTranslation);
+
+                matchedCount++;
             }
-        });
-
-        return matchedTranslation;
-    }
-
-    searchSpelling(spelling) {
-        let searchResult = this.search(spelling);
-        let matchedTranslation = [];
-
-        searchResult.forEach(translation => {
-            if(spelling == translation.spelling) {
-                matchedTranslation.push(translation);
-            }
-        });
+        }
 
         return matchedTranslation;
     }
