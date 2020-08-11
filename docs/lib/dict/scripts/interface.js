@@ -309,10 +309,12 @@ class Interface {
         let $main = popup.$elem.find('.popup-content-main');
         let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
 
+        // 入力エリアにペアを追加する関数
         let addInputAreaPair = (name, $pairInput) => {
             let $pair = $('<div class="popup-content-main-inputarea-pair">');
 
             let $pairName = $('<div></div>');
+            $pairName.css('width', '150px');
             $pairName.text(langData.messages[name]);
             $pair.append($pairName);
 
