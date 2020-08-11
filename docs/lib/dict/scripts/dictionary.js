@@ -213,10 +213,10 @@ class Dictionary {
         this.data.splice(index, 1);
     }
 
-    // wordLimit ... 返される検索結果の最大の長さ; -1 の場合は制限なし
+    // searchResultLimit ... 返される検索結果の最大の長さ; Infinity の場合は制限なし
     // matchOnlySpelling ... スペリングにのみでの検索にするかどうか
     // 特にこの関数では速度を重視してforEachなどを使用しない
-    search(keyword, wordLimit = 30, perfectMatching = false, matchOnlySpelling = false) {
+    search(keyword, searchResultLimit = -1, perfectMatching = false, matchOnlySpelling = false) {
         let matchedTranslation = [];
         // 検索条件にマッチした単語の合計
         let matchedCount = 0;
@@ -225,7 +225,7 @@ class Dictionary {
             perfectMatching ? source == keyword : source.includes(keyword);
 
         for(let trans_i = 0; trans_i < this.data.length; trans_i++) {
-            if(matchedCount >= wordLimit && wordLimit != -1)
+            if(matchedCount >= searchResultLimit && searchResultLimit != -1)
                 break;
 
             let translation = this.data[trans_i];

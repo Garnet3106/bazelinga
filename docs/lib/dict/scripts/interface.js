@@ -24,6 +24,7 @@ class Interface {
         ];
 
         this.isPerfectMatchEnable = false;
+        this.searchResultLimit = 30;
         this.inputErrorColor = '#ffdddd';
 
         this.loadDataFiles();
@@ -326,11 +327,25 @@ class Interface {
         $perfectMatch.prop('checked', this.isPerfectMatchEnable);
         addInputAreaPair('perfectMatching', $perfectMatch);
 
+        // 検索時の単語数の制限
+        let $searchResultLimit = $('<input type="text">');
+        $searchResultLimit.val(this.searchResultLimit);
+        addInputAreaPair('searchResultLimit', $searchResultLimit);
+
         $main.append($inputArea);
 
         // 保存ボタン
         popup.addBottomButton(langData.messages.ok, () => {
             this.isPerfectMatchEnable = $perfectMatch.prop('checked');
+
+            let limit = Number($searchResultLimit.val());
+
+            if(isNaN(limit) || limit < -1 || limit === 0 || limit === Infinity) {
+                Popup.showNotification(langData.messages.theInputtedNumberIsInvalid);
+                return;
+            }
+
+            this.searchResultLimit = limit;
 
             // 検索条件が変更された場合のために単語リストを更新する
             this.updateWordList();
@@ -922,7 +937,7 @@ class Interface {
             return;
         }
 
-        let translationList = this.dict.search(keyword, 30, this.isPerfectMatchEnable, false);
+        let translationList = this.dict.search(keyword, this.searchResultLimit, this.isPerfectMatchEnable, false);
 
         if(translationList.length == 0) {
             this.setGuideMessage(langData.messages.theWordHasNotFound);
