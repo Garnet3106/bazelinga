@@ -23,6 +23,7 @@ class Interface {
             '#rightMenuShare'
         ];
 
+        this.isPerfectMatchEnable = false;
         this.inputErrorColor = '#ffdddd';
 
         this.loadDataFiles();
@@ -289,6 +290,53 @@ class Interface {
 
             $rightMenuShare.find('.workarea-sidemenu-item-icon').css('cursor', 'pointer');
         });
+
+        $('#rightMenuSettingsTop').on('click', () => {
+            Popup.show(popup => {
+                this.initSattingPopup(popup);
+            });
+        });
+    }
+
+    initSattingPopup(popup) {
+        let title = langData.messages.download;
+        let iconURI = '../../../lib/dict/img/download.svg';
+
+        popup.addTopIcon(iconURI);
+        popup.addTopTitle(title);
+
+        let $main = popup.$elem.find('.popup-content-main');
+        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
+
+        let addInputAreaPair = (name, $pairInput) => {
+            let $pair = $('<div class="popup-content-main-inputarea-pair">');
+
+            let $pairName = $('<div></div>');
+            $pairName.text(langData.messages[name]);
+            $pair.append($pairName);
+
+            $pairInput.attr('name', name);
+            $pair.append($pairInput);
+
+            $inputArea.append($pair);
+        };
+
+        // 完全一致かどうか
+        let $perfectMatch = $('<input type="checkbox">');
+        $perfectMatch.prop('checked', this.isPerfectMatchEnable);
+        addInputAreaPair('perfectMatching', $perfectMatch);
+
+        $main.append($inputArea);
+
+        // 保存ボタン
+        popup.addBottomButton(langData.messages.ok, () => {
+            this.isPerfectMatchEnable = $perfectMatch.prop('checked');
+
+            // 検索条件が変更された場合のために単語リストを更新する
+            this.updateWordList();
+
+            popup.hide();
+        });
     }
 
     initDownloadPopup(popup) {
@@ -502,10 +550,10 @@ class Interface {
                     return;
 
                 let $inputType = $item.children('[name=type]');
-                let translationType = $inputType.children('option:selected').eq(0).val();
+                let translationType = $inputType.children('option').prop('selected').eq(0).val();
 
                 let $inputClass = $item.children('[name=class]');
-                let translationClass = $inputClass.children('option:selected').eq(0).val();
+                let translationClass = $inputClass.children('option').prop('selected').eq(0).val();
 
                 newTranslation.push({
                     type: translationType,
@@ -874,7 +922,7 @@ class Interface {
             return;
         }
 
-        let translationList = this.dict.search(keyword);
+        let translationList = this.dict.search(keyword, 30, this.isPerfectMatchEnable, false);
 
         if(translationList.length == 0) {
             this.setGuideMessage(langData.messages.theWordHasNotFound);

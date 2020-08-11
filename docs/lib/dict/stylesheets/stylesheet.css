@@ -346,6 +346,10 @@ div.workarea-sidemenu-item-icon#rightMenuShareTwitter {
     background-image: url('../../dict/img/twitter.svg');
 }
 
+div.workarea-sidemenu-item-icon#rightMenuSettingsTop {
+    background-image: url('../../dict/img/settings.svg');
+}
+
 div.workarea-sidemenu-item-icon:last-child {
     border: none;
 }
