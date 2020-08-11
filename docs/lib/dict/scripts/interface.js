@@ -315,7 +315,7 @@ class Interface {
             let $pair = $('<div class="popup-content-main-inputarea-pair">');
 
             let $pairName = $('<div></div>');
-            $pairName.css('width', '150px');
+            $pairName.css('width', '200px');
             $pairName.text(langData.messages[name]);
             $pair.append($pairName);
 
