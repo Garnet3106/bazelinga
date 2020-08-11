@@ -24,6 +24,7 @@ class Interface {
         ];
 
         this.isPerfectMatchEnable = false;
+        this.matchOnlySpelling = false;
         this.searchResultLimit = 30;
         this.inputErrorColor = '#ffdddd';
 
@@ -300,8 +301,8 @@ class Interface {
     }
 
     initSattingPopup(popup) {
-        let title = langData.messages.download;
-        let iconURI = '../../../lib/dict/img/download.svg';
+        let title = langData.messages.settings;
+        let iconURI = '../../../lib/dict/img/settings.svg';
 
         popup.addTopIcon(iconURI);
         popup.addTopTitle(title);
@@ -329,6 +330,11 @@ class Interface {
         $perfectMatch.prop('checked', this.isPerfectMatchEnable);
         addInputAreaPair('perfectMatching', $perfectMatch);
 
+        // スペルのみの検索にするかどうか
+        let $matchOnlySpelling = $('<input type="checkbox">');
+        $matchOnlySpelling.prop('checked', this.matchOnlySpelling);
+        addInputAreaPair('matchOnlySpelling', $matchOnlySpelling);
+
         // 検索時の単語数の制限
         let $searchResultLimit = $('<input type="text">');
         $searchResultLimit.val(this.searchResultLimit);
@@ -338,8 +344,13 @@ class Interface {
 
         // 保存ボタン
         popup.addBottomButton(langData.messages.ok, () => {
+            // 完全一致かどうか
             this.isPerfectMatchEnable = $perfectMatch.prop('checked');
 
+            // スペルのみの検索にするかどうか
+            this.matchOnlySpelling = $matchOnlySpelling.prop('checked');
+
+            // 検索時の単語数の制限
             let limit = Number($searchResultLimit.val());
 
             if(isNaN(limit) || limit < -1 || limit === 0 || limit === Infinity) {
@@ -939,7 +950,7 @@ class Interface {
             return;
         }
 
-        let translationList = this.dict.search(keyword, this.searchResultLimit, this.isPerfectMatchEnable, false);
+        let translationList = this.dict.search(keyword, this.searchResultLimit, this.isPerfectMatchEnable, this.matchOnlySpelling);
 
         if(translationList.length == 0) {
             this.setGuideMessage(langData.messages.theWordHasNotFound);
