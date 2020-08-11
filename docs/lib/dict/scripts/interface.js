@@ -275,7 +275,7 @@ class Interface {
                 // ドキュメントURLをクリップボードにコピー
                 this.copyToClipboard(this.dict.getDocsURI(this.selectedItemIndex));
                 this.hideMenu('rightMenuShare');
-                Popup.showNotification(langData.messages.copiedToTheClipboard);
+                Popup.showNotification(langData.messages.copiedTheTextToTheClipboard);
             });
 
             $twitterShareIcon.on('click', () => {
@@ -367,7 +367,7 @@ class Interface {
 
         popup.addTopIcon(iconURI);
         popup.addTopTitle(title);
-        popup.addMainMessage(langData.messages.selectOrDropYourFile + '<br><br>[' + langData.messages.clickHereOrDropAllOver + ']');
+        popup.addMainMessage(langData.messages.selectOrDropYourFile + '<br><br>[' + langData.messages.clickHereOrDropAFileAllOver + ']');
 
         let $main = popup.$elem.find('.popup-content-upload');
 
@@ -528,7 +528,7 @@ class Interface {
 
         // 戻るボタン
         popup.addBottomButton(langData.messages.back, () => {
-            let message = langData.messages.doYouReallyClose + '<br>' + langData.messages.theDataWillBeDiscarded;
+            let message = langData.messages.doYouReallyCloseThePopup + '<br>' + langData.messages.theDataWillBeDiscarded;
 
             Popup.showConfirmation(message, () => {
                 popup.hide();
@@ -605,7 +605,7 @@ class Interface {
 
         // 戻るボタン
         popup.addBottomButton(langData.messages.back, () => {
-            let message = langData.messages.doYouReallyClose + '<br>' + langData.messages.theDataWillBeDiscarded;
+            let message = langData.messages.doYouReallyCloseThePopup + '<br>' + langData.messages.theDataWillBeDiscarded;
 
             Popup.showConfirmation(message, () => {
                 // Yesの場合
@@ -689,7 +689,7 @@ class Interface {
 
         // 戻るボタン
         popup.addBottomButton(langData.messages.back, () => {
-            let message = langData.messages.doYouReallyClose + '<br>' + langData.messages.theDataWillBeDiscarded;
+            let message = langData.messages.doYouReallyCloseThePopup + '<br>' + langData.messages.theDataWillBeDiscarded;
 
             Popup.showConfirmation(message, () => {
                 // Yesの場合
