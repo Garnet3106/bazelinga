@@ -228,7 +228,7 @@ class Interface {
             Popup.showConfirmation(langData.messages.doYouReallyRemoveTheWord, () => {
                 let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
                 let spelling = $selectedItem.children('.workarea-wordlist-item-spelling').text();
-                let searchResult = this.dict.searchSpelling(spelling);
+                let searchResult = this.dict.search(spelling, -1, true, true);
 
                 if(!Object.keys(searchResult).length) {
                     Popup.showNotification(langData.messages.failedToRemoveTheWord);
@@ -737,7 +737,7 @@ class Interface {
     initWordEditionPopup(popup) {
         let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
         let oldSpelling = $selectedItem.children('.workarea-wordlist-item-spelling').text();
-        let oldTranslation = this.dict.searchSpelling(oldSpelling);
+        let oldTranslation = this.dict.search(oldSpelling, -1, true, true);
 
         let $main = popup.$elem.find('.popup-content-main');
 
