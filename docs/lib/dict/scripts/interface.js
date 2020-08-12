@@ -427,13 +427,13 @@ class Interface {
 
         let setDataByFile = file => {
             Popup.showConfirmation(langData.messages.doYouReallySaveTheData, () => {
-                this.dict.setDataByFile(file, langData.messages, () => {
+                this.dict.setDataByFile(file, () => {
                     // 成功時の処理
                     Popup.showNotification(langData.messages.theDataHasSaved);
                     popup.hide();
                 }, error => {
                     // エラー時の処理
-                    Popup.showNotification(langData.messages.theDataHasSaved + '<br><br>[' + error.message + ']');
+                    Popup.showNotification(langData.messages.failedToParseTheFile);
                 });
             });
         };
@@ -450,7 +450,14 @@ class Interface {
         popup.setFileDropEvent(event => {
             // ファイルは1つまで
             let file = event.dataTransfer.files[0];
-            setDataByFile(file);
+            setDataByFile(file, () => {
+                // 成功時の処理
+                Popup.showNotification(langData.messages.theDataHasSaved);
+                popup.hide();
+            }, () => {
+                // エラー時の処理
+                Popup.showNotification(langData.messages.failedToParseTheFile);
+            });
         }, () => {
             // ファイルを掴んでいるときのイベント
             $main.css('background-color', '#dddddd');
@@ -465,7 +472,14 @@ class Interface {
         popup.setFileSelectEvent(event => {
             // ファイルは1つまで
             let file = event.target.files[0];
-            setDataByFile(file);
+            setDataByFile(file, () => {
+                // 成功時の処理
+                Popup.showNotification(langData.messages.theDataHasSaved);
+                popup.hide();
+            }, error => {
+                // エラー時の処理
+                Popup.showNotification(langData.messages.failedToParseTheFile);
+            });
         });
 
         // 戻るボタン

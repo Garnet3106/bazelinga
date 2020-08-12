@@ -260,11 +260,11 @@ class Dictionary {
         return matchedTranslation;
     }
 
-    setDataByFile(file, messages, onLoaded = () => {}, onErrored = error => {}) {
+    setDataByFile(file, onLoaded = () => {}, onErrored = () => {}) {
         // 文字列などがドロップされた際は undefined が渡されるので弾く
         // プレーンテキスト形式でなければ弾く
         if(file === undefined || file.type != 'text/plain') {
-            Popup.showNotification(messages.thisFileTypeIsNotSupported);
+            Popup.showNotification(langData.messages.thisFileTypeIsNotSupported);
             return;
         }
 
@@ -278,11 +278,17 @@ class Dictionary {
         blob.text()
             .then(text => {
                 // 読み込みが成功したらデータをパースする
-                this.data = Dictionary.parseToData(text);
-                onLoaded();
+                let data = Dictionary.parseToData(text);
+
+                if(data.length != 0) {
+                    this.data = data;
+                    onLoaded();
+                } else {
+                    onErrored();
+                }
             })
-            .catch(error => {
-                onErrored(error);
+            .catch(() => {
+                onErrored();
             });
     }
 }
