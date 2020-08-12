@@ -592,10 +592,10 @@ class Interface {
                     return;
 
                 let $inputType = $item.children('[name=type]');
-                let translationType = $inputType.children('option').prop('selected').eq(0).val();
+                let translationType = $inputType.children('option:selected').eq(0).val();
 
                 let $inputClass = $item.children('[name=class]');
-                let translationClass = $inputClass.children('option').prop('selected').eq(0).val();
+                let translationClass = $inputClass.children('option:selected').eq(0).val();
 
                 newTranslation.push({
                     type: translationType,

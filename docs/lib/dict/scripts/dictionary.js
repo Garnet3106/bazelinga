@@ -100,7 +100,6 @@ class Dictionary {
     isSpellingValid(inputtedText) {
         let formattedInput = Dictionary.formatSearchKeyword(inputtedText);
         let searchResult = this.search(formattedInput, -1, true, true);
-        console.log(searchResult)
 
         if(formattedInput == '')
             return langData.messages.theInputItemLacks;
