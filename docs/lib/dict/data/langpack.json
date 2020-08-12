@@ -1,8 +1,19 @@
 {
     "en": {
         "classes": {
+            "agric": "agric.",
             "archit": "archit.",
-            "gen": "general"
+            "culture": "culture",
+            "gen": "general",
+            "hist": "history",
+            "info": "info",
+            "lang": "lang.",
+            "law": "law",
+            "math": "math.",
+            "phil": "phil.",
+            "politics": "politics",
+            "sci": "science",
+            "traffic": "traffic"
         },
         "dictionary": {
             "licenseGuideMessage": "; \n; < BZ-JA DICTIONARY DATA FILE >\n; \n; Please check the license for using this data.\n; \n;   Homepage: http://bazelinga.gant.work/\n;   Repository: https://github.com/Garnet3106/bazelinga\n; \n;   Official Twitter: https://twitter.com/bazelinga\n;   Creator's Twitter: https://twitter.com/Garnet3106\n; ",
@@ -75,8 +86,19 @@
     },
     "eo": {
         "classes": {
+            "agric": "agro.",
             "archit": "arkit.",
-            "gen": "ĝenerala"
+            "culture": "kulturo",
+            "gen": "ĝenerala",
+            "hist": "histrio",
+            "info": "info.",
+            "lang": "lingvo",
+            "law": "juro",
+            "math": "mat.",
+            "phil": "fil.",
+            "politics": "politiko",
+            "sci": "scienco",
+            "traffic": "trafiko"
         },
         "dictionary": {
             "licenseGuideMessage": "; \n; < BZ-JA Vortaro-Dateno-Dosiero >\n; \n; Bonvolu konfirmi la permesilon por uzi ĉi tiun dateno.\n; \n;   Hejmpaĝo: http://bazelinga.gant.work/\n;   Hangaro: https://github.com/Garnet3106/bazelinga\n; \n;   Oficiala Twitter: https://twitter.com/bazelinga\n;   Kreanta Twitter: https://twitter.com/Garnet3106\n; ",
@@ -149,8 +171,19 @@
     },
     "ja": {
         "classes": {
+            "agric": "農学",
             "archit": "建築",
-            "gen": "一般"
+            "culture": "文化",
+            "gen": "一般",
+            "hist": "歴史",
+            "info": "情報",
+            "lang": "言語",
+            "law": "法律",
+            "math": "数学",
+            "phil": "哲学",
+            "politics": "政治",
+            "sci": "科学",
+            "traffic": "交通"
         },
         "dictionary": {
             "licenseGuideMessage": "; \n; < 把日辞書データファイル >\n; \n; データの利用に関してはライセンスを確認してください。\n; \n;   ホームページ: http://bazelinga.gant.work/\n;   リポジトリ: https://github.com/Garnet3106/bazelinga\n; \n;   公式Twitter: https://twitter.com/bazelinga\n;   制作者Twitter: https://twitter.com/Garnet3106\n; ",
