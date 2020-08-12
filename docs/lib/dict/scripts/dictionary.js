@@ -201,15 +201,13 @@ class Dictionary {
         return translation;
     }
 
-    removeAllTranslation(translation) {
-        translation.forEach((trans, index) => {
-            // 削除時は要素数が減っていくのでインデックスを1つずつ減らしていく
-            this.removeTranslation(trans.index - index);
-        });
-    }
+    remove(spelling) {
+        let searchResult = this.search(spelling, -1, true, true);
 
-    removeTranslation(index) {
-        this.data.splice(index, 1);
+        searchResult.forEach((trans, index) => {
+            // 削除時は要素数が減っていくのでインデックスを1つずつ減らしていく
+            this.data.splice(trans.index - index, 1);
+        });
     }
 
     // searchResultLimit ... 返される検索結果の最大の長さ; Infinity の場合は制限なし

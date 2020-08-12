@@ -235,7 +235,8 @@ class Interface {
                     return;
                 }
 
-                this.dict.removeAllTranslation(searchResult);
+                this.dict.remove(spelling);
+                this.unslectListItem();
                 this.updateWordList();
             });
         });
@@ -811,7 +812,8 @@ class Interface {
                     return;
                 }
 
-                this.dict.removeAllTranslation(translation);
+                this.dict.remove(oldSpelling);
+                this.unslectListItem();
 
                 translation.forEach(trans => {
                     this.dict.addTranslation(spelling, trans.class, trans.type, trans.words);
