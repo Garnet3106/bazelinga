@@ -58,12 +58,18 @@
         },
         "types": {
             "adj": "adj.",
+            "adj,num": "num.",
+            "adj,num,card": "c.num.",
             "adv": "adv.",
+            "conj": "conj.",
             "interj": "interj.",
-            "noun": "noun",
+            "noun": "n.",
+            "noun,pron": "pron.",
+            "noun,prop": "p.n.",
             "prep": "prep.",
-            "verb": "verb",
-            "verb,intr": "v.i.",
+            "verb": "v.",
+            "verb,auxil": "auxil.v.",
+            "verb,intrans": "v.i.",
             "verb,trans": "v.t."
         }
     },
@@ -126,12 +132,18 @@
         },
         "types": {
             "adj": "adj.",
+            "adj,num": "num.",
+            "adj,num,card": "c.num.",
             "adv": "adv.",
+            "conj": "conj.",
             "interj": "interj.",
-            "noun": "noun",
+            "noun": "n.",
+            "noun,pron": "pron.",
+            "noun,prop": "p.n.",
             "prep": "prep.",
-            "verb": "verb",
-            "verb,intr": "v.i.",
+            "verb": "v.",
+            "verb,auxil": "auxil.v.",
+            "verb,intrans": "v.i.",
             "verb,trans": "v.t."
         }
     },
@@ -194,12 +206,18 @@
         },
         "types": {
             "adj": "形",
+            "adj,num": "数",
+            "adj,num,card": "基数",
             "adv": "副",
+            "conj": "接",
             "interj": "間",
             "noun": "名",
+            "noun,pron": "代名",
+            "noun,prop": "固名",
             "prep": "前",
-            "verb": "動詞",
-            "verb,intr": "自動",
+            "verb": "動",
+            "verb,auxil": "助動",
+            "verb,intrans": "自動",
             "verb,trans": "他動"
         }
     }
