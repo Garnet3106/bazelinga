@@ -8,6 +8,7 @@
             "hist": "history",
             "info": "info",
             "lang": "lang.",
+            "sports": "sports",
             "law": "law",
             "math": "math.",
             "phil": "phil.",
@@ -95,6 +96,7 @@
             "law": "juro",
             "math": "mat.",
             "phil": "fil.",
+            "sports": "sportoj",
             "politics": "politiko",
             "sci": "scienco",
             "traffic": "trafiko"
@@ -174,6 +176,7 @@
             "culture": "文化",
             "gen": "一般",
             "hist": "歴史",
+            "sports": "スポ",
             "info": "情報",
             "lang": "言語",
             "law": "法律",
