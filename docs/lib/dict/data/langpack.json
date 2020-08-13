@@ -238,17 +238,17 @@
         "types": {
             "adj": "形",
             "adj,num": "数",
-            "adj,num,card": "基数",
+            "adj,num,card": "基",
             "adv": "副",
             "conj": "接",
             "interj": "間",
             "noun": "名",
-            "noun,pron": "代名",
-            "noun,prop": "固名",
+            "noun,pron": "代",
+            "noun,prop": "固",
             "verb": "動",
-            "verb,auxil": "助動",
-            "verb,intrans": "自動",
-            "verb,trans": "他動"
+            "verb,auxil": "助",
+            "verb,intrans": "自",
+            "verb,trans": "他"
         }
     }
 }
