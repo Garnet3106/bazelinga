@@ -1,5 +1,8 @@
+'use strict';
+
 const fs = require('fs');
 
+const { bot } = require('../../main.js');
 const { Module } = require('../../module.js');
 
 
@@ -36,4 +39,6 @@ exports.MainClass = class Settings extends Module {
 
         return true;
     }
+
+    ready() {}
 }

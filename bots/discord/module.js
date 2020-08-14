@@ -1,3 +1,5 @@
+'use strict';
+
 const fs = require('fs');
 const { EventEmitter } = require('events');
 
@@ -67,16 +69,19 @@ exports.Module = class Module extends EventEmitter {
                 statusName = key;
         });
 
-        let items = [];
-        items.push([ Module.getTimeString(new Date()), 10 ]);
-        items.push([ type, 10 ]);
-        items.push([ this.moduleName, 15 ]);
-        items.push([ statusName, 15 ]);
-        items.push([ action, 15 ]);
-        items.push([ target, 40 ]);
-        items.push([ message, 50 ]);
+        let items = [
+            [ Module.getTimeString(new Date()), 10 ],
+            [ type, 10 ],
+            [ this.moduleName, 15 ],
+            [ statusName, 15 ],
+            [ action, 15 ],
+            [ target, 40 ],
+            [ message, 50 ],
+        ];
 
         let line = Module.joinLogItems(items);
         console.log(line);
     }
+
+    ready() {}
 }

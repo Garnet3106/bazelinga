@@ -1,3 +1,5 @@
+'use strict';
+
 const Discord = require('discord.js');
 
 const dotenv = require('dotenv');
@@ -6,13 +8,12 @@ dotenv.config();
 const { Module, ModuleStatus } = require('../../module.js');
 
 
-
 exports.MainClass = class BOT extends Module {
     final() {}
 
     // モジュール名が見つからなければnullを返します
     getModuleInstance(modName) {
-        return this.modules in modName ? null : this.modules[modName];
+        return modName in this.modules ? this.modules[modName] : null;
     }
 
     init() {
@@ -39,10 +40,13 @@ exports.MainClass = class BOT extends Module {
 
     loadModules() {
         this.modules = {};
+        let modIndex = 0;
         let modNames = Module.getModuleNames();
 
         modNames.forEach(name => {
             try {
+                modIndex++;
+
                 let mod = require('../' + name + '/module.js');
 
                 // モジュール名が既に存在する場合は弾く
@@ -68,13 +72,34 @@ exports.MainClass = class BOT extends Module {
                         instance.log('Event', 'Fail', 'Creating a module instance');
                     });
             } catch(e) {
-                this.log('Event', 'Fail', 'Loading a module source (' + name + ')');
+                // 例外メッセージは1行目のみを表示
+                this.log('Event', 'Fail', 'Loading a module source (' + name + ')', e.message.split('\n')[0]);
                 return;
             }
         });
 
-        this.log('Event', 'GetReady', 'All modules');
+        let interval = setInterval(() => {
+            let ready = false;
+
+            Object.values(this.modules).forEach(instance => {
+                if(instance.moduleStatus != ModuleStatus.Loaded) {
+                    ready = true;
+                }
+            });
+
+            if(ready) {
+                // 全モジュールインスタンスのready()を呼び出す
+                Object.values(this.modules).forEach(instance => {
+                    instance.ready();
+                });
+
+                this.log('Event', 'GetReady', 'All modules');
+                clearInterval(interval);
+            }
+        }, 200);
     }
+
+    ready() {}
 
     terminateBOT() {
         this.unloadModules();
