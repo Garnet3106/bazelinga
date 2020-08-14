@@ -1,3 +1,3 @@
-const Module = new require('./modules/Module/module.js').MainClass;
+const BOT = new require('./modules/BOT/module.js').MainClass;
 
-new Module().launchBOT();
+new BOT().launchBOT();

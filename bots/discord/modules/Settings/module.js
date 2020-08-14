@@ -1,19 +1,24 @@
 const fs = require('fs');
 
-const Module = require('../Module/module.js').MainClass;
+const Module = require('../../module.js').MainClass;
 
 
 
 exports.MainClass = class Settings extends Module {
-    final() {
-        super.final();
-    }
+    final() {}
 
     init() {
-        this.load();
-        super.init();
+        return new Promise((resolve, reject) => {
+            if(this.load()) {
+                reject('Setting file');
+                return;
+            }
+
+            resolve();
+        });
     }
 
+    // 戻り値 ... 成功した場合: true / 失敗した場合: false
     load() {
         let filePath = './modules/Settings/settings.json';
 
@@ -22,9 +27,13 @@ exports.MainClass = class Settings extends Module {
         } catch(excep) {
             fs.writeFileSync(filePath, JSON.stringify({}));
             this.log('Event', 'Created', 'Setting file');
+
+            return false;
         }
 
         this.data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
         this.log('Event', 'Loaded', 'Setting file');
+
+        return true;
     }
 }
