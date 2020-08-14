@@ -55,10 +55,10 @@ exports.MainClass = class BOT extends Module {
 
             instance.init()
                 .then(() => {
-                    this.log('Event', 'Initialized');
+                    this.log('Event', 'Initialized', 'Module instance');
                 })
-                .catch(target => {
-                    this.log('Event', 'Failed', target);
+                .catch(message => {
+                    this.log('Event', 'Failed', 'Module instance', message);
                 });
 
             this.modules[name] = instance;

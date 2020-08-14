@@ -31,10 +31,18 @@ exports.MainClass = class Module {
 
     init() {}
 
-    log(type, action, target = '') {
-        let typeWithSpaces = Module.fillSpaces(type, 10);
-        let modNameWithSpaces = Module.fillSpaces(this.moduleName, 15);
+    static joinLogItems(items) {
+        let result = '';
 
+        items.forEach((data) => {
+            // data[0] → メッセージ / data[1] → 長さ
+            result += Module.fillSpaces(data[0], data[1]) + '|';
+        });
+
+        return result;
+    }
+
+    log(type, action = '-', target = '-', message = '-') {
         let statusName = 'Unknown';
 
         Object.keys(ModuleStatus).forEach(key => {
@@ -42,10 +50,15 @@ exports.MainClass = class Module {
                 statusName = key;
         });
 
-        let modStatusWithSpaces = Module.fillSpaces(statusName, 15);
-        let actionWithSpaces = Module.fillSpaces(action, 15);
-        let targetWithSpaces = Module.fillSpaces(target, 20);
+        let items = [];
+        items.push([ type, 10 ]);
+        items.push([ this.moduleName, 15 ]);
+        items.push([ statusName, 15 ]);
+        items.push([ action, 15 ]);
+        items.push([ target, 20 ]);
+        items.push([ message, 40 ]);
 
-        console.log(typeWithSpaces + '|' + modNameWithSpaces + '|' + modStatusWithSpaces + '|' + actionWithSpaces + '|' + targetWithSpaces + '|');
+        let line = Module.joinLogItems(items);
+        console.log(line);
     }
 }

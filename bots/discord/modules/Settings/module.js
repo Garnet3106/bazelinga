@@ -9,8 +9,8 @@ exports.MainClass = class Settings extends Module {
 
     init() {
         return new Promise((resolve, reject) => {
-            if(this.load()) {
-                reject('Setting file');
+            if(!this.load()) {
+                reject('Failed to load a setting file');
                 return;
             }
 
