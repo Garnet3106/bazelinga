@@ -1,3 +1,7 @@
+const fs = require('fs');
+
+
+
 const ModuleStatus = {
     Unknown: 0,
     Loaded: 1,
@@ -29,10 +33,14 @@ exports.MainClass = class Module {
 
     final() {}
 
+    static getModuleNames() {
+        return fs.readdirSync('./modules/');
+    }
+
     init() {}
 
     static joinLogItems(items) {
-        let result = '';
+        let result = '|';
 
         items.forEach((data) => {
             // data[0] → メッセージ / data[1] → 長さ
@@ -42,7 +50,7 @@ exports.MainClass = class Module {
         return result;
     }
 
-    log(type, action = '-', target = '-', message = '-') {
+    log(type, action, target, message = '-') {
         let statusName = 'Unknown';
 
         Object.keys(ModuleStatus).forEach(key => {
@@ -55,8 +63,8 @@ exports.MainClass = class Module {
         items.push([ this.moduleName, 15 ]);
         items.push([ statusName, 15 ]);
         items.push([ action, 15 ]);
-        items.push([ target, 20 ]);
-        items.push([ message, 40 ]);
+        items.push([ target, 30 ]);
+        items.push([ message, 30 ]);
 
         let line = Module.joinLogItems(items);
         console.log(line);

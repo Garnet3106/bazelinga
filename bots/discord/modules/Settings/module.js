@@ -10,7 +10,7 @@ exports.MainClass = class Settings extends Module {
     init() {
         return new Promise((resolve, reject) => {
             if(!this.load()) {
-                reject('Failed to load a setting file');
+                reject();
                 return;
             }
 
@@ -26,13 +26,13 @@ exports.MainClass = class Settings extends Module {
             fs.statSync(filePath);
         } catch(excep) {
             fs.writeFileSync(filePath, JSON.stringify({}));
-            this.log('Event', 'Created', 'Setting file');
+            this.log('Event', 'Fail', 'Loading the setting file');
 
             return false;
         }
 
         this.data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-        this.log('Event', 'Loaded', 'Setting file');
+        this.log('Event', 'Load', 'The setting file');
 
         return true;
     }

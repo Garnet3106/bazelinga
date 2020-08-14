@@ -14,10 +14,6 @@ const ModuleStatus = ModulePack.ModuleStatus;
 exports.MainClass = class BOT extends Module {
     final() {}
 
-    static getModuleNames() {
-        return fs.readdirSync('./modules/');
-    }
-
     init() {
         return new Promise((resolve, reject) => {
             this.token = process.env.ELEMBOT_DISCORD_TOKEN;
@@ -25,10 +21,11 @@ exports.MainClass = class BOT extends Module {
 
             this.client.login(this.token)
                 .then(() => {
-                    this.log('Event', 'Succeeded', 'Logged in');
+                    this.log('Event', 'Succeed', 'Logging in');
                 })
-                .catch((exep) => {
-                    this.log('Event', 'Failed', 'Logging in');
+                .catch(excep => {
+                    // 非同期処理なのでreject()できない
+                    this.log('Event', 'Fail', 'Logging in', excep.message);
                 });
 
             resolve();
@@ -41,7 +38,7 @@ exports.MainClass = class BOT extends Module {
 
     loadModules() {
         this.modules = {};
-        let modNames = BOT.getModuleNames();
+        let modNames = Module.getModuleNames();
 
         modNames.forEach(name => {
             let mod = require('../' + name + '/module.js');
@@ -55,16 +52,17 @@ exports.MainClass = class BOT extends Module {
 
             instance.init()
                 .then(() => {
-                    this.log('Event', 'Initialized', 'Module instance');
+                    instance.moduleStatus = ModuleStatus.Initialized;
+                    this.log('Event', 'Create', 'A module instance');
                 })
-                .catch(message => {
-                    this.log('Event', 'Failed', 'Module instance', message);
+                .catch(() => {
+                    this.log('Event', 'Fail', 'Creating a module instance');
                 });
 
             this.modules[name] = instance;
         });
 
-        this.log('Event', 'Initialized', 'All modules')
+        this.log('Event', 'GetReady', 'All modules')
     }
 
     terminateBOT() {
@@ -78,7 +76,7 @@ exports.MainClass = class BOT extends Module {
         Object.keys(this.modules).forEach(key => {
             let instance = this.modules[key];
             instance.final();
-            instance.log('Event', 'Finalized');
+            instance.log('Event', 'Finalize', 'A module instance');
         });
     }
 }
