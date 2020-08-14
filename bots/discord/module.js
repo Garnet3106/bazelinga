@@ -1,6 +1,8 @@
 const fs = require('fs');
 const { EventEmitter } = require('events');
 
+require('date-utils');
+
 
 
 const ModuleStatus = {
@@ -40,6 +42,10 @@ exports.Module = class Module extends EventEmitter {
         return fs.readdirSync('./modules/');
     }
 
+    static getTimeString(date) {
+        return date.toFormat('HH24:MM:SS');
+    }
+
     init() {}
 
     static joinLogItems(items) {
@@ -62,6 +68,7 @@ exports.Module = class Module extends EventEmitter {
         });
 
         let items = [];
+        items.push([ Module.getTimeString(new Date()), 10 ]);
         items.push([ type, 10 ]);
         items.push([ this.moduleName, 15 ]);
         items.push([ statusName, 15 ]);
