@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const Module = require('../../module.js').MainClass;
+const { Module } = require('../../module.js');
 
 
 

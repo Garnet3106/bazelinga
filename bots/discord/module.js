@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { EventEmitter } = require('events');
 
 
 
@@ -14,8 +15,10 @@ const ModuleStatus = {
 
 exports.ModuleStatus = ModuleStatus;
 
-exports.MainClass = class Module {
+exports.Module = class Module extends EventEmitter {
     constructor() {
+        super();
+
         this.moduleName = this.constructor.name;
         this.moduleStatus = ModuleStatus.Loaded;
     }
@@ -63,8 +66,8 @@ exports.MainClass = class Module {
         items.push([ this.moduleName, 15 ]);
         items.push([ statusName, 15 ]);
         items.push([ action, 15 ]);
-        items.push([ target, 30 ]);
-        items.push([ message, 30 ]);
+        items.push([ target, 40 ]);
+        items.push([ message, 50 ]);
 
         let line = Module.joinLogItems(items);
         console.log(line);

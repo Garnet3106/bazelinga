@@ -3,16 +3,17 @@ const Discord = require('discord.js');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const fs = require('fs');
-
-const ModulePack = require('../../module.js');
-const Module = ModulePack.MainClass;
-const ModuleStatus = ModulePack.ModuleStatus;
+const { Module, ModuleStatus } = require('../../module.js');
 
 
 
 exports.MainClass = class BOT extends Module {
     final() {}
+
+    // モジュール名が見つからなければnullを返します
+    getModuleInstance(modName) {
+        return this.modules in modName ? null : this.modules[modName];
+    }
 
     init() {
         return new Promise((resolve, reject) => {
@@ -41,28 +42,38 @@ exports.MainClass = class BOT extends Module {
         let modNames = Module.getModuleNames();
 
         modNames.forEach(name => {
-            let mod = require('../' + name + '/module.js');
+            try {
+                let mod = require('../' + name + '/module.js');
 
-            // モジュール名が既に存在する場合は弾く
-            if(name in this.modules)
+                // モジュール名が既に存在する場合は弾く
+                if(name in this.modules)
+                    return;
+
+                // BOTモジュールの場合はthisを、そうでない場合は新たに生成したインスタンスを使用する
+                let instance = name == this.moduleName ? this : new mod.MainClass();
+
+                // モジュール名(フォルダ名)とクラス名が異なる場合はエラー
+                if(name != instance.moduleName) {
+                    instance.log('Event', 'Fail', 'Creating a module instance', 'Class name is diffirent from the module name.');
+                    return;
+                }
+
+                instance.init()
+                    .then(() => {
+                        instance.moduleStatus = ModuleStatus.Initialized;
+                        this.modules[name] = instance;
+                        instance.log('Event', 'Create', 'A module instance');
+                    })
+                    .catch(() => {
+                        instance.log('Event', 'Fail', 'Creating a module instance');
+                    });
+            } catch(e) {
+                this.log('Event', 'Fail', 'Loading a module source (' + name + ')');
                 return;
-
-            // BOTモジュールの場合はthisを、そうでない場合は新たに生成したインスタンスを使用する
-            let instance = name == this.moduleName ? this : new mod.MainClass();
-
-            instance.init()
-                .then(() => {
-                    instance.moduleStatus = ModuleStatus.Initialized;
-                    this.log('Event', 'Create', 'A module instance');
-                })
-                .catch(() => {
-                    this.log('Event', 'Fail', 'Creating a module instance');
-                });
-
-            this.modules[name] = instance;
+            }
         });
 
-        this.log('Event', 'GetReady', 'All modules')
+        this.log('Event', 'GetReady', 'All modules');
     }
 
     terminateBOT() {
