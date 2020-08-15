@@ -3,15 +3,24 @@
 const fs = require('fs');
 
 const { bot } = require('../../main.js');
-const { Module } = require('../../module.js');
+const { Module, ModuleStatus } = require('../../module.js');
+const { threadId } = require('worker_threads');
 
 
 
 exports.MainClass = class Settings extends Module {
-    final() {}
+    final() {
+        this.saveDataFinally();
+    }
+
+    getData(modName) {
+        return this.data[modName];
+    }
 
     init() {
         return new Promise((resolve, reject) => {
+            this.dataFileData = './modules/Settings/settings.json';
+
             if(!this.load()) {
                 reject();
                 return;
@@ -23,22 +32,45 @@ exports.MainClass = class Settings extends Module {
 
     // 戻り値 ... 成功した場合: true / 失敗した場合: false
     load() {
-        let filePath = './modules/Settings/settings.json';
-
         try {
-            fs.statSync(filePath);
+            fs.statSync(this.dataFileData);
         } catch(excep) {
-            fs.writeFileSync(filePath, JSON.stringify({}));
+            fs.writeFileSync(this.dataFileData, JSON.stringify({}));
             this.log('Event', 'Fail', 'Loading the setting file');
 
             return false;
         }
 
-        this.data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        let source = fs.readFileSync(this.dataFileData, 'utf-8');
+        this.data = JSON.parse(source);
         this.log('Event', 'Load', 'The setting file');
 
         return true;
     }
 
-    ready() {}
+    ready() {
+        let modNames = Module.getModuleNames();
+
+        // 各モジュールの設定データを初期化
+        modNames.forEach(name => {
+            if(!(name in Object.keys(this.data))) {
+                this.data[name] = {};
+            }
+        });
+    }
+
+    // 終了時にファイルを保存します
+    saveDataFinally() {
+        let source = JSON.stringify(this.data);
+
+        fs.writeFile(this.dataFileData, source, error => {
+            if(error) {
+                this.log('Event', 'Fail', 'Saving the setting file');
+            } else {
+                this.log('Event', 'Save', 'The setting file');
+            }
+
+            this.moduleStatus = ModuleStatus.Finalized;
+        });
+    }
 }

@@ -13,6 +13,7 @@ exports.MainClass = class TwitterBOT extends Module {
     }
 
     ready() {
-        console.log(bot.getModuleInstance('Settings'));
+        let mod_settings = bot.getModuleInstance('Settings');
+        console.log(mod_settings.getData(this.moduleName));
     }
 }
