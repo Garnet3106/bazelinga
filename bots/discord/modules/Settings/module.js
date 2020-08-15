@@ -22,7 +22,7 @@ exports.MainClass = class Settings extends Module {
             this.dataFileData = './modules/Settings/settings.json';
 
             if(!this.load()) {
-                reject();
+                reject('Failed to load the setting file.');
                 return;
             }
 
@@ -36,7 +36,7 @@ exports.MainClass = class Settings extends Module {
             fs.statSync(this.dataFileData);
         } catch(excep) {
             fs.writeFileSync(this.dataFileData, JSON.stringify({}));
-            this.log('Event', 'Fail', 'Loading the setting file');
+            this.log('Error', 'Load', 'The setting file', excep.message);
 
             return false;
         }
@@ -65,7 +65,7 @@ exports.MainClass = class Settings extends Module {
 
         fs.writeFile(this.dataFileData, source, error => {
             if(error) {
-                this.log('Event', 'Fail', 'Saving the setting file');
+                this.log('Error', 'Save', 'The setting file');
             } else {
                 this.log('Event', 'Save', 'The setting file');
             }

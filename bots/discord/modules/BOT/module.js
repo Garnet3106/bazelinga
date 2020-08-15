@@ -23,14 +23,13 @@ exports.MainClass = class BOT extends Module {
 
             this.client.login(this.token)
                 .then(() => {
-                    this.log('Event', 'Succeed', 'Logging in');
+                    this.log('Event', 'LoggingIn', 'The BOT client');
+                    resolve();
                 })
                 .catch(excep => {
-                    // 非同期処理なのでreject()できない
-                    this.log('Event', 'Fail', 'Logging in', excep.message);
+                    this.log('Error', 'LoggingIn', 'The BOT client', excep.message);
+                    reject();
                 });
-
-            resolve();
         });
     }
 
@@ -58,7 +57,7 @@ exports.MainClass = class BOT extends Module {
 
                 // モジュール名(フォルダ名)とクラス名が異なる場合はエラー
                 if(name != instance.moduleName) {
-                    instance.log('Event', 'Fail', 'Creating a module instance', 'Class name is diffirent from the module name.');
+                    instance.log('Error', 'Create', 'A module instance', 'Class name is diffirent from the module name.');
                     return;
                 }
 
@@ -68,12 +67,12 @@ exports.MainClass = class BOT extends Module {
                         this.modules[name] = instance;
                         instance.log('Event', 'Create', 'A module instance');
                     })
-                    .catch(() => {
-                        instance.log('Event', 'Fail', 'Creating a module instance');
+                    .catch((message = '') => {
+                        instance.log('Error', 'Create', 'A module instance', message);
                     });
             } catch(e) {
                 // 例外メッセージは1行目のみを表示
-                this.log('Event', 'Fail', 'Loading a module source (' + name + ')', e.message.split('\n')[0]);
+                this.log('Error', 'Load', 'A module source (' + name + ')', e.message.split('\n')[0]);
                 return;
             }
         });
