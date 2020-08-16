@@ -84,29 +84,21 @@ exports.MainClass = class BOT extends Module {
                     return;
                 }
 
-                let promise = instance.init();
+                instance.init()
+                    .then(() => {
+                        instance.moduleStatus = ModuleStatus.Initialized;
+                        this.modules[name] = instance;
+                        instance.log('Event', 'Create', 'A module instance');
 
-                // 戻り値がPromiseオブジェクトでない場合は弾く
-                if(promise === undefined || promise.constructor.name !== 'Promise') {
-                    instance.log('Error', 'Load', 'A module instance', 'The returned value from init() is not Promise object.');
-                    return;
-                }
-
-                promise.then(() => {
-                    instance.moduleStatus = ModuleStatus.Initialized;
-                    this.modules[name] = instance;
-                    instance.log('Event', 'Create', 'A module instance');
-
-                    // 全モジュールの読み込みが終わった場合はready()を呼び出す
-                    // (もともとのモジュール数と、初期化＆追加されているモジュール数を比較する)
-                    if(Object.keys(this.modules).length == modNames.length) {
-                        callReadyFuncs();
-                    }
-                })
-
-                promise.catch((message = '') => {
-                    instance.log('Error', 'Create', 'A module instance', message);
-                });
+                        // 全モジュールの読み込みが終わった場合はready()を呼び出す
+                        // (もともとのモジュール数と、初期化＆追加されているモジュール数を比較する)
+                        if(Object.keys(this.modules).length == modNames.length) {
+                            callReadyFuncs();
+                        }
+                    })
+                    .catch((message = '') => {
+                        instance.log('Error', 'Create', 'A module instance', message);
+                    });
             } catch(e) {
                 // 例外メッセージは1行目のみを表示
                 this.log('Error', 'Load', 'A module source (' + name + ')', e.message.split('\n')[0]);

@@ -7,7 +7,7 @@ const { Module } = require('../../module.js');
 
 
 
-exports.MainClass = class TwitterBOT extends Module {
+exports.MainClass = class Twitter extends Module {
     finishRandomTweeting() {
         // tweetInterval が設定されていない場合は弾く
         if(this.tweetInterval == null || this.tweetInterval == undefined)
@@ -19,7 +19,7 @@ exports.MainClass = class TwitterBOT extends Module {
 
     init() {
         return new Promise((resolve, reject) => {
-            fs.readFile("./modules/TwitterBOT/messages.json", "utf-8", (error, data) => {
+            fs.readFile("./modules/Twitter/messages.json", "utf-8", (error, data) => {
                 if(error) {
                     this.log('Error', 'Load', 'The message data file', error.message);
                     this.messages = [];
