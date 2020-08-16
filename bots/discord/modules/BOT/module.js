@@ -42,6 +42,29 @@ exports.MainClass = class BOT extends Module {
         let modIndex = 0;
         let modNames = Module.getModuleNames();
 
+        this.log('Event', 'Start', 'Loading all modules');
+
+        // ロードの制限時間を設ける (10秒)
+        let timeout = setTimeout(() => {
+            this.log('Error', 'NotReady', 'Any modules', 'Initialization process has been timeout.');
+        }, 10000);
+
+        let callReadyFuncs = () => {
+            // 全モジュールインスタンスのready()を呼び出す
+            Object.values(this.modules).forEach(instance => {
+                try {
+                    instance.ready();
+                } catch(e) {
+                    instance.log('Error', 'Ready', 'A module source', e.message.split('\n')[0]);
+                }
+            });
+
+            this.log('Event', 'GetReady', 'All modules');
+            // ロードに成功した場合はタイムアウトを解除する
+            clearTimeout(timeout);
+        }
+
+        // 各モジュールをロード
         modNames.forEach(name => {
             try {
                 modIndex++;
@@ -61,41 +84,35 @@ exports.MainClass = class BOT extends Module {
                     return;
                 }
 
-                instance.init()
-                    .then(() => {
-                        instance.moduleStatus = ModuleStatus.Initialized;
-                        this.modules[name] = instance;
-                        instance.log('Event', 'Create', 'A module instance');
-                    })
-                    .catch((message = '') => {
-                        instance.log('Error', 'Create', 'A module instance', message);
-                    });
+                let promise = instance.init();
+
+                // 戻り値がPromiseオブジェクトでない場合は弾く
+                if(promise === undefined || promise.constructor.name !== 'Promise') {
+                    instance.log('Error', 'Load', 'A module instance', 'The returned value from init() is not Promise object.');
+                    return;
+                }
+
+                promise.then(() => {
+                    instance.moduleStatus = ModuleStatus.Initialized;
+                    this.modules[name] = instance;
+                    instance.log('Event', 'Create', 'A module instance');
+
+                    // 全モジュールの読み込みが終わった場合はready()を呼び出す
+                    // (もともとのモジュール数と、初期化＆追加されているモジュール数を比較する)
+                    if(Object.keys(this.modules).length == modNames.length) {
+                        callReadyFuncs();
+                    }
+                })
+
+                promise.catch((message = '') => {
+                    instance.log('Error', 'Create', 'A module instance', message);
+                });
             } catch(e) {
                 // 例外メッセージは1行目のみを表示
                 this.log('Error', 'Load', 'A module source (' + name + ')', e.message.split('\n')[0]);
                 return;
             }
         });
-
-        let interval = setInterval(() => {
-            let ready = false;
-
-            Object.values(this.modules).forEach(instance => {
-                if(instance.moduleStatus != ModuleStatus.Loaded) {
-                    ready = true;
-                }
-            });
-
-            if(ready) {
-                // 全モジュールインスタンスのready()を呼び出す
-                Object.values(this.modules).forEach(instance => {
-                    instance.ready();
-                });
-
-                this.log('Event', 'GetReady', 'All modules');
-                clearInterval(interval);
-            }
-        }, 200);
     }
 
     ready() {}

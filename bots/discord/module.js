@@ -19,12 +19,17 @@ const ModuleStatus = {
 
 exports.ModuleStatus = ModuleStatus;
 
-exports.Module = class Module extends EventEmitter {
+exports.Module = class Module {
     constructor() {
-        super();
-
         this.moduleName = this.constructor.name;
         this.moduleStatus = ModuleStatus.Loaded;
+
+        this.events = {};
+        this.eventEmitter = new EventEmitter();
+    }
+
+    emitEvent(name, ...args) {
+        this.eventEmitter.emit(name, ...args);
     }
 
     static fillSpaces(text, sumLen) {
@@ -39,6 +44,16 @@ exports.Module = class Module extends EventEmitter {
     }
 
     final() {}
+
+    getEnumArray(array) {
+        let result = {};
+
+        array.forEach((value, index) => {
+            result[value] = index;
+        });
+
+        return result;
+    }
 
     static getModuleNames() {
         return fs.readdirSync('./modules/');
@@ -84,4 +99,8 @@ exports.Module = class Module extends EventEmitter {
     }
 
     ready() {}
+
+    setEvent(name, callback) {
+        this.eventEmitter.on(name, callback);
+    }
 }

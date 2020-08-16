@@ -19,24 +19,20 @@ exports.MainClass = class TwitterBOT extends Module {
 
     init() {
         return new Promise((resolve, reject) => {
-            fs.readFile("messages.json", "utf-8", (error, data) => {
+            fs.readFile("./modules/TwitterBOT/messages.json", "utf-8", (error, data) => {
                 if(error) {
                     this.log('Error', 'Load', 'The message data file', error.message);
                     this.messages = [];
                     reject();
-                }
-
-                if(data == undefined) {
                     return;
                 }
 
                 try {
                     let jsonData = JSON.parse(data);
+                    this.messages = jsonData.messages;
                 } catch(e) {
                     this.log('Error', 'Parse', 'The message data', e.message);
                 }
-
-                this.messages = jsonData.messages;
 
                 this.log('Event', 'Load', 'The message data file');
                 resolve();
@@ -50,7 +46,7 @@ exports.MainClass = class TwitterBOT extends Module {
     }
 
     sendRandomTweet() {
-        let messageID = 'ID生成だるい';
+        let messageID = 0;
 
         if(this.messages.length == 0) {
             this.log('Error', 'Send', 'Random tweet (' + messageID + ')', 'There\'s no messages.');
@@ -61,7 +57,7 @@ exports.MainClass = class TwitterBOT extends Module {
         let messageWithoutNewLine = message.replace(/\n/g, ' ');
         let logMessage = messageWithoutNewLine.length > 20 ? messageWithoutNewLine.substring(0, 17) + '...' : messageWithoutNewLine;
 
-        this.log('Event', 'Send', 'Random tweet (' + messageID + ')', logMessage);
+        this.log('Event', 'Send', 'Random tweet (ID: ' + messageID + ')', logMessage);
     }
 
     startRandomTweeting() {
