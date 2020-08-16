@@ -18,6 +18,8 @@ exports.MainClass = class BOT extends Module {
 
     init() {
         return new Promise((resolve, reject) => {
+            this.setPrefix('bot');
+
             this.token = process.env.ELEMBOT_DISCORD_TOKEN;
             this.client = new Discord.Client();
 
@@ -47,6 +49,7 @@ exports.MainClass = class BOT extends Module {
         // ロードの制限時間を設ける (10秒)
         let timeout = setTimeout(() => {
             this.log('Error', 'NotReady', 'Any modules', 'Initialization process has been timeout.');
+            this.log('Error', 'Fail', 'LoggingIn', 'Couldn\'t launch the BOT for some reason.');
         }, 10000);
 
         let callReadyFuncs = () => {

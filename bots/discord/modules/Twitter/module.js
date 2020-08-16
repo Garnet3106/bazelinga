@@ -19,6 +19,8 @@ exports.MainClass = class Twitter extends Module {
 
     init() {
         return new Promise((resolve, reject) => {
+            this.setPrefix('tw');
+
             fs.readFile("./modules/Twitter/messages.json", "utf-8", (error, data) => {
                 if(error) {
                     this.log('Error', 'Load', 'The message data file', error.message);
@@ -43,6 +45,16 @@ exports.MainClass = class Twitter extends Module {
     ready() {
         this.mod_settings = bot.getModuleInstance('Settings');
         this.startRandomTweeting();
+
+        this.mod_messages = bot.getModuleInstance('Messages');
+        this.mod_messages.setEvent(this.mod_messages.events.receiveMessage, message => {
+            
+        });
+
+        this.mod_commands = bot.getModuleInstance('Commands');
+        this.mod_commands.setEvent(this.mod_commands.events.receiveCommand, (message, cmdPrefix, cmdName, cmdArgs) => {
+            
+        });
     }
 
     sendRandomTweet() {
@@ -62,7 +74,7 @@ exports.MainClass = class Twitter extends Module {
 
     startRandomTweeting() {
         this.tweetInterval = setInterval(() => {
-            this.sendRandomTweet();
+            //this.sendRandomTweet();
         }, 10000);
     }
 }

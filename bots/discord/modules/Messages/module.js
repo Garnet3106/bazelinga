@@ -5,9 +5,11 @@ const { Module } = require('../../module.js');
 
 
 
-exports.MainClass = class Message extends Module {
+exports.MainClass = class Messages extends Module {
     init() {
         return new Promise((resolve, reject) => {
+            this.setPrefix('msg');
+
             this.events = this.getEnumArray([
                 'deleteMessage',
                 'receiveMessage'
@@ -21,8 +23,5 @@ exports.MainClass = class Message extends Module {
         });
     }
 
-    ready() {
-        this.setEvent(this.events.receiveMessage, message => {
-        });
-    }
+    ready() {}
 }

@@ -26,6 +26,8 @@ exports.Module = class Module {
 
         this.events = {};
         this.eventEmitter = new EventEmitter();
+
+        this.prefix = null;
     }
 
     emitEvent(name, ...args) {
@@ -102,5 +104,15 @@ exports.Module = class Module {
 
     setEvent(name, callback) {
         this.eventEmitter.on(name, callback);
+    }
+
+    setPrefix(prefix) {
+        if(prefix.match(/^[]/)) {
+            this.log('Error', 'Set', 'Prefix', 'Contains invalid character.');
+            return;
+        }
+
+        this.prefix = prefix;
+        this.log('Event', 'Set', 'Prefix', 'Changed to \'' + prefix +'\'');
     }
 }
