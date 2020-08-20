@@ -28,6 +28,8 @@ exports.Module = class Module {
         this.eventEmitter = new EventEmitter();
 
         this.prefix = null;
+
+        this.commands = {};
     }
 
     emitEvent(name, ...args) {
@@ -102,8 +104,16 @@ exports.Module = class Module {
 
     ready() {}
 
+    removePrefix() {
+        this.prefix = null;
+    }
+
     setEvent(name, callback) {
         this.eventEmitter.on(name, callback);
+    }
+
+    setOnceEvent(name, callback) {
+        this.eventEmitter.once(name, callback);
     }
 
     setPrefix(prefix) {

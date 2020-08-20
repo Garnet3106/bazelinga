@@ -24,4 +24,14 @@ exports.MainClass = class Messages extends Module {
     }
 
     ready() {}
+
+    reserve() {
+        console.log('e')
+        return new Promise((resolve, reject) => {
+            this.setOnceEvent(this.events.receiveMessage, message => {
+                console.log('d')
+                resolve(message);
+            });
+        });
+    }
 }

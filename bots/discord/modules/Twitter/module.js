@@ -42,18 +42,31 @@ exports.MainClass = class Twitter extends Module {
         });
     }
 
+    proceedCommand(message, cmdPrefix, cmdName, cmdArgs) {
+        if(cmdPrefix == this.prefix)
+            return;
+
+            console.log(cmdName)
+        switch(cmdName) {
+            case 'send':
+            this.mod_messages.reserve()
+                .then(message => {
+                    console.log('a')
+                    this.sendTweet(message.content);
+                });
+            break;
+        }
+    }
+
     ready() {
         this.mod_settings = bot.getModuleInstance('Settings');
         this.startRandomTweeting();
 
         this.mod_messages = bot.getModuleInstance('Messages');
-        this.mod_messages.setEvent(this.mod_messages.events.receiveMessage, message => {
-            
-        });
 
         this.mod_commands = bot.getModuleInstance('Commands');
         this.mod_commands.setEvent(this.mod_commands.events.receiveCommand, (message, cmdPrefix, cmdName, cmdArgs) => {
-            
+            this.proceedCommand(message, cmdPrefix, cmdName, cmdArgs);
         });
     }
 
@@ -70,6 +83,10 @@ exports.MainClass = class Twitter extends Module {
         let logMessage = messageWithoutNewLine.length > 20 ? messageWithoutNewLine.substring(0, 17) + '...' : messageWithoutNewLine;
 
         this.log('Event', 'Send', 'Random tweet (ID: ' + messageID + ')', logMessage);
+    }
+
+    sendTweet(text) {
+        this.log('Event', 'Send', 'Random tweet', text);
     }
 
     startRandomTweeting() {

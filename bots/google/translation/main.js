@@ -65,10 +65,10 @@ let interval = setInterval(() => {
         closeTargetLangList();
         clearInterval(interval);
 
-        console.log(result);
+        console.log(Object.values(result));
     }
 
     latestLangCode = switchTargetLang(index);
 
     index++;
-}, 500);
+}, 800);

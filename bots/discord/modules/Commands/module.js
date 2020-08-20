@@ -40,12 +40,4 @@ exports.MainClass = class Commands extends Module {
             this.proceedMessage(message);
         });
     }
-
-    removePrefix(modName) {
-        delete this.prefixes[modName];
-    }
-
-    setPrefix(modName, prefix) {
-        this.prefixes[modName] = prefix;
-    }
 }
