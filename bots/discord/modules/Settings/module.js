@@ -13,7 +13,12 @@ exports.MainClass = class Settings extends Module {
         this.saveDataFinally();
     }
 
+    // モジュール名が見つからなければ自動で値を初期化します。
+    // モジュールごとの設定データを取得する際にはできるだけこの関数を使用するようにしてください。
     getData(modName) {
+        if(!(modName in this.data))
+            this.data[modName] = {}
+
         return this.data[modName];
     }
 

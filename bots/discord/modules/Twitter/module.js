@@ -1,12 +1,14 @@
 'use strict';
 
 const fs = require('fs');
+const TwitterClient = require('twitter');
 
 const { bot } = require('../../main.js');
 const { Module } = require('../../module.js');
 
 
 
+// exports = class ~ できる？
 exports.MainClass = class Twitter extends Module {
     finishRandomTweeting() {
         // tweetInterval が設定されていない場合は弾く
@@ -42,6 +44,28 @@ exports.MainClass = class Twitter extends Module {
         });
     }
 
+    // モジュールの設定データを初期化します。
+    // ready() 内で呼び出してください。
+    initSettingData() {
+        this.settings = this.mod_settings.getData(this.moduleName);
+
+        if(!('loginData' in this.settings))
+            this.settings.loginData = [];
+
+        // テスト用
+        this.settings.loginData.push({
+            keys: {
+                consumer_key: process.env.CONSUMER_KEY,
+                consumer_secret: process.env.CONSUMER_SECRET,
+                access_token_key: process.env.ACCESS_TOKEN_KEY,
+                access_token_secret: process.env.ACCESS_TOKEN_SECRET
+            },
+            discordUserIDs: [
+                '495511715425812481'
+            ]
+        });
+    }
+
     proceedCommand(message, cmdPrefix, cmdName, cmdArgs) {
         if(cmdPrefix != this.prefix)
             return;
@@ -57,17 +81,29 @@ exports.MainClass = class Twitter extends Module {
                 }
             });
 
-            this.mod_messages.reserve()
-                .then(message => {
-                    this.sendTweet(message.content);
-                });
+            // ツイート内容のメッセージを待機する
+            let reserveMessage = () => {
+                this.mod_messages.reserve()
+                    .then(reservedMessage => {
+                        // 送信者のIDが一致しなければもう一度メッセージを待つ
+                        if(message.author.id != reservedMessage.author.id) {
+                            reserveMessage();
+                            return;
+                        }
+
+                        this.sendTweet(reservedMessage.content, reservedMessage.channel);
+                    });
+            }
+
+            reserveMessage();
             break;
         }
     }
 
     ready() {
         this.mod_settings = bot.getModuleInstance('Settings');
-        this.startRandomTweeting();
+        this.initSettingData();
+        //this.startRandomTweeting();
 
         this.mod_messages = bot.getModuleInstance('Messages');
 
@@ -92,10 +128,28 @@ exports.MainClass = class Twitter extends Module {
         this.log('Event', 'Send', 'Random tweet (ID: ' + messageID + ')', logMessage);
     }
 
-    sendTweet(text) {
-        let logMessage = 'Garnet3106/123456789';
+    sendTweet(text, channel) {
+        let client = new TwitterClient(this.settings.loginData[0].keys);
 
-        this.log('Event', 'Send', 'User tweet', logMessage);
+        client.post('statuses/update', { status: text }, (error, tweet, response) => {
+            if(error) {
+                this.log('Error', 'Send', 'User tweet', '[' + error[0].code + '] ' + error[0].message);
+                return;
+            }
+
+            let userName = tweet.user.screen_name;
+            let tweetID = tweet.id_str;
+            let tweetDataPair = userName + '/' + tweetID;
+
+            this.log('Event', 'Send', 'User tweet', tweetDataPair);
+
+            channel.send({
+                embed: {
+                    title: 'ツイート送信 (@' + userName + ')',
+                    description: 'ツイートを送信しました。\n[' + tweetDataPair + '](https://twitter.com/' + userName + '/status/' + tweetID + ')'
+                }
+            });
+        });
     }
 
     startRandomTweeting() {
