@@ -43,15 +43,22 @@ exports.MainClass = class Twitter extends Module {
     }
 
     proceedCommand(message, cmdPrefix, cmdName, cmdArgs) {
-        if(cmdPrefix == this.prefix)
+        if(cmdPrefix != this.prefix)
             return;
 
-            console.log(cmdName)
         switch(cmdName) {
             case 'send':
+
+            let accountID = 'Garnet3106';
+            message.channel.send({
+                embed: {
+                    title: 'ツイート送信 (@' + accountID + ')',
+                    description: 'ツイート内容を入力してください。'
+                }
+            });
+
             this.mod_messages.reserve()
                 .then(message => {
-                    console.log('a')
                     this.sendTweet(message.content);
                 });
             break;
@@ -86,7 +93,9 @@ exports.MainClass = class Twitter extends Module {
     }
 
     sendTweet(text) {
-        this.log('Event', 'Send', 'Random tweet', text);
+        let logMessage = 'Garnet3106/123456789';
+
+        this.log('Event', 'Send', 'User tweet', logMessage);
     }
 
     startRandomTweeting() {
