@@ -33,6 +33,11 @@ function openTargetLangList() {
     }
 }
 
+function printResult(array) {
+    let output = Object.values(array).sort();
+    console.log(output.join('\n'));
+}
+
 function setTargetLangListItem(index) {
     let $item = $targetLangListItems[index]
 
@@ -64,8 +69,7 @@ let interval = setInterval(() => {
     if(index > 108) {
         closeTargetLangList();
         clearInterval(interval);
-
-        console.log(Object.values(result));
+        printResult(result);
     }
 
     latestLangCode = switchTargetLang(index);
