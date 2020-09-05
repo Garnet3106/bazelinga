@@ -1,3 +1,15 @@
+/* 
+ * 
+ * Baze Language Dictionary
+ * 
+ * PLEASE CHECK THE LICENSE FOR USING SOURCES:
+ *     https://garnet3106.github.io/native-baze-dictionary/how_to_use.html
+ * 
+ * Copyright (c) 2020 Garnet3106
+ * 
+ */
+
+
 'use strict';
 
 
@@ -19,8 +31,9 @@ class Dictionary {
         this.data.push(translation);
     }
 
-    static convertDataToString(data) {
-        let words = {};
+    // 辞書データを配列に変換して返します
+    static convertDataToArray(data) {
+        let translation = {};
 
         data.forEach(trans => {
             let spelling = trans.spelling;
@@ -29,22 +42,29 @@ class Dictionary {
             let transWords = trans.words;
 
             // スペルが見つからない場合は初期化する
-            if(!(spelling in words))
-                words[spelling] = {};
+            if(!(spelling in translation))
+                translation[spelling] = {};
 
             // 翻訳のクラスが見つからない場合は初期化する
-            if(!(transClass in words[spelling]))
-                words[spelling][transClass] = [];
+            if(!(transClass in translation[spelling]))
+                translation[spelling][transClass] = [];
 
             // '種類|訳1,訳2...' の部分を追加する
-            words[spelling][transClass].push([ transType, transWords.join(',') ]);
+            translation[spelling][transClass].push([ transType, transWords.join(',') ]);
         });
+
+        return translation;
+    }
+
+    // 辞書データを文字列に変換して返します
+    static convertDataToString(data) {
+        let translation = Dictionary.convertDataToArray(data);
 
         let result = '';
         result += langData.dictionary.licenseGuideMessage + '\n';
 
-        for(let spelling in words) {
-            let transClasses = words[spelling];
+        for(let spelling in translation) {
+            let transClasses = translation[spelling];
             result += '\n#' + spelling + '\n';
 
             for(let transClassName in transClasses) {
@@ -60,6 +80,7 @@ class Dictionary {
         return result;
     }
 
+    // 空白文字などを検索キーワード向けにフォーマットします
     static formatSearchKeyword(keyword) {
         keyword = keyword.replace(/　/g, ' ');
         keyword = keyword.replace(/^ +/g, '');
@@ -74,6 +95,7 @@ class Dictionary {
     getDocsURI(index) {
         let $item = $('.workarea-wordlist-item').eq(index);
         let spelling = $item.children('.workarea-wordlist-item-spelling').eq(0).text();
+        // 単語ページはbazelinga.gant.work側
         let dictURI = 'http://bazelinga.gant.work/docs/' + this.lang + '/dict/words/' + spelling + '/';
 
         return dictURI;
@@ -86,7 +108,7 @@ class Dictionary {
         let relatedAccount = 'Garnet3106';
 
         let string = 'BazeLinga \'' + spelling + '\'';
-        let link = 'http://bazelinga.gant.work/docs/' + this.lang + '/dict/search/#' + spelling;
+        let link = 'https://garnet3106.github.io/native-baze-dictionary/' + this.lang + '/dict/#' + spelling;
         let mention = '@bazelinga';
         let hashtag = '#bazelinga';
 
@@ -100,6 +122,8 @@ class Dictionary {
     isSpellingValid(inputtedText) {
         let formattedInput = Dictionary.formatSearchKeyword(inputtedText);
         let searchResult = this.search(formattedInput, -1, true, true);
+
+        // スペルをチェックしてエラーを返す
 
         if(formattedInput == '')
             return langData.messages.theInputItemLacks;
@@ -120,6 +144,8 @@ class Dictionary {
     isTranslationValid(inputtedText) {
         let formattedInput = Dictionary.formatSearchKeyword(inputtedText);
 
+        // 翻訳をチェックしてエラーを返す
+
         if(formattedInput == '')
             return langData.messages.theInputItemLacks;
 
@@ -133,22 +159,17 @@ class Dictionary {
     }
 
     load(succeeded = () => {}, failed = error => {}) {
-        let uri = 'http://bazelinga.gant.work/docs/lib/dict/data/' + this.lang + '/words.txt';
+        let uri = 'https://garnet3106.github.io/native-baze-dictionary/lib/data/' + this.lang + '/words.txt';
 
-        let options = {
-            timespan: 5000,
-            url: uri
-        };
-
-        $.ajax(options)
-            .done(data => {
+        getFileContent(uri)
+            .then(data => {
                 // ロード成功時
                 this.data = Dictionary.parseToData(data);
                 this.ready = true;
 
                 succeeded();
             })
-            .fail(error => {
+            .catch(error => {
                 // ロード失敗時
                 failed(error);
             });
@@ -245,7 +266,7 @@ class Dictionary {
 
             if(matched) {
                 // 翻訳のコピーを作成する (参照渡し防止)
-                let tmpTranslation = $.extend(true, {}, translation);
+                let tmpTranslation = Object.assign({}, translation);
                 // コピーした翻訳にインデックスを追加する
                 tmpTranslation.index = trans_i;
                 matchedTranslation.push(tmpTranslation);
@@ -257,7 +278,7 @@ class Dictionary {
         return matchedTranslation;
     }
 
-    setDataByFile(file, onLoaded = () => {}, onErrored = () => {}) {
+    saveDataByFile(file, onLoaded = () => {}, onErrored = () => {}) {
         // 文字列などがドロップされた際は undefined が渡されるので弾く
         // プレーンテキスト形式でなければ弾く
         if(file === undefined || file.type != 'text/plain') {

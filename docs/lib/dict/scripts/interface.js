@@ -1,7 +1,42 @@
+/* 
+ * 
+ * Baze Language Dictionary
+ * 
+ * PLEASE CHECK THE LICENSE FOR USING SOURCES:
+ *     https://bazelinga.gant.work/how_to_use.html
+ * 
+ * Copyright (c) 2020 Garnet3106
+ * 
+ */
+
+
 'use strict';
 
 
 var langData;
+
+
+// サーバ上のファイルの内容をPromiseで返します
+function getFileContent(url) {
+    return new Promise((resolve, reject) => {
+        fetch(url, {
+            cache: 'no-cache',
+            mode: 'cors'
+        })
+            .then(response => {
+                if(response.status == 200) {
+                    // 成功した場合はresolveにテキストを渡す
+                    response.text()
+                        .then(text => {
+                            resolve(text);
+                        });
+                } else {
+                    // 失敗したらrejectにエラーコードを渡す
+                    reject(request.statusText);
+                }
+            });
+    });
+}
 
 
 class Interface {
@@ -23,94 +58,48 @@ class Interface {
             '#rightMenuShare'
         ];
 
-        this.isPerfectMatchEnable = false;
-        this.matchOnlySpelling = false;
-        this.searchResultLimit = 30;
-        this.inputErrorColor = '#ffdddd';
+        // ユーザ設定一覧
+        this.settings = {
+            isPerfectMatchEnable: false,
+            matchOnlySpelling: false,
+            searchResultLimit: 30,
+            inputErrorColor: '#ffdddd'
+        };
 
         this.loadDataFiles();
     }
 
-    addWordsToList(translationList) {
-        let $input = $('#searchInput');
-        let $list = $('#wordList');
-
-        translationList.forEach(translation => {
-            let translationClass = langData.classes[translation.class];
-
-            // 要素を生成・追加
-            let $elem = $('<div class="workarea-wordlist-item"></div>');
-            $elem.attr('id', 'wordListItem_' + translation.index);
-
-            let $elemSpelling = $('<div class="workarea-wordlist-item-spelling"></div>');
-            let $elemType = $('<div class="workarea-wordlist-item-type"></div>');
-
-            $elemSpelling.text(translation.spelling);
-            $elemType.text('[' + langData.types[translation.type] + ']');
-
-            $elem.append($elemSpelling);
-            $elem.append($elemType);
-
-            if(translation.class != 'gen') {
-                let $elemClass = $('<div class="workarea-wordlist-item-class"></div>');
-                $elemClass.text('[' + translationClass + ']');
-                $elem.append($elemClass);
-            }
-
-            let $elemTranslationWords = $('<div class="workarea-wordlist-item-translation"></div>');
-            $elemTranslationWords.text(translation.words.join(', '));
-            $elem.append($elemTranslationWords);
-
-            // クリックイベントを設定
-            $elem.on('click', elem => {
-                let $target = $(elem.target);
-                let formattedKeyword = Dictionary.formatSearchKeyword($input.val());
-
-                let $item = $target.eq(0);
-
-                if($item.attr('class') != 'workarea-wordlist-item')
-                    $item = $item.parent();
-
-                let index = $item.index() - 1;
-
-                // 選択済みの項目がクリックされた場合
-                if($item.attr('id') == this.latestSelectedItemID) {
-                    this.unslectListItem();
-                    return;
-                }
-
-                this.selectListItem(index);
-
-                // キーワードが変更された場合のみ入力欄のvalueを変更
-                if(formattedKeyword != translation.spelling) {
-                    $input.val(translation.spelling);
-                    // val() ではイベントが発火しないので手動で処理
-                    $input.trigger('input');
-                }
-            });
-
-            $list.append($elem);
-        });
+    addTranslationToWordList(translationList) {
+        WordList.addTranslationItems(translationList);
 
         if(this.latestSelectedItemID != '') {
             let $latestSelectedItem = $('#' + this.latestSelectedItemID);
+
+            // 項目が見つからない場合は選択を解除する
+            if($latestSelectedItem === undefined) {
+                this.unselectListItem();
+                return;
+            }
+
             let index = $latestSelectedItem.index() - 1;
 
             // インデックスからは1を引かれてるので注意
-            if(index >= -1 && $latestSelectedItem.length == 1) {
+            if(index >= -1 && $latestSelectedItem.length == 1)
                 this.selectListItem(index);
-            }
         }
     }
 
     copyToClipboard(text) {
-        let $clipboardText = $('<div id="clipboardText">' + text + '</div>');
+        // display: none; にすると効かなくなるので注意
+        let $clipboardText = $('<div id="clipboardText"></div>');
+        $clipboardText.text(text);
         $('#body').append($clipboardText);
 
-        // DOM要素が必要なので getElementById() を使う
-        getSelection().selectAllChildren(document.getElementById('clipboardText'));
+        // 一時的に作成した要素を使ってクリップボードにコピーする
+        getSelection().selectAllChildren($clipboardText.get());
         document.execCommand('copy');
 
+        // 使用後は削除する
         $clipboardText.remove();
     }
 
@@ -122,11 +111,11 @@ class Interface {
 
         // 背景色とカーソルを切り替える
         $targetItems.css('background-color', '#dddddd');
-        // カーソルはitemにではなくiconに設定する必要がある
+        // カーソルは項目そのものにではなくアイコン側に設定する必要がある
         $targetItemIcons.css('cursor', 'not-allowed');
 
         // 共有項目を閉じる
-        this.hideMenu('rightMenuShare');
+        this.collapseMenu('rightMenuShare');
     }
 
     // サイドメニューの全項目を選択可能にします (単語が選択解除されたときの処理)
@@ -136,124 +125,152 @@ class Interface {
 
         // 背景色とカーソルを切り替える
         $targetItems.css('background-color', '#ffffff');
-        // カーソルはitemにではなくiconに設定する必要がある
+        // カーソルは項目そのものにではなくアイコン側に設定する必要がある
         $targetItemIcons.css('cursor', 'pointer');
+    }
+
+    expandShareMenu() {
+        let $rightMenuShare = $('#rightMenuShare');
+
+        // アイコンがすでに表示されている場合は閉じる
+        if($rightMenuShare.children().length > 1) {
+            this.collapseMenu('rightMenuShare');
+            return;
+        }
+
+        if(this.selectedItemIndex == -1)
+            return;
+
+        // リンク共有アイコン
+        let $linkShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareLink"></div>');
+        // Twitter共有アイコン
+        let $twitterShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareTwitter"></div>');
+
+        $linkShareIcon.on('click', () => {
+            // ドキュメントURLをクリップボードにコピーしてメニューを閉じる
+            this.copyToClipboard(this.dict.getDocsURI(this.selectedItemIndex));
+            this.collapseMenu('rightMenuShare');
+            Popup.showNotification(langData.messages.copiedTheTextToTheClipboard);
+        });
+
+        $twitterShareIcon.on('click', () => {
+            // Twitterのシェアリンクを新規タブで開いてメニューを閉じる
+            open(this.dict.getTwitterShareLink(this.selectedItemIndex));
+            this.collapseMenu('rightMenuShare');
+        });
+
+        $rightMenuShare.append($linkShareIcon);
+        $rightMenuShare.append($twitterShareIcon);
+
+        $rightMenuShare.find('.workarea-sidemenu-item-icon').css('cursor', 'pointer');
     }
 
     hideGuideMessage() {
         $('#wordListGuide').hide();
     }
 
-    /*
-     * id
-     *   すべて → 指定なし(undefined)
-     *   指定する → メニューのエレメントID
-     */
-    hideMenu(id) {
+    collapseMenu(id) {
         let $sideMenuItems;
 
         // 引数をもとに対象のメニューアイテムを取り出す
         if(id === undefined) {
+            // idの指定がない場合はすべてのメニュー項目を対象にする
             $sideMenuItems = $('.workarea-sidemenu-item');
         } else {
             $sideMenuItems = $('#' + id);
         }
 
-        $sideMenuItems.each((itemIndex, item) => {
-            let parentID = $(item).parent().attr('id');
+        $sideMenuItems.each((item_i, $item) => {
+            let parentID = $item.parent().attr('id');
             // 除外するインデックス = TopIconのインデックス (left: 0, right: 最後のインデックス)
             let exceptIndex = 0;
 
             if(parentID == 'leftMenu')
-                exceptIndex = $(item).children().length - 1;
+                exceptIndex = $item.children().length - 1;
 
-            $(item).children().each((iconIndex, icon) => {
+            $item.children().each((icon_i, $icon) => {
                 // インデックスが除外対象であればreturn
-                if(iconIndex == exceptIndex)
+                if(icon_i == exceptIndex)
                     return;
 
-                $(icon).remove();
+                $icon.remove();
             });
         });
     }
 
     init() {
         $(() => {
+            this.logInitialMessages();
+
             $('title').text(langData.dictionary.pageTitle);
             $('#searchInput').attr('placeholder', langData.messages.searchKeyword);
 
-            // 単語リストの初期的なガイドメッセージを設定
+            // 単語リストの初期的なガイドメッセージを設定する
             this.setGuideMessage(langData.messages.theSearchResultsWillBeDisplayedHere);
             this.showGuideMessage();
 
+            // 各種イベントを設定する
+            this.initAllEvents();
+
             this.disableSideMenuItems();
-            this.initEvents();
             this.setSideMenuObserver();
             this.setInitialKeyword();
         });
     }
 
-    initEvents() {
+    initAllEvents() {
+        this.initLeftMenuEvents();
+        this.initRightMenuEvents();
+        this.initOtherEvents();
+    }
+
+    initLeftMenuEvents() {
+        $('#leftMenuAddTop').on('click', () => {
+            PopupManager.showWordAdditionPopup();
+        });
+
+        $('#leftMenuEditTop').on('click', () => {
+            // 未選択の場合は弾く
+            if(this.selectedItemIndex == -1)
+                return;
+
+            PopupManager.showWordEditionPopup();
+        });
+
+        $('#leftMenuRemoveTop').on('click', () => {
+            // 未選択の場合は弾く
+            if(this.selectedItemIndex == -1)
+                return;
+
+            PopupManager.showRemovePopup();
+        });
+
+        $('#leftMenuUploadTop').on('click', () => {
+            PopupManager.showUploadPopup();
+        });
+
+        $('#leftMenuDownloadTop').on('click', () => {
+            PopupManager.showDownloadPopup();
+        });
+    }
+
+    initOtherEvents() {
         $('.bottomlinks-item').on('click', event => {
             // 下部リンクの項目のIDは 'bottomLinkItem_{言語名}' である必要があります
             let $target = $(event.target);
             let langName = $target.attr('id').split('_')[1];
 
-            location.href = 'http://bazelinga.gant.work/docs/' + langName + '/dict/search';
+            this.jumpToDictPage(langName);
         });
 
         $('#searchInput').on('input', () => {
             this.updateWordList();
         });
+    }
 
-        $('#leftMenuAddTop').on('click', () => {
-            Popup.show(popup => {
-                this.initWordAdditionPopup(popup);
-            });
-        });
-
-        $('#leftMenuEditTop').on('click', () => {
-            if(this.selectedItemIndex == -1)
-                return;
-
-            Popup.show(popup => {
-                this.initWordEditionPopup(popup);
-            });
-        });
-
-        $('#leftMenuRemoveTop').on('click', () => {
-            if(this.selectedItemIndex == -1)
-                return;
-
-            Popup.showConfirmation(langData.messages.doYouReallyRemoveTheWord, () => {
-                let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
-                let spelling = $selectedItem.children('.workarea-wordlist-item-spelling').text();
-                let searchResult = this.dict.search(spelling, -1, true, true);
-
-                if(!Object.keys(searchResult).length) {
-                    Popup.showNotification(langData.messages.failedToRemoveTheWord);
-                    return;
-                }
-
-                this.dict.remove(spelling);
-                this.unslectListItem();
-                this.updateWordList();
-            });
-        });
-
-        $('#leftMenuUploadTop').on('click', () => {
-            Popup.showUploadPopup(popup => {
-                this.initUploadPopup(popup);
-            });
-        });
-
-        $('#leftMenuDownloadTop').on('click', () => {
-            Popup.show(popup => {
-                this.initDownloadPopup(popup);
-            });
-        });
-
+    initRightMenuEvents() {
         $('#rightMenuDocsTop').on('click', () => {
+            // 未選択の場合は弾く
             if(this.selectedItemIndex == -1)
                 return;
 
@@ -261,570 +278,32 @@ class Interface {
         });
 
         $('#rightMenuShareTop').on('click', () => {
-            let $rightMenuShare = $('#rightMenuShare');
-
-            // アイコンがすでに表示されている場合は閉じる
-            if($rightMenuShare.children().length > 1) {
-                this.hideMenu('rightMenuShare');
-                return;
-            }
-
+            // 未選択の場合は弾く
             if(this.selectedItemIndex == -1)
                 return;
 
-            let $linkShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareLink"></div>');
-            let $twitterShareIcon = $('<div class="workarea-sidemenu-item-icon" id="rightMenuShareTwitter"></div>');
-
-            $linkShareIcon.on('click', () => {
-                // ドキュメントURLをクリップボードにコピー
-                this.copyToClipboard(this.dict.getDocsURI(this.selectedItemIndex));
-                this.hideMenu('rightMenuShare');
-                Popup.showNotification(langData.messages.copiedTheTextToTheClipboard);
-            });
-
-            $twitterShareIcon.on('click', () => {
-                // Twitterのシェアリンクを新規タブで開く
-                open(this.dict.getTwitterShareLink(this.selectedItemIndex));
-                this.hideMenu('rightMenuShare');
-            });
-
-            $rightMenuShare.append($linkShareIcon);
-            $rightMenuShare.append($twitterShareIcon);
-
-            $rightMenuShare.find('.workarea-sidemenu-item-icon').css('cursor', 'pointer');
+            this.expandShareMenu();
         });
 
         $('#rightMenuSettingsTop').on('click', () => {
-            Popup.show(popup => {
-                this.initSattingPopup(popup);
-            });
+            PopupManager.showSettingsPopup();
         });
     }
 
-    initSattingPopup(popup) {
-        let title = langData.messages.settings;
-        let iconURI = '../../../lib/dict/img/settings.svg';
-
-        popup.addTopIcon(iconURI);
-        popup.addTopTitle(title);
-
-        let $main = popup.$elem.find('.popup-content-main');
-        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
-
-        // 入力エリアにペアを追加する関数
-        let addInputAreaPair = (name, $pairInput) => {
-            let $pair = $('<div class="popup-content-main-inputarea-pair">');
-
-            let $pairName = $('<div></div>');
-            $pairName.css('width', '200px');
-            $pairName.text(langData.messages[name]);
-            $pair.append($pairName);
-
-            $pairInput.attr('name', name);
-            $pair.append($pairInput);
-
-            $inputArea.append($pair);
-        };
-
-        // 完全一致かどうか
-        let $perfectMatch = $('<input type="checkbox">');
-        $perfectMatch.prop('checked', this.isPerfectMatchEnable);
-        addInputAreaPair('perfectMatching', $perfectMatch);
-
-        // スペルのみの検索にするかどうか
-        let $matchOnlySpelling = $('<input type="checkbox">');
-        $matchOnlySpelling.prop('checked', this.matchOnlySpelling);
-        addInputAreaPair('matchOnlySpelling', $matchOnlySpelling);
-
-        // 検索時の単語数の制限
-        let $searchResultLimit = $('<input type="text">');
-        $searchResultLimit.val(this.searchResultLimit);
-        addInputAreaPair('searchResultLimit', $searchResultLimit);
-
-        $main.append($inputArea);
-
-        // 保存ボタン
-        popup.addBottomButton(langData.messages.ok, () => {
-            // 完全一致かどうか
-            this.isPerfectMatchEnable = $perfectMatch.prop('checked');
-
-            // スペルのみの検索にするかどうか
-            this.matchOnlySpelling = $matchOnlySpelling.prop('checked');
-
-            // 検索時の単語数の制限
-            let limit = Number($searchResultLimit.val());
-
-            if(isNaN(limit) || limit < -1 || limit === 0 || limit === Infinity) {
-                Popup.showNotification(langData.messages.theInputtedNumberIsInvalid);
-                return;
-            }
-
-            this.searchResultLimit = limit;
-
-            // 検索条件が変更された場合のために単語リストを更新する
-            this.updateWordList();
-
-            popup.hide();
-        });
+    static isFileAPIValid() {
+        return window.File && window.FileReader && window.Blob;
     }
 
-    initDownloadPopup(popup) {
-        if(!window.Blob) {
-            Popup.showNotification(langData.messages.thisFeatureIsNotAvailableForYourEnvironment);
-            popup.hide();
-            return;
-        }
-
-        let title = langData.messages.download;
-        let iconURI = '../../../lib/dict/img/download.svg';
-
-        popup.addTopIcon(iconURI);
-        popup.addTopTitle(title);
-
-        let $link = $('<a></a>');
-        $link.attr('href', '//bazelinga.gant.work/');
-        // target="_blank" での脆弱性対策のためrel値を設定
-        $link.attr('rel', 'noopener noreferrer');
-        $link.attr('target', '_blank');
-        $link.text(langData.messages.pleaseReadTheLicenseBeforeUsingTheData + '');
-        popup.addMainMessage($link);
-
-        // 戻るボタン
-        popup.addBottomButton(langData.messages.back, () => {
-            popup.hide();
-        });
-
-        let url;
-
-        // 保存ボタン
-        popup.addBottomButton(langData.messages.save, $button => {
-            // BlobのデフォルトでUTF-8を使用する
-            let data = [ Dictionary.convertDataToString(this.dict.data) ];
-            let properties = {
-                type: "text/plain"
-            };
-
-            let blob = new Blob(data, properties);
-            url = URL.createObjectURL(blob);
-
-            $button.attr('download', this.lang + '.txt');
-            $button.attr('href', url);
-            $button.attr('text', 'url');
-            $button.css('display', 'none');
-
-            popup.hide();
-        }, () => {
-            // ブラウザによってはrevoke処理にタイムアウトを入れる必要がありそう (要検証)
-            URL.revokeObjectURL(url);
-        }, $('<a class="popup-content-bottom-button"></a>'));
+    static isSearchResultLimitValid(searchResultLimit) {
+        return !(isNaN(searchResultLimit) || searchResultLimit < -1
+            || searchResultLimit === 0 || searchResultLimit === Infinity);
     }
 
-    initUploadPopup(popup) {
-        if(!window.File || !window.FileReader || !window.Blob) {
-            Popup.showNotification(langData.messages.thisFeatureIsNotAvailableForYourEnvironment);
-            popup.hide();
-            return;
-        }
-
-        let setDataByFile = file => {
-            Popup.showConfirmation(langData.messages.doYouReallySaveTheData, () => {
-                this.dict.setDataByFile(file, () => {
-                    // 成功時の処理
-                    Popup.showNotification(langData.messages.theDataHasSaved);
-                    popup.hide();
-                }, error => {
-                    // エラー時の処理
-                    Popup.showNotification(langData.messages.failedToParseTheFile);
-                });
-            });
-        };
-
-        let title = langData.messages.upload;
-        let iconURI = '../../../lib/dict/img/upload.svg';
-
-        popup.addTopIcon(iconURI);
-        popup.addTopTitle(title);
-        popup.addMainMessage(langData.messages.selectOrDropYourFile + '<br><br>[' + langData.messages.clickHereOrDropAFileAllOver + ']');
-
-        let $main = popup.$elem.find('.popup-content-upload');
-
-        popup.setFileDropEvent(event => {
-            // ファイルは1つまで
-            let file = event.dataTransfer.files[0];
-            setDataByFile(file, () => {
-                // 成功時の処理
-                Popup.showNotification(langData.messages.theDataHasSaved);
-                popup.hide();
-            }, () => {
-                // エラー時の処理
-                Popup.showNotification(langData.messages.failedToParseTheFile);
-            });
-        }, () => {
-            // ファイルを掴んでいるときのイベント
-            $main.css('background-color', '#dddddd');
-            popup.$elem.css('cursor', 'grabbing');
-        }, () => {
-            // ファイルのドロップが終了したときのイベント
-            $main.css('background-color', '#ffffff');
-            popup.$elem.css('cursor', 'auto');
-        });
-
-        // 選択エリアを設定
-        popup.setFileSelectEvent(event => {
-            // ファイルは1つまで
-            let file = event.target.files[0];
-            setDataByFile(file, () => {
-                // 成功時の処理
-                Popup.showNotification(langData.messages.theDataHasSaved);
-                popup.hide();
-            }, error => {
-                // エラー時の処理
-                Popup.showNotification(langData.messages.failedToParseTheFile);
-            });
-        });
-
-        // 戻るボタン
-        popup.addBottomButton(langData.messages.back, () => {
-            popup.hide();
-        });
+    jumpToDictPage(langName) {
+        location.href = 'https://garnet3106.github.io/native-baze-dictionary/' + langName;
     }
 
-    /* 翻訳編集用のポップアップ */
-    initTranslationEditionPopup(popup, translation, onSaveButtonClicked = data => {}) {
-        let title = langData.messages.translationEdition;
-        let iconURI = '../../../lib/dict/img/edit.svg';
-
-        popup.addTopIcon(iconURI);
-        popup.addTopTitle(title);
-
-        let $main = popup.$elem.find('.popup-content-main');
-        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
-
-        // words は文字列配列
-        let addInputAreaPair = (type, className, words) => {
-            let $pair = $('<div class="popup-content-main-inputarea-pair"></div>');
-
-            let $pairType = $('<select></select>');
-            $pairType.attr('name', 'type');
-
-            for(let key in langData.types) {
-                let $option = $('<option></option>');
-
-                $option.attr('value', key);
-                $option.text(langData.types[key]);
-
-                $pairType.append($option);
-            }
-
-            if(type !== undefined)
-                $pairType.val(type);
-
-            $pair.append($pairType);
-
-            let $pairClass = $('<select></select>');
-            $pairClass.attr('name', 'class');
-
-            for(let key in langData.classes) {
-                let $option = $('<option></option>');
-
-                $option.attr('value', key);
-                $option.text(langData.classes[key]);
-
-                $pairClass.append($option);
-            }
-
-            if(className !== undefined)
-                $pairClass.val(className);
-
-            $pair.append($pairClass);
-
-            let $pairInput = $('<input>');
-            $pairInput.attr('name', 'words');
-            $pairInput.css('width', '250px');
-
-            if(words !== undefined) {
-                // words が undefined でない場合は入力欄を埋める
-                $pairInput.val(words.join(','));
-            } else {
-                // words が undefined な場合は赤背景にする
-                $pairInput.css('background-color', this.inputErrorColor);
-            }
-
-            $pairInput.on('input', () => {
-                let isTranslationValid = this.dict.isTranslationValid($pairInput.val()) === true;
-                $pairInput.css('background-color', isTranslationValid ? '#ffffff' : this.inputErrorColor);
-            });
-
-            $pair.append($pairInput);
-
-            let $pairRemoveIcon = $('<img>');
-            $pairRemoveIcon.attr('src', '../../../lib/dict/img/remove.svg');
-
-            $pairRemoveIcon.on('click', event => {
-                let $parent = $(event.target).parent();
-
-                if($parent.parent().children().length < 2) {
-                    Popup.showNotification(langData.messages.youCannotRemoveAnyMore);
-                } else {
-                    $parent.remove();
-                }
-            });
-
-            $pair.append($pairRemoveIcon);
-
-            $inputArea.append($pair);
-        };
-
-        let getInputData = () => {
-            let $pairs = $inputArea.children();
-            let newTranslation = [];
-
-            $pairs.each((i, elem) => {
-                let $item = $(elem);
-
-                let translationWords = $item.children('[name=words]').val().split(',');
-
-                translationWords.forEach((word, index) => {
-                    translationWords[index] = Dictionary.formatSearchKeyword(word);
-                });
-
-                // translationWords の空配列判定が [ '' ] でできなかったので配列の長さと最初のインデックスの値で比較
-                if(translationWords.length == 0 || translationWords[0] === '')
-                    return;
-
-                let $inputType = $item.children('[name=type]');
-                let translationType = $inputType.children('option:selected').eq(0).val();
-
-                let $inputClass = $item.children('[name=class]');
-                let translationClass = $inputClass.children('option:selected').eq(0).val();
-
-                newTranslation.push({
-                    type: translationType,
-                    class: translationClass,
-                    words: translationWords
-                });
-            });
-
-            return newTranslation;
-        };
-
-        translation.forEach(item => {
-            addInputAreaPair(item.type, item.class, item.words);
-        });
-
-        if(translation.length == 0)
-            addInputAreaPair();
-
-        $main.append($inputArea);
-
-        // 戻るボタン
-        popup.addBottomButton(langData.messages.back, () => {
-            let message = langData.messages.doYouReallyCloseThePopup + '<br>' + langData.messages.theDataWillBeDiscarded;
-
-            Popup.showConfirmation(message, () => {
-                popup.hide();
-            });
-        });
-
-        // 追加ボタン
-        popup.addBottomButton(langData.messages.add, () => {
-            addInputAreaPair();
-        });
-
-        // 保存ボタン
-        popup.addBottomButton(langData.messages.save, () => {
-            let newTranslation = getInputData();
-
-            if(newTranslation.length == 0) {
-                Popup.showNotification(langData.messages.theTranslationIsNotInputted);
-                return;
-            }
-
-            // 入力が正しくない場合は弾く
-            for(let transInput of $inputArea.find('input')) {
-                let isTranslationValid = this.dict.isTranslationValid($(transInput).val());
-
-                if(isTranslationValid !== true) {
-                    Popup.showNotification(isTranslationValid);
-                    return;
-                }
-            }
-
-            translation = newTranslation;
-            onSaveButtonClicked(translation);
-            popup.hide();
-        });
-    }
-
-    /* 単語追加用のポップアップ */
-    initWordAdditionPopup(popup) {
-        let $main = popup.$elem.find('.popup-content-main');
-
-        let title = langData.messages.wordAddition;
-        let iconURI = '../../../lib/dict/img/add.svg';
-
-        popup.addTopIcon(iconURI);
-        popup.addTopTitle(title);
-
-        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
-
-        let addInputAreaPair = (name, $pairInput) => {
-            let $pair = $('<div class="popup-content-main-inputarea-pair">');
-
-            let $pairName = $('<div></div>');
-            $pairName.text(langData.messages[name]);
-            $pair.append($pairName);
-
-            $pairInput.attr('name', name);
-            $pair.append($pairInput);
-
-            $inputArea.append($pair);
-        };
-
-        let $spellingInput = $('<input>');
-        // 単語追加時は入力欄が空のためデフォルトで赤背景にする (編集時は白のままで問題ない)
-        $spellingInput.css('background-color', this.inputErrorColor);
-
-        $spellingInput.on('input', () => {
-            $spellingInput.css('background-color', this.dict.isSpellingValid($spellingInput.val()) === true ? '#ffffff' : this.inputErrorColor);
-        });
-
-        addInputAreaPair('spelling', $spellingInput);
-        $main.append($inputArea);
-
-        let translation = [];
-
-        // 戻るボタン
-        popup.addBottomButton(langData.messages.back, () => {
-            let message = langData.messages.doYouReallyCloseThePopup + '<br>' + langData.messages.theDataWillBeDiscarded;
-
-            Popup.showConfirmation(message, () => {
-                // Yesの場合
-                popup.hide();
-            });
-        });
-
-        // 翻訳ボタン
-        popup.addBottomButton(langData.messages.trans, () => {
-            Popup.show(translationPopup => {
-                this.initTranslationEditionPopup(translationPopup, translation, data => {
-                    translation = data;
-                });
-            });
-        });
-
-        // 追加ボタン
-        popup.addBottomButton(langData.messages.add, () => {
-            let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
-            let spelling = Dictionary.formatSearchKeyword($input_spelling.val());
-            let isSpellingValid = this.dict.isSpellingValid(spelling);
-
-            if(isSpellingValid !== true) {
-                Popup.showNotification(isSpellingValid);
-                return;
-            }
-
-            // 入力された翻訳を追加
-            translation.forEach(trans => {
-                this.dict.addTranslation(spelling, trans.class, trans.type, trans.words);
-            });
-
-            this.updateWordList();
-            popup.hide();
-        });
-    }
-
-    /* 単語編集用のポップアップ */
-    initWordEditionPopup(popup) {
-        let $selectedItem = $('.workarea-wordlist-item').eq(this.selectedItemIndex);
-        let oldSpelling = $selectedItem.children('.workarea-wordlist-item-spelling').text();
-        let oldTranslation = this.dict.search(oldSpelling, -1, true, true);
-
-        let $main = popup.$elem.find('.popup-content-main');
-
-        let title = langData.messages.wordEdition;
-        let iconURI = '../../../lib/dict/img/edit.svg';
-
-        popup.addTopIcon(iconURI);
-        popup.addTopTitle(title);
-
-        let $inputArea = $('<div class="popup-content-main-inputarea"></div>');
-
-        let addInputAreaPair = (name, $pairInput) => {
-            let $pair = $('<div class="popup-content-main-inputarea-pair">');
-
-            let $pairName = $('<div></div>');
-            $pairName.text(langData.messages[name]);
-            $pair.append($pairName);
-
-            $pairInput.attr('name', name);
-            $pair.append($pairInput);
-
-            $inputArea.append($pair);
-        };
-
-        let $spellingInput = $('<input>');
-        $spellingInput.val(oldSpelling);
-
-        $spellingInput.on('input', () => {
-            let formattedSpelling = Dictionary.formatSearchKeyword($spellingInput.val());
-            // 元のスペルと一致した場合は赤背景から除外する
-            let isInputValid = oldSpelling == formattedSpelling || this.dict.isSpellingValid($spellingInput.val()) === true;
-            $spellingInput.css('background-color', isInputValid ? '#ffffff' : this.inputErrorColor);
-        });
-
-        addInputAreaPair('spelling', $spellingInput);
-        $main.append($inputArea);
-
-        let translation = oldTranslation;
-
-        // 戻るボタン
-        popup.addBottomButton(langData.messages.back, () => {
-            let message = langData.messages.doYouReallyCloseThePopup + '<br>' + langData.messages.theDataWillBeDiscarded;
-
-            Popup.showConfirmation(message, () => {
-                // Yesの場合
-                popup.hide();
-            });
-        });
-
-        // 翻訳ボタン
-        popup.addBottomButton(langData.messages.trans, () => {
-            Popup.show(translationPopup => {
-                this.initTranslationEditionPopup(translationPopup, translation, data => {
-                    translation = data;
-                });
-            });
-        });
-
-        // 保存ボタン
-        popup.addBottomButton(langData.messages.save, () => {
-            let message = langData.messages.doYouReallySaveTheWord;
-
-            Popup.showConfirmation(message, () => {
-                let $input_spelling = $inputArea.find('[name=spelling]').eq(0);
-                let spelling = Dictionary.formatSearchKeyword($input_spelling.val());
-                let isSpellingValid = this.dict.isSpellingValid(spelling);
-
-                // 前のスペルと同じ場合はエラーから除外
-                if(spelling != oldSpelling && isSpellingValid !== true) {
-                    Popup.showNotification(isSpellingValid);
-                    return;
-                }
-
-                this.dict.remove(oldSpelling);
-                this.unslectListItem();
-
-                translation.forEach(trans => {
-                    this.dict.addTranslation(spelling, trans.class, trans.type, trans.words);
-                });
-
-                this.updateWordList();
-                popup.hide();
-            });
-        });
-    }
-
+    // 必要なファイルをすべて読み込みます
     loadDataFiles() {
         // 言語パックデータを読み込む
         let loadLangPackData = () => {
@@ -837,7 +316,7 @@ class Interface {
                 loadDictionaryData();
             }, error => {
                 // ロード失敗時
-                console.log(error.message)
+                console.log(error)
             });
         };
 
@@ -851,12 +330,115 @@ class Interface {
                 this.init();
             }, error => {
                 // ロード失敗時
-                console.log(error.message);
+                console.log(error);
             });
         };
 
         // ロード処理を開始
         loadLangPackData();
+    }
+
+    static log(message, cssProperties) {
+        let propertyItems = [];
+
+        // 連想配列のCSSプロパティを文字列に変換する
+        Object.keys(cssProperties).forEach(name => {
+            propertyItems.push(name + ':' + cssProperties[name]);
+        });
+
+        let strProperties = propertyItems.join(';');
+        console.log('%c' + message, strProperties);
+    }
+
+    static logError(message) {
+        Interface.log('[ERROR] ' + message, {
+            'color': 'red'
+        });
+    }
+
+    logInitialMessages() {
+        Interface.log('把日辞書 検索ツール', {
+            'background': 'lime',
+            'border-radius': '10px',
+            'color': 'royalblue',
+            'font-size': '30px',
+            'font-weight': 'bold',
+            'margin': '15px 0',
+            'padding': '5px 40px'
+        });
+
+        Interface.log('\n' + langData.orinChanAA + '\n', {
+            'color': 'red',
+            'font-size': '10px'
+        });
+
+        Interface.log('Mi baze linga es bon linga!', {
+            'background': 'deepskyblue',
+            'color': 'red',
+            'border-bottom': '5px solid royalblue',
+            'border-radius': '10px',
+            'font-family': 'serif',
+            'font-size': '30px',
+            'font-weight': 'bold',
+            'margin': '15px 0',
+            'padding': '10px 15px'
+        });
+
+        Interface.log('Vimビーム！！！！！', {
+            'background': 'linear-gradient(to right, #ff0000 0, #0000ff 33.3%, #00ffff 66.6%, #00ff00 100%)',
+            'border-radius': '10px',
+            'color': 'yellow',
+            'font-size': '30px',
+            'font-style': 'italic',
+            'font-weight': 'bold',
+            'margin': '15px 0',
+            'padding': '20px',
+            'text-align': 'center'
+        });
+    }
+
+    // 設定の保存に成功した場合はtrue、そうでない場合はfalseを返します
+    saveSettings(perfectMatch, matchOnlySpelling, searchResultLimit) {
+        // 完全一致かどうか
+        this.settings.isPerfectMatchEnable = perfectMatch;
+
+        // スペルのみの検索にするかどうか
+        this.settings.matchOnlySpelling = matchOnlySpelling;
+
+        // 検索時の単語数の制限
+        if(!Interface.isSearchResultLimitValid(searchResultLimit)) {
+            Popup.showNotification(langData.messages.theInputtedNumberIsInvalid);
+            return false;
+        }
+
+        this.settings.searchResultLimit = searchResultLimit;
+
+        // 検索条件が変更された場合のために単語リストを更新する
+        this.updateWordList();
+
+        return true;
+    }
+
+    // 設定の保存に成功した場合はgetTranslationInputData()の結果を、そうでない場合はfalseを返します
+    saveInputtedTranslationData($inputArea) {
+        let newTranslation = PopupManager.getTranslationInputData($inputArea);
+
+        if(newTranslation.length == 0) {
+            Popup.showNotification(langData.messages.theTranslationIsNotInputted);
+            return false;
+        }
+
+        // 入力が正しくない場合は弾く
+        for(let transInput of $inputArea.find('input').get()) {
+            let isTranslationValid = this.dict.isTranslationValid($(transInput).val());
+
+            if(isTranslationValid !== true) {
+                Popup.showNotification(isTranslationValid);
+                return false;
+            }
+        }
+
+        return newTranslation;
     }
 
     selectListItem(index) {
@@ -869,7 +451,7 @@ class Interface {
         let tmpLatestID = $item.attr('id');
 
         // 選択する前に他の選択を解除
-        this.unslectListItem();
+        this.unselectListItem();
 
         // 選択解除前だと背景色がリセットされる
         $item.css('background-color', '#dddddd');
@@ -908,19 +490,20 @@ class Interface {
         // サイドメニューの変更イベントを監視
         this.sideMenuObserver = new MutationObserver(event => {
             let $target = $(event[0].target);
+            let $children = $target.children();
 
             // 横幅をアニメーションをつけて操作する
-            $target.animate({
-                width: $target.children().length * 40
-            }, 500);
+            // transitionには初期値が必要なので div.workarea-sidemenu-item で width: 40px; にしてある
+            let width = $children.length * 40;
+            $target.css('width', width + 'px');
         });
 
         let options = {
             childList: true
         };
 
-        $('.workarea-sidemenu-item').each((i, elem) => {
-            this.sideMenuObserver.observe(elem, options);
+        $('.workarea-sidemenu-item').each((elem_i, $elem) => {
+            this.sideMenuObserver.observe($elem.get(), options);
         });
     }
 
@@ -928,7 +511,7 @@ class Interface {
         $('#wordListGuide').show();
     }
 
-    unslectListItem() {
+    unselectListItem() {
         // 選択されていた単語の背景を戻す
         let $items = $('.workarea-wordlist-item');
         $items.css('background-color', '#ffffff');
@@ -955,7 +538,7 @@ class Interface {
 
         // 選択解除でlatestSelectedItemIDが初期化されるため保持
         let tmpLatestID = this.latestSelectedItemID;
-        this.unslectListItem();
+        this.unselectListItem();
         this.latestSelectedItemID = tmpLatestID;
 
         let keyword = Dictionary.formatSearchKeyword($searchInput.val());
@@ -966,7 +549,7 @@ class Interface {
             return;
         }
 
-        let translationList = this.dict.search(keyword, this.searchResultLimit, this.isPerfectMatchEnable, this.matchOnlySpelling);
+        let translationList = this.dict.search(keyword, this.settings.searchResultLimit, this.settings.isPerfectMatchEnable, this.settings.matchOnlySpelling);
 
         if(translationList.length == 0) {
             this.setGuideMessage(langData.messages.theWordHasNotFound);
@@ -976,6 +559,6 @@ class Interface {
 
         //this.setGuideMessage(langData.messages.theSearchResultsWillBeDisplayedHere);
         this.hideGuideMessage();
-        this.addWordsToList(translationList);
+        this.addTranslationToWordList(translationList);
     }
 }

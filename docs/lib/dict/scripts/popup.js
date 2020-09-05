@@ -1,3 +1,15 @@
+/* 
+ * 
+ * Baze Language Dictionary
+ * 
+ * PLEASE CHECK THE LICENSE FOR USING SOURCES:
+ *     https://bazelinga.gant.work/how_to_use.html
+ * 
+ * Copyright (c) 2020 Garnet3106
+ * 
+ */
+
+
 'use strict';
 
 
@@ -22,6 +34,7 @@ class Popup {
     }
 
     addMainMessage(message) {
+        // アップロード用のポップアップにも対応する
         let $main = this.$elem.find('.popup-content-main,.popup-content-upload');
         let $msg = $('<div class="popup-content-main-message"></div>');
 
@@ -57,65 +70,6 @@ class Popup {
         }, 200);
     }
 
-    // ファイルドロップのイベントを設定します
-    // onDropped() の第一引数には event.originalEvent が渡されます
-    setFileDropEvent(onFileDropped = event => {}, onFileHeldUp = popup => {}, onFileDragLeft = popup => {}) {
-        this.$elem.on('dragover', event => {
-            event.originalEvent.preventDefault();
-            onFileHeldUp();
-        });
-
-        this.$elem.on('dragenter', event => {
-            event.originalEvent.preventDefault();
-        });
-
-        this.$elem.on('dragleave', event => {
-            onFileDragLeft();
-        });
-
-        this.$elem.on('drop', event => {
-            event.originalEvent.preventDefault();
-            onFileDragLeft();
-            onFileDropped(event.originalEvent);
-        });
-    }
-
-    // ファイル選択のイベントを設定します
-    setFileSelectEvent(onFileSelected = event => {}) {
-        let $popupBottom = this.$elem.find('.popup-content-bottom');
-        // アップロード用のクラス .popup-content-upload を使用する
-        let $main = this.$elem.find('.popup-content-upload');
-        let $input;
-
-        // ファイル選択に必要なinput要素を作成する
-        let regenerateInputElem = () => {
-            if($input !== undefined)
-                $input.remove();
-
-            this.addBottomButton('', () => {}, $button => {
-                $button.css('display', 'none');
-                $button.attr('type', 'file');
-
-                // ファイルが選択された場合
-                $button.on('change', event => {
-                    onFileSelected(event.originalEvent);
-                    // 同じファイルを連続で選択するとchangeイベントが発火しないので要素を作り直す
-                    regenerateInputElem();
-                });
-
-                // メイン要素がクリックされた場合はイベントをトリガーしてファイル選択画面を開く
-                $main.on('click', () => {
-                    $button.trigger('click');
-                });
-
-                $popupBottom.append($input);
-                $input = $button;
-            }, $('<input>'));
-        };
-
-        regenerateInputElem();
-    }
-
     static show(onPopupReady = popup => {}) {
         let popup = new Popup();
 
@@ -147,8 +101,9 @@ class Popup {
 
     static showConfirmation(message, onYesButtonClicked = $button => {}, onNoButtonClicked = $button => {}) {
         Popup.show(popup => {
-            let iconURI = '../../../lib/dict/img/question.svg';
+            let iconURI = '../lib/img/question.svg';
             popup.addTopIcon(iconURI);
+            popup.addTopTitle(langData.messages.confirmationPopup);
             popup.addMainMessage(message);
 
             popup.addBottomButton(langData.messages.no, $button => {
@@ -163,19 +118,9 @@ class Popup {
         });
     }
 
-    static showUploadPopup(onPopupReady = popup => {}) {
-        Popup.show(popup => {
-            // メイン要素を popup-content-upload に置き換える
-            let $main = popup.$elem.find('.popup-content-main');
-            $main.attr('class', 'popup-content-upload');
-
-            onPopupReady(popup);
-        });
-    }
-
     static showNotification(message, onOKButtonClicked = $button => {}) {
         Popup.show(popup => {
-            let iconURI = '../../../lib/dict/img/notice.svg';
+            let iconURI = '../lib/img/notice.svg';
             popup.addTopIcon(iconURI);
             popup.addMainMessage(message);
 
