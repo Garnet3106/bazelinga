@@ -4,6 +4,7 @@ const fs = require('fs');
 
 const { bot } = require('../../main.js');
 const { Module } = require('../../module.js');
+const { setegid } = require('process');
 
 
 exports.MainClass = class Reactions extends Module {
@@ -43,12 +44,31 @@ exports.MainClass = class Reactions extends Module {
         });
     }
 
-    setReactionRemover(modName = '', cmdName = '') {
-        this.setEvent(this.events.addReaction, (reaction, user) => {
+    setReactionRemover(messageID = '', removeOnce = false, ignoreBOT = true) {
+        let eventName = this.events.addReaction;
+
+        let callback = (reaction, user) => {
             if(user.bot)
                 return;
 
-            reaction.remove();
-        });
+            if(messageID != '' && messageID != reaction.message.id) {
+                if(removeOnce)
+                    setEvent();
+
+                return;
+            }
+
+            reaction.users.remove(user);
+        };
+
+        let setEvent = () => {
+            if(removeOnce) {
+                this.setOnceEvent(eventName, callback);
+            } else {
+                this.setEvent(eventName, callback);
+            }
+        };
+
+        setEvent();
     }
 }
