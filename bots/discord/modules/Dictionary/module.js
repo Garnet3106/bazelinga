@@ -32,7 +32,7 @@ exports.MainClass = class Dictionary extends Module {
                     title: '単語編集: ' + spelling
                 };
 
-                message.channel.send({
+                this.mod_messages.send(message.channel, {
                     embed: embed
                 })
                     .then(sentMessage => {
