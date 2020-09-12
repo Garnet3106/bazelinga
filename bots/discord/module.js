@@ -29,7 +29,15 @@ exports.Module = class Module {
 
         this.prefix = null;
 
+        this.commandFunctions = {};
+        this.commandTypes = {};
+
         this.commands = {};
+    }
+
+    addCommand(name, type, func) {
+        this.commandFunctions[type] = func;
+        this.commandTypes[name] = type;
     }
 
     emitEvent(name, ...args) {
@@ -48,6 +56,14 @@ exports.Module = class Module {
     }
 
     final() {}
+
+    getCommandFunction(cmdType) {
+        return this.commandFunctions[cmdType];
+    }
+
+    getCommandType(cmdType) {
+        return this.commandTypes[cmdType];
+    }
 
     getEnumArray(array) {
         let result = {};
@@ -102,10 +118,29 @@ exports.Module = class Module {
         console.log(line);
     }
 
+    proceedCommand(modInstance, message, cmdPrefix, cmdName, cmdArgs, disableLoop = false) {
+        let cmdType = this.getCommandType(cmdName);
+        let cmdFunc = this.getCommandFunction(cmdType);
+
+        if(!disableLoop && typeof(cmdFunc) !== 'function') {
+            this.proceedCommand(message, cmdPrefix, 'help', cmdArgs, true);
+            return;
+        }
+
+        cmdFunc(modInstance, message, cmdPrefix, cmdName, cmdArgs);
+    }
+
     ready() {}
 
     removePrefix() {
         this.prefix = null;
+    }
+
+    // モジュール読み込み完了後に呼び出します
+    setCommandEvent(modInstance, mod_commands) {
+        mod_commands.setEvent(this.mod_commands.events.receiveCommand, (message, cmdPrefix, cmdName, cmdArgs) => {
+            this.proceedCommand(modInstance, message, cmdPrefix, cmdName, cmdArgs);
+        });
     }
 
     setEvent(name, callback) {
