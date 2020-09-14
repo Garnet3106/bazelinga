@@ -1,6 +1,7 @@
 'use strict';
 
 const Discord = require('discord.js');
+const usage = require('usage');
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -22,6 +23,15 @@ exports.MainClass = class BOT extends Module {
 
             this.token = process.env.ELEMBOT_DISCORD_TOKEN;
             this.client = new Discord.Client();
+
+            this.processID = process.pid;
+
+            setInterval(() => {
+                usage.lookup(this.processID, (err, result) => {
+                    this.logCPUUsage(result);
+                    this.logMemoryUsage(result);
+                });
+            }, 10000);
 
             this.client.login(this.token)
                 .then(() => {
@@ -108,6 +118,17 @@ exports.MainClass = class BOT extends Module {
                 return;
             }
         });
+    }
+
+    logCPUUsage(usageResult) {
+        let cpuUsage = usageResult.cpu;
+        this.log('Status', 'Memory', 'CPU Used: ' + cpuUsage + ' %');
+    }
+
+    logMemoryUsage(usageResult) {
+        let memUsage = usageResult.memory;
+        let processMemSize = Math.round(memUsage / 1024 / 1024 * 100) / 100;
+        this.log('Status', 'Memory', 'Total Used: ' + processMemSize + ' MB');
     }
 
     ready() {}
