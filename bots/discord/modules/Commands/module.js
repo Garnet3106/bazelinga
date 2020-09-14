@@ -35,8 +35,8 @@ exports.MainClass = class Commands extends Module {
     }
 
     ready() {
-        let mod_messages = bot.getModuleInstance('Messages');
-        mod_messages.setEvent(mod_messages.events.receiveMessage, message => {
+        this.mod_messages = bot.getModuleInstance('Messages');
+        this.mod_messages.setEvent(this.mod_messages.events.receiveMessage, message => {
             this.proceedMessage(message);
         });
     }

@@ -48,6 +48,9 @@ exports.MainClass = class Reactions extends Module {
         let eventName = this.events.addReaction;
 
         let callback = (reaction, user) => {
+            if(reaction.message.deleted)
+                return;
+
             if(user.bot)
                 return;
 

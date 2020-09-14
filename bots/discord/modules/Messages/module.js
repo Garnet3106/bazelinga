@@ -7,6 +7,14 @@ const { resolve } = require('path');
 
 
 exports.MainClass = class Messages extends Module {
+    delete(message) {
+        if(message.deleted)
+            return;
+
+        message.delete();
+        this.log('Event', 'Delete', 'A message', 'ID: \'' + message.id + '\'');
+    }
+
     init() {
         return new Promise((resolve, reject) => {
             this.setPrefix('msg');
@@ -34,11 +42,17 @@ exports.MainClass = class Messages extends Module {
         });
     }
 
-    send(channel, ...contents) {
+    send(channel, contents, deleteAfter = -1) {
         return new Promise((resolve, reject) => {
-            channel.send(...contents)
+            channel.send(contents)
                 .then(message => {
-                    this.log('Error', 'Send', 'A message', 'Text: \'' + message.content + '\'');
+                    if(deleteAfter != -1) {
+                        setTimeout(() => {
+                            message.delete();
+                        }, deleteAfter);
+                    }
+
+                    this.log('Event', 'Send', 'A message', 'ID: \'' + message.id + '\'');
                     resolve(message);
                 })
                 .catch(error => {
