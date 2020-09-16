@@ -1,25 +1,28 @@
 'use strict';
 
 const fs = require('fs');
+const { resolve } = require('path');
 
 const { bot } = require('../../main.js');
 const { Module } = require('../../module.js');
 
 
 exports.MainClass = class Baze extends Module {
-    cmd_word(instance, message, cmdPrefix, cmdName, cmdArgs) {
+    cmd_word(instance, cmdMsg, cmdPrefix, cmdName, cmdArgs) {
         if(cmdArgs.length != 0)
             return;
+
+        instance.mod_messages.delete(cmdMsg);
 
         let embed = {
             description: 'スペリングを入力して下さい。'
         };
 
-        instance.mod_messages.send(message.channel, {
+        instance.mod_messages.send(cmdMsg.channel, {
             embed: embed
         })
             .then(spellingGuideMsg => {
-                instance.cmd_word_receiveSpelling(message, spellingGuideMsg);
+                instance.cmd_word_receiveSpelling(cmdMsg, spellingGuideMsg);
             });
     }
 
@@ -36,9 +39,8 @@ exports.MainClass = class Baze extends Module {
                     return;
                 }
 
-                cmdMsg.delete();
-                spellingGuideMsg.delete();
-                spellingMsg.delete();
+                this.mod_messages.delete(spellingGuideMsg);
+                this.mod_messages.delete(spellingMsg);
 
                 // キャンセルの場合はreturn
                 if(spellingMsg.content == 'cancel')
@@ -65,51 +67,106 @@ exports.MainClass = class Baze extends Module {
                     embed: embed
                 })
                     .then(wordOperationMsg => {
-                        this.cmd_word_setOperationReactions(wordOperationMsg, cmdUser);
+                        this.cmd_word_giveOperationReactions(wordOperationMsg);
+                        this.cmd_word_setOperationReactionEvent(wordOperationMsg, cmdUser, embed, spelling);
                     })
-                    .catch(error => {
-                        console.log(error);
+                    .catch(err => {
+                        console.log(err);
                     });
             });
     }
 
-    cmd_word_setOperationReactions(wordOperationMsg, cmdUser) {
-        wordOperationMsg.react('💬');
-        wordOperationMsg.react('❌');
-
+    cmd_word_setOperationReactionEvent(wordOperationMsg, cmdUser, msgEmbed, spelling) {
         let eventName = this.mod_reactions.events.addReaction;
         this.mod_reactions.setEvent(eventName, (reaction, user) => {
             if(user.id != cmdUser.id)
+                return;
+
+            if(wordOperationMsg.id != reaction.message.id)
                 return;
 
             let emojiName = reaction.emoji.name;
 
             switch(emojiName) {
                 case '💬':
-                
+                this.cmd_word_receiveNewSpelling(wordOperationMsg, cmdUser, spelling)
+                    .then(spelling => {
+                        msgEmbed.title = spelling;
+                        this.mod_messages.send(wordOperationMsg.channel, {
+                            embed: msgEmbed
+                        })
+                            .then(newWordOperationMsg => {
+                                wordOperationMsg = newWordOperationMsg;
+                                this.cmd_word_giveOperationReactions(wordOperationMsg);
+                            });
+                    });
                 break;
 
                 case '❌':
-                let embed = {
-                    description: '単語編集を取り消しました。'
-                };
-
-                this.mod_messages.send(wordOperationMsg.channel, {
-                    embed: embed
-                }, 3000);
-
-                wordOperationMsg.delete();
+                this.cmd_word_quitWordOperation(wordOperationMsg);
                 break;
             }
         });
     }
 
+    cmd_word_giveOperationReactions(wordOperationMsg) {
+        this.mod_reactions.react(wordOperationMsg, '💬');
+        this.mod_reactions.react(wordOperationMsg, '❌');
+    }
+
+    cmd_word_receiveNewSpelling(wordOperationMsg, cmdUser, spelling) {
+        return new Promise((resolve, reject) => {
+            this.mod_messages.delete(wordOperationMsg);///
+
+            let reserveSpellingInput = newSpellingGuideMsg => {
+                this.mod_messages.reserve()
+                    .then(spellingMsg => {
+                        if(spellingMsg.author.id != cmdUser.id)
+                            return;
+
+                        let spelling = spellingMsg.content;
+
+                        // スペルチェック
+
+                        this.mod_messages.delete(newSpellingGuideMsg);
+                        this.mod_messages.delete(spellingMsg);
+                        resolve(spelling);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+            };
+
+            let embed = {
+                title: 'スペル編集',
+                description: '新しいスペルを入力して下さい。\n\n(変更前: \'' + spelling + '\')'
+            };
+
+            this.mod_messages.send(wordOperationMsg.channel, {
+                embed: embed
+            })
+                .then(newSpellingGuideMsg => {
+                    reserveSpellingInput(newSpellingGuideMsg);
+                });
+        });
+    }
+
+    cmd_word_quitWordOperation(wordOperationMsg) {
+        let embed = {
+            description: '単語編集を取り消しました。'
+        };
+
+        this.mod_messages.send(wordOperationMsg.channel, {
+            embed: embed
+        }, 3000);
+
+        this.mod_messages.delete(wordOperationMsg);
+    }
+
     init() {
         return new Promise((resolve, reject) => {
             this.setPrefix('baze');
-
             this.addCommand('word', 'word', this.cmd_word);
-
             resolve();
         });
     }

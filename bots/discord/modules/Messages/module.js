@@ -7,11 +7,16 @@ const { resolve } = require('path');
 
 
 exports.MainClass = class Messages extends Module {
-    delete(message) {
+    delete(message, timeout = 0, reason = '') {
         if(message.deleted)
             return;
 
-        message.delete();
+        let options = {
+            timeout: timeout,
+            reason: reason
+        };
+
+        message.delete(options);
         this.log('Event', 'Delete', 'A message', 'ID: \'' + message.id + '\'');
     }
 
@@ -48,7 +53,7 @@ exports.MainClass = class Messages extends Module {
                 .then(message => {
                     if(deleteAfter != -1) {
                         setTimeout(() => {
-                            message.delete();
+                            this.delete(message);
                         }, deleteAfter);
                     }
 

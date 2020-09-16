@@ -28,6 +28,16 @@ exports.MainClass = class Reactions extends Module {
         
     }
 
+    react(message, emojiName) {
+        if(message.deleted)
+            return;
+
+        message.react(emojiName)
+            .catch(err => {
+                this.log('Notice', 'Fail', 'A reaction', err);
+            });
+    }
+
     ready() {
         bot.client.on('messageReactionAdd', (reaction, user) => {
             this.emitEvent(this.events.addReaction, reaction, user);
@@ -44,27 +54,33 @@ exports.MainClass = class Reactions extends Module {
         });
     }
 
+    removeReaction(reaction, user) {
+        if(reaction.message.deleted)
+            return;
+
+        if(user.bot)
+            return;
+
+        reaction.users.remove(user)
+            .catch(err => {
+                this.log('Notice', 'Fail', 'A reaction', err);
+            });
+    }
+
     setReactionRemover(messageID = '', removeOnce = false, ignoreBOT = true) {
         let eventName = this.events.addReaction;
 
         let callback = (reaction, user) => {
-            if(reaction.message.deleted)
-                return;
-
-            if(user.bot)
-                return;
-
-            if(messageID != '' && messageID != reaction.message.id) {
-                if(removeOnce)
-                    setEvent();
-
+            // 削除が1度のみかつメッセージIDが異なる場合はもう一度待つ
+            if(removeOnce && messageID != '' && messageID != reaction.message.id) {
+                setReactionEvent();
                 return;
             }
 
-            reaction.users.remove(user);
+            this.removeReaction(reaction, user);
         };
 
-        let setEvent = () => {
+        let setReactionEvent = () => {
             if(removeOnce) {
                 this.setOnceEvent(eventName, callback);
             } else {
@@ -72,6 +88,6 @@ exports.MainClass = class Reactions extends Module {
             }
         };
 
-        setEvent();
+        setReactionEvent();
     }
 }
