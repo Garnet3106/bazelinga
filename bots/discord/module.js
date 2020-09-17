@@ -29,15 +29,15 @@ exports.Module = class Module {
 
         this.prefix = null;
 
-        this.commandFunctions = {};
+        this.commandClasses = {};
         this.commandTypes = {};
 
         this.commands = {};
     }
 
-    addCommand(name, type, func) {
-        this.commandFunctions[type] = func;
+    addCommand(name, type, classObj) {
         this.commandTypes[name] = type;
+        this.commandClasses[type] = classObj;
     }
 
     emitEvent(name, ...args) {
@@ -57,8 +57,8 @@ exports.Module = class Module {
 
     final() {}
 
-    getCommandFunction(cmdType) {
-        return this.commandFunctions[cmdType];
+    getCommandClass(cmdType) {
+        return this.commandClasses[cmdType];
     }
 
     getCommandType(cmdType) {
@@ -120,14 +120,14 @@ exports.Module = class Module {
 
     proceedCommand(modInstance, message, cmdPrefix, cmdName, cmdArgs, disableLoop = false) {
         let cmdType = this.getCommandType(cmdName);
-        let cmdFunc = this.getCommandFunction(cmdType);
+        let classObj = this.getCommandClass(cmdType);
 
-        if(!disableLoop && typeof(cmdFunc) !== 'function') {
-            this.proceedCommand(message, cmdPrefix, 'help', cmdArgs, true);
+        if(!disableLoop && typeof(classObj) !== 'function') {
+            this.proceedCommand(modInstance, message, cmdPrefix, 'help', cmdArgs, true);
             return;
         }
 
-        cmdFunc(modInstance, message, cmdPrefix, cmdName, cmdArgs);
+        return new classObj(modInstance, message, cmdPrefix, cmdName, cmdArgs);
     }
 
     ready() {}
