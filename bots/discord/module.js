@@ -29,15 +29,7 @@ exports.Module = class Module {
 
         this.prefix = null;
 
-        this.commandClasses = {};
-        this.commandTypes = {};
-
         this.commands = {};
-    }
-
-    addCommand(name, type, classObj) {
-        this.commandTypes[name] = type;
-        this.commandClasses[type] = classObj;
     }
 
     emitEvent(name, ...args) {
@@ -79,6 +71,10 @@ exports.Module = class Module {
         return fs.readdirSync('./modules/');
     }
 
+    static getCommandPrefix() {
+        return this.prefix;
+    }
+
     static getTimeString(date) {
         return date.toFormat('HH24:MM:SS');
     }
@@ -118,29 +114,8 @@ exports.Module = class Module {
         console.log(line);
     }
 
-    proceedCommand(modInstance, message, cmdPrefix, cmdName, cmdArgs, disableLoop = false) {
-        let cmdType = this.getCommandType(cmdName);
-        let classObj = this.getCommandClass(cmdType);
-
-        if(!disableLoop && typeof(classObj) !== 'function') {
-            this.proceedCommand(modInstance, message, cmdPrefix, 'help', cmdArgs, true);
-            return;
-        }
-
-        return new classObj(modInstance, message, cmdPrefix, cmdName, cmdArgs);
-    }
-
-    ready() {}
-
     removePrefix() {
         this.prefix = null;
-    }
-
-    // モジュール読み込み完了後に呼び出します
-    setCommandEvent(modInstance, mod_commands) {
-        mod_commands.setEvent(this.mod_commands.events.receiveCommand, (message, cmdPrefix, cmdName, cmdArgs) => {
-            this.proceedCommand(modInstance, message, cmdPrefix, cmdName, cmdArgs);
-        });
     }
 
     setEvent(name, callback) {
@@ -151,7 +126,7 @@ exports.Module = class Module {
         this.eventEmitter.once(name, callback);
     }
 
-    setPrefix(prefix) {
+    setCommandPrefix(prefix) {
         if(prefix.match(/^[]/)) {
             this.log('Error', 'Set', 'Prefix', 'Contains invalid character.');
             return;

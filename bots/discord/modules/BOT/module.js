@@ -9,6 +9,104 @@ dotenv.config();
 const { Module, ModuleStatus } = require('../../module.js');
 
 
+class ExitCommand {
+    constructor(mod_bot, cmdMsg, cmdPrefix, cmdName, cmdArgs) {
+        if(cmdMsg.author.id == '495511715425812481') {
+            this.mod_bot = mod_bot;
+            this.mod_messages = mod_bot.getModuleInstance('Messages');
+            this.setProcessTimeout(cmdMsg);
+        }
+    }
+
+    cancelProcess(cmdMsg, timeout) {
+        clearTimeout(timeout);
+
+        let embed = {
+            title: 'BOT終了処理',
+            description: '終了処理をキャンセルしました。'
+        };
+
+        this.mod_messages.send(cmdMsg.channel, {
+            embed: embed
+        }, 3000);
+    }
+
+    exitBOT(cmdMsg, forcely = false) {
+        let msgDescription = forcely ? '直ちにBOTを終了しています...' : 'BOTを終了しています...';
+
+        let embed = {
+            title: 'BOT終了処理',
+            description: msgDescription
+        };
+
+        // 送信に失敗した場合もBOTを終了する
+        this.mod_messages.send(cmdMsg.channel, {
+            embed: embed
+        }, 3000)
+            .finally(() => {
+                setTimeout(() => {
+                    this.mod_bot.log('Event', 'Exit', 'The BOT', 'Via exit command (User ID: ' + cmdMsg.author.id + ')');
+                    process.exit(0);
+                }, 5000);
+            });
+    }
+
+    setProcessTimeout(cmdMsg) {
+        let cmdChannel = cmdMsg.channel;
+        let timeoutSec = 5;
+
+        this.mod_messages.delete(cmdMsg);
+
+        let embed = {
+            title: 'BOT終了処理',
+            description: timeoutSec + '秒後にBOTを終了します。'
+        };
+
+        this.mod_messages.send(cmdChannel, {
+            embed: embed
+        })
+            .then(guideMsg => {
+                let timeout = setTimeout(() => {
+                    this.mod_messages.delete(guideMsg);
+                    this.exitBOT(cmdMsg);
+                }, timeoutSec * 1000);
+        
+                this.receiveOperation(cmdMsg, guideMsg, timeout);
+            });
+    }
+
+    receiveOperation(cmdMsg, guideMsg, timeout) {
+        this.mod_messages.reserve()
+            .then(opeMsg => {
+                if(opeMsg.channel.id == cmdMsg.channel.id
+                        && opeMsg.author.id == cmdMsg.author.id) {
+                    let opeName = opeMsg.content;
+
+                    console.log(opeName);
+
+                    switch(opeName) {
+                        case '.cancel':
+                        this.mod_messages.delete(guideMsg);
+                        this.mod_messages.delete(opeMsg);
+                        this.cancelProcess(cmdMsg, opeMsg, timeout);
+                        // キャンセル時はreserveし続ける必要がないのでreturnする
+                        return;
+
+                        case '.force':
+                        this.mod_messages.delete(guideMsg);
+                        this.mod_messages.delete(opeMsg);
+                        this.exitBOT(cmdMsg, true);
+                        break;
+                    }
+                }
+
+                // 複数回受け付ける
+                this.receiveOperation(cmdMsg, timeout);
+            });
+    }
+}
+
+
 exports.MainClass = class BOT extends Module {
     final() {}
 
@@ -19,7 +117,7 @@ exports.MainClass = class BOT extends Module {
 
     init() {
         return new Promise((resolve, reject) => {
-            this.setPrefix('bot');
+            this.setCommandPrefix('bot');
 
             this.token = process.env.ELEMBOT_DISCORD_TOKEN;
             this.client = new Discord.Client();
@@ -131,7 +229,10 @@ exports.MainClass = class BOT extends Module {
         this.log('Status', 'Memory', 'Used: ' + processMemSize + ' MB');
     }
 
-    ready() {}
+    ready() {
+        this.mod_commands = this.getModuleInstance('Commands');
+        this.mod_commands.addCommand('exit', 'exit', ExitCommand);
+    }
 
     terminateBOT() {
         this.unloadModules();

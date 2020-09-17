@@ -8,14 +8,13 @@ const { Module } = require('../../module.js');
 
 
 class WordCommand {
-    constructor(modInstance, cmdMsg, cmdPrefix, cmdName, cmdArgs) {
+    constructor(mod_bot, cmdMsg, cmdPrefix, cmdName, cmdArgs) {
         if(cmdArgs.length != 0)
             return;
 
-        this.modInstance = modInstance;
-        this.mod_messages = this.modInstance.mod_messages;
-        this.mod_reactions = this.modInstance.mod_reactions;
+        this.mod_messages = mod_bot.getModuleInstance('Messages');
         this.mod_messages.delete(cmdMsg);
+        this.mod_reactions = mod_bot.getModuleInstance('Reactions');
 
         let embed = {
             description: 'スペリングを入力して下さい。'
@@ -171,8 +170,7 @@ class WordCommand {
 exports.MainClass = class Baze extends Module {
     init() {
         return new Promise((resolve, reject) => {
-            this.setPrefix('baze');
-            this.addCommand('word', 'word', WordCommand);
+            this.setCommandPrefix('baze');
             resolve();
         });
     }
@@ -186,7 +184,7 @@ exports.MainClass = class Baze extends Module {
         this.initSettingData();
 
         this.mod_commands = bot.getModuleInstance('Commands');
-        this.setCommandEvent(this, this.mod_commands);
+        this.mod_commands.addCommand('word', 'word', WordCommand);
 
         this.mod_messages = bot.getModuleInstance('Messages');
 

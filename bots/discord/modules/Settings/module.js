@@ -24,7 +24,7 @@ exports.MainClass = class Settings extends Module {
 
     init() {
         return new Promise((resolve, reject) => {
-            this.setPrefix('set');
+            this.setCommandPrefix('set');
 
             this.dataFileData = './modules/Settings/settings.json';
 

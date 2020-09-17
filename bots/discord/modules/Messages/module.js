@@ -17,12 +17,12 @@ exports.MainClass = class Messages extends Module {
         };
 
         message.delete(options);
-        this.log('Event', 'Delete', 'A message', 'ID: \'' + message.id + '\'');
+        this.log('Event', 'Delete', 'A message', 'ID: ' + message.id);
     }
 
     init() {
         return new Promise((resolve, reject) => {
-            this.setPrefix('msg');
+            this.setCommandPrefix('msg');
 
             this.events = this.getEnumArray([
                 'deleteMessage',
@@ -57,7 +57,7 @@ exports.MainClass = class Messages extends Module {
                         }, deleteAfter);
                     }
 
-                    this.log('Event', 'Send', 'A message', 'ID: \'' + message.id + '\'');
+                    this.log('Event', 'Send', 'A message', 'ID: ' + message.id);
                     resolve(message);
                 })
                 .catch(error => {

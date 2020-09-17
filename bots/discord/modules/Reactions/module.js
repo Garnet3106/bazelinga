@@ -10,7 +10,7 @@ const { setegid } = require('process');
 exports.MainClass = class Reactions extends Module {
     init() {
         return new Promise((resolve, reject) => {
-            this.setPrefix('react');
+            this.setCommandPrefix('react');
 
             this.events = this.getEnumArray([
                 'addReaction'

@@ -21,7 +21,7 @@ exports.MainClass = class Twitter extends Module {
 
     init() {
         return new Promise((resolve, reject) => {
-            this.setPrefix('tw');
+            this.setCommandPrefix('tw');
 
             fs.readFile("./modules/Twitter/messages.json", "utf-8", (error, data) => {
                 if(error) {
