@@ -53,13 +53,25 @@ class ExitCommand {
 
     setProcessTimeout(cmdMsg) {
         let cmdChannel = cmdMsg.channel;
-        let timeoutSec = 5;
+        let timeoutSec = 30;
 
         this.mod_messages.delete(cmdMsg);
 
         let embed = {
             title: 'BOT終了処理',
-            description: timeoutSec + '秒後にBOTを終了します。'
+            description: timeoutSec + '秒後にBOTを終了します。',
+            fields: [
+                {
+                    name: '.cancel',
+                    value: '終了処理を取り消します。',
+                    inline: true
+                },
+                {
+                    name: '.force',
+                    value: '直ちにBOTを終了します。',
+                    inline: true
+                }
+            ],
         };
 
         this.mod_messages.send(cmdChannel, {
@@ -81,8 +93,6 @@ class ExitCommand {
                 if(opeMsg.channel.id == cmdMsg.channel.id
                         && opeMsg.author.id == cmdMsg.author.id) {
                     let opeName = opeMsg.content;
-
-                    console.log(opeName);
 
                     switch(opeName) {
                         case '.cancel':
