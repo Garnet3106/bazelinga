@@ -380,26 +380,94 @@ exports.MainClass = class Baze extends Module {
     }
 
     initDictionaryFile() {
-        this.dictFilePath = './modules/BOT/dict.json';
+        this.dictFilePath = './modules/BOT/dict.txt';
+        this.dictFile = this.mod_files.load(this.dictFilePath, '');
 
-        this.dictData = {};
-        let defaultData = {
-            words: []
-        };
-        let stringifiedJSON = JSON.stringify(defaultData);
-
-        this.dictFile = this.mod_files.load(this.dictFilePath, stringifiedJSON);
-
-        this.dictFile.read()
-            .then(data => {
-                try {
-                    this.dictData = JSON.parse(data);
-                } catch(excep) {
-                    this.modInstance.log('Error', 'Init', 'The dictionary data', 'Failed to convert JSON data.');
-                }
-            })
-            .catch(() => {
-                this.modInstance.log('Error', 'Init', 'The dictionary data', 'Failed to read the file.');
+        DictionaryData.getFromFile(this, this.dictFile)
+            .then(dictData => {
+                this.dictData = dictData;
             });
+    }
+}
+
+
+class DictionaryData {
+    constructor(textData) {
+        this.textData = textData;
+        this.objData = this.toObject();
+    }
+
+    static getFromFile(modInstance, dictFile) {
+        return new Promise((resolve, reject) => {
+            dictFile.read()
+                .then(textData => {
+                    try {
+                        resolve(new DictionaryData(textData));
+                    } catch(excep) {
+                        modInstance.log('Error', 'Init', 'The dictionary data', excep.message);
+                        reject(excep);
+                    }
+                })
+                .catch(err => {
+                    modInstance.log('Error', 'Init', 'The dictionary data', err.messge);
+                    reject(err);
+                });
+        });
+    }
+
+    toObject() {
+        let words = {};
+        let lines = this.textData.split('\n');
+
+        let latestSpelling = '';
+        let latestClass = '';
+
+        for(let line_i = 0; line_i < lines.length; line_i++) {
+            // 空行またはコメントアウトの場合は飛ばす
+            if(lines[line_i] == '' || lines[line_i].startsWith(';'))
+                continue;
+
+                if(lines[line_i].startsWith('#')) {
+                // スペルを設定する
+                latestSpelling = lines[line_i].substring(1);
+                continue;
+            }
+
+            if(lines[line_i].startsWith('@')) {
+                if(latestSpelling == '')
+                    continue;
+
+                // クラスを設定する
+                latestClass = lines[line_i].substring(1);
+                continue;
+            }
+
+            if(latestClass == '')
+                continue;
+
+            let elems = lines[line_i].split('|');
+
+            // データの数が不正な場合は飛ばす
+            if(elems.length != 2)
+                continue;
+
+            if(!(latestSpelling in words))
+                words[latestSpelling] = {
+                    ipa: this.getIPANotation(latestSpelling),
+                    translation: []
+                };
+
+            words[latestSpelling].translation.push({
+                class: latestClass,
+                type: elems[0],
+                words: elems[1].split(',')
+            });
+        }
+
+        return { words: words };
+    }
+
+    getIPANotation(spelling) {
+        return '[' + spelling + ']';
     }
 }
