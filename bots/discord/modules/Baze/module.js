@@ -1,6 +1,5 @@
 'use strict';
 
-const fs = require('fs');
 const { resolve } = require('path');
 
 const { bot } = require('../../main.js');
@@ -81,7 +80,7 @@ class WordCommand {
     setOperationReactionEvent() {
         let eventName = this.mod_reactions.events.addReaction;
         this.mod_reactions.setEvent(eventName, (reaction, user) => {
-            if(user.id != this.cmdUser.id)
+            if(this.cmdUser.id != user.id)
                 return;
 
             if(this.wordOpeMsg.id != reaction.message.id)
@@ -109,7 +108,76 @@ class WordCommand {
                 case '✅':
                 this.saveWordOperation();
                 break;
+
+                case '❓':
+                this.showHelpMessage();
+                break;
             }
+        });
+    }
+
+    showHelpMessage() {
+        this.mod_messages.send(this.cmdChannel, {
+            embed: {
+                title: '単語編集ヘルプ',
+                description: '操作用リアクションの一覧です。\n\n(:arrow_backward: で戻る)',
+                fields: [
+                    {
+                        name: '💬',
+                        value: 'スペル編集',
+                        inline: true
+                    },
+                    {
+                        name: '📝',
+                        value: '翻訳編集',
+                        inline: true
+                    },
+                    {
+                        name: '❌',
+                        value: '単語削除',
+                        inline: true
+                    },
+                    {
+                        name: '✅',
+                        value: '編集保存',
+                        inline: true
+                    },
+                    {
+                        name: '❓',
+                        value: 'ヘルプ表示',
+                        inline: true
+                    }
+                ]
+            }
+        })
+            .then(helpMsg => {
+                this.setHelpMessageReactions(helpMsg);
+            });
+
+        this.mod_messages.delete(this.wordOpeMsg);
+    }
+
+    setHelpMessageReactions(helpMsg) {
+        this.mod_reactions.react(helpMsg, '◀');
+
+        let eventName = this.mod_reactions.events.addReaction;
+        this.mod_reactions.setEvent(eventName, (reaction, user) => {
+            if(this.cmdUser.id != user.id)
+                return;
+
+            if(helpMsg.id != reaction.message.id)
+                return;
+
+            let emojiName = reaction.emoji.name;
+
+            switch(emojiName) {
+                case '◀':
+                this.mod_messages.delete(helpMsg);
+                this.sendWordOperationMessage();
+                return;
+            }
+
+            this.setHelpMessageReactions(helpMsg);
         });
     }
 
@@ -141,7 +209,7 @@ class WordCommand {
     }
 
     reactToOperationMessage() {
-        let reactEmojis = [ '💬', '📝', '❌', '✅' ];
+        let reactEmojis = [ '💬', '📝', '❌', '✅', '❓' ];
 
         reactEmojis.forEach(emoji => {
             this.mod_reactions.react(this.wordOpeMsg, emoji);
@@ -295,13 +363,9 @@ exports.MainClass = class Baze extends Module {
         });
     }
 
-    initSettingData() {
-        
-    }
-
     ready() {
         this.mod_settings = bot.getModuleInstance('Settings');
-        this.initSettingData();
+        //this.initSettingData();
 
         this.mod_commands = bot.getModuleInstance('Commands');
         this.mod_commands.addCommand('word', 'word', WordCommand);
@@ -310,5 +374,32 @@ exports.MainClass = class Baze extends Module {
 
         this.mod_reactions = bot.getModuleInstance('Reactions');
         this.mod_reactions.setReactionRemover();
+
+        this.mod_files = bot.getModuleInstance('Files');
+        this.initDictionaryFile();
+    }
+
+    initDictionaryFile() {
+        this.dictFilePath = './modules/BOT/dict.json';
+
+        this.dictData = {};
+        let defaultData = {
+            words: []
+        };
+        let stringifiedJSON = JSON.stringify(defaultData);
+
+        this.dictFile = this.mod_files.load(this.dictFilePath, stringifiedJSON);
+
+        this.dictFile.read()
+            .then(data => {
+                try {
+                    this.dictData = JSON.parse(data);
+                } catch(excep) {
+                    this.modInstance.log('Error', 'Init', 'The dictionary data', 'Failed to convert JSON data.');
+                }
+            })
+            .catch(() => {
+                this.modInstance.log('Error', 'Init', 'The dictionary data', 'Failed to read the file.');
+            });
     }
 }
