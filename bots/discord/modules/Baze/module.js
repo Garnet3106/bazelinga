@@ -12,6 +12,9 @@ class WordCommand {
         this.mod_messages.delete(cmdMsg);
         this.mod_reactions = mod_bot.getModuleInstance('Reactions');
 
+        this.mod_baze = mod_bot.getModuleInstance('Baze');
+        this.dictData = this.mod_baze.dictData;
+
         this.spelling = '';
         // 単語操作メッセージ向けにリアクションイベントを設定したか
         this.hasSetOperationReactionEvent = false;
@@ -27,7 +30,7 @@ class WordCommand {
         })
             .then(spellingGuideMsg => {
                 this.spellingGuideMsg = spellingGuideMsg;
-                this.receiveSpelling();
+                this.receiveOriginalSpelling();
             });
     }
 
@@ -40,12 +43,12 @@ class WordCommand {
         }, 3000);
     }
 
-    receiveSpelling() {
+    receiveOriginalSpelling() {
         this.mod_messages.reserve()
             .then(spellingMsg => {
                 // 送信者のIDが一致しなければもう一度メッセージを待つ
                 if(spellingMsg.author.id != this.cmdUser.id) {
-                    this.receiveSpelling();
+                    this.receiveOriginalSpelling();
                     return;
                 }
 
@@ -71,6 +74,15 @@ class WordCommand {
                     });
 
                     return;
+                }
+
+                // 変更前のスペル
+                this.originalSpelling = this.spelling;
+
+                if(this.dictData.existsWord(this.spelling)) {
+                    this.wordData = this.dictData.getWord(this.spelling);
+                } else {
+                    this.wordData = DictionaryData.getNewWordObject(this.spelling);
                 }
 
                 this.sendWordOperationMessage();
@@ -210,6 +222,7 @@ class WordCommand {
 
     reactToOperationMessage() {
         let reactEmojis = [ '💬', '📝', '❌', '✅', '❓' ];
+        let count = 0;
 
         reactEmojis.forEach(emoji => {
             this.mod_reactions.react(this.wordOpeMsg, emoji);
@@ -232,6 +245,9 @@ class WordCommand {
 
                         this.mod_messages.delete(newSpellingGuideMsg);
                         this.mod_messages.delete(spellingMsg);
+
+                        this.wordData = DictionaryData.getNewWordObject(newSpelling);
+
                         resolve(newSpelling);
                     })
                     .catch(err => {
@@ -320,6 +336,7 @@ class WordCommand {
                         this.mod_messages.delete(this.removationConfirmMsg);
                         this.mod_messages.delete(opeMsg);
                         this.removeWord();
+                        this.saveWordOperation();
                         return;
 
                         case '.no':
@@ -336,6 +353,8 @@ class WordCommand {
     }
 
     removeWord() {
+        this.isWordRemoved = true;
+
         this.mod_messages.send(this.cmdChannel, {
             embed: {
                 description: '単語を削除しました。'
@@ -344,6 +363,11 @@ class WordCommand {
     }
 
     saveWordOperation() {
+        this.dictData.removeWord(this.originalSpelling);
+
+        if(!this.isWordRemoved)
+            this.dictData.addWord(this.spelling, this.wordData);
+
         this.mod_messages.send(this.cmdChannel, {
             embed: {
                 description: '変更を保存しました。'
@@ -395,6 +419,14 @@ class DictionaryData {
     constructor(textData) {
         this.textData = textData;
         this.objData = this.toObject();
+    }
+
+    addWord(spelling, wordData) {
+        this.objData.words[spelling] = wordData;
+    }
+
+    existsWord(spelling) {
+        return spelling in this.objData.words;
     }
 
     static getFromFile(modInstance, dictFile) {
@@ -452,10 +484,7 @@ class DictionaryData {
                 continue;
 
             if(!(latestSpelling in words))
-                words[latestSpelling] = {
-                    ipa: this.getIPANotation(latestSpelling),
-                    translation: []
-                };
+                words[latestSpelling] = DictionaryData.getNewWordObject(latestSpelling);
 
             words[latestSpelling].translation.push({
                 class: latestClass,
@@ -467,7 +496,23 @@ class DictionaryData {
         return { words: words };
     }
 
-    getIPANotation(spelling) {
+    static getIPANotation(spelling) {
         return '[' + spelling + ']';
+    }
+
+    static getNewWordObject(spelling) {
+        return {
+            ipa: DictionaryData.getIPANotation(spelling),
+            spelling: spelling,
+            translation: []
+        };
+    }
+
+    getWord(spelling) {
+        return this.objData.words[spelling];
+    }
+
+    removeWord(spelling) {
+        delete this.objData.words[spelling];
     }
 }

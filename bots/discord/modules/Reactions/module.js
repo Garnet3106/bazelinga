@@ -32,9 +32,10 @@ exports.MainClass = class Reactions extends Module {
         if(message.deleted)
             return;
 
+            console.log('a');
         message.react(emojiName)
             .catch(err => {
-                this.log('Notice', 'Fail', 'A reaction', err);
+                this.log('Notice', 'Fail', 'Reaction', err);
             });
     }
 
@@ -63,7 +64,7 @@ exports.MainClass = class Reactions extends Module {
 
         reaction.users.remove(user)
             .catch(err => {
-                this.log('Notice', 'Fail', 'A reaction', err);
+                this.log('Notice', 'Fail', 'Reaction', err);
             });
     }
 

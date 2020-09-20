@@ -78,12 +78,12 @@ class File {
                 encoding: 'utf-8'
             }, (err, data) => {
                 if(err) {
-                    this.modInstance.log('Error', 'Read', 'A file: \'' + this.filePath + '\'', err.message);
+                    this.modInstance.log('Error', 'Read', 'File: \'' + this.filePath + '\'', err.message);
                     reject(err);
                     return;
                 }
 
-                this.modInstance.log('Event', 'Read', 'A file: \'' + this.filePath + '\'');
+                this.modInstance.log('Event', 'Read', 'File: \'' + this.filePath + '\'');
                 resolve(data);
             });
         });
