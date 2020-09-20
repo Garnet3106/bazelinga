@@ -130,7 +130,10 @@ exports.MainClass = class BOT extends Module {
             this.setCommandPrefix('bot');
 
             this.token = process.env.ELEMBOT_DISCORD_TOKEN;
-            this.client = new Discord.Client();
+            // リアクション速度のためにrestTimeOffsetを設定
+            this.client = new Discord.Client({
+                restTimeOffset: 0
+            });
 
             this.processID = process.pid;
 
