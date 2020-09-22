@@ -311,43 +311,43 @@ div.workarea-sidemenu-item-icon {
 }
 
 div.workarea-sidemenu-item-icon#leftMenuAddTop {
-    background-image: url('../../dict/img/add.svg');
+    background-image: url('https://bazelinga.gant.work/lib/dict/img/add.svg');
 }
 
 div.workarea-sidemenu-item-icon#leftMenuEditTop {
-    background-image: url('../../dict/img/edit.svg');
+    background-image: url('https://bazelinga.gant.work/lib/dict/img/edit.svg');
 }
 
 div.workarea-sidemenu-item-icon#leftMenuRemoveTop {
-    background-image: url('../../dict/img/remove.svg');
+    background-image: url('https://bazelinga.gant.work/lib/dict/img/remove.svg');
 }
 
 div.workarea-sidemenu-item-icon#leftMenuDownloadTop {
-    background-image: url('../../dict/img/download.svg');
+    background-image: url('https://bazelinga.gant.work/lib/dict/img/download.svg');
 }
 
 div.workarea-sidemenu-item-icon#leftMenuUploadTop {
-    background-image: url('../../dict/img/upload.svg');
+    background-image: url('https://bazelinga.gant.work/lib/dict/img/upload.svg');
 }
 
 div.workarea-sidemenu-item-icon#rightMenuDocsTop {
-    background-image: url('../../dict/img/docs.svg');
+    background-image: url('https://bazelinga.gant.work/lib/dict/img/docs.svg');
 }
 
 div.workarea-sidemenu-item-icon#rightMenuShareTop {
-    background-image: url('../../dict/img/share.svg');
+    background-image: url('https://bazelinga.gant.work/lib/dict/img/share.svg');
 }
 
 div.workarea-sidemenu-item-icon#rightMenuShareLink {
-    background-image: url('../../dict/img/link.svg');
+    background-image: url('https://bazelinga.gant.work/lib/dict/img/link.svg');
 }
 
 div.workarea-sidemenu-item-icon#rightMenuShareTwitter {
-    background-image: url('../../dict/img/twitter.svg');
+    background-image: url('https://bazelinga.gant.work/lib/dict/img/twitter.svg');
 }
 
 div.workarea-sidemenu-item-icon#rightMenuSettingsTop {
-    background-image: url('../../dict/img/settings.svg');
+    background-image: url('https://bazelinga.gant.work/lib/dict/img/settings.svg');
 }
 
 div.workarea-sidemenu-item-icon:last-child {
